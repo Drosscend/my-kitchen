@@ -1,9 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-	experimental: {
-		cacheComponents: true,
-	},
+  experimental: {
+    authInterrupts: true,
+  },
+  reactCompiler: true,
+  cacheComponents: true,
 };
 
 export default nextConfig;
