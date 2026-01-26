@@ -1,6 +1,6 @@
 "use client";
 
-import { DownloadIcon, FilterIcon, SearchIcon, UploadIcon, XIcon } from "lucide-react";
+import { DownloadIcon, SearchIcon, UploadIcon, XIcon } from "lucide-react";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -106,8 +106,7 @@ export function InventoryActions({
       <Card className="kraft-card">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="kraft-title flex items-center gap-2 text-base">
-              <FilterIcon className="size-4" />
+            <CardTitle className="kraft-title flex items-center text-base">
               Filtres
             </CardTitle>
             {hasActiveFilters && (
