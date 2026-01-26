@@ -43,3 +43,5 @@ next-env.d.ts
 # Ai stuff
 .claude
 .mcp.json
+
+data
