@@ -1,6 +1,11 @@
 "use client";
 
-import { AlertTriangleIcon, ClipboardListIcon, LeafIcon, SnowflakeIcon } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  ClipboardListIcon,
+  LeafIcon,
+  SnowflakeIcon,
+} from "lucide-react";
 import type { Ingredient } from "../types";
 import { isLowStock, isPerishable } from "../utils";
 

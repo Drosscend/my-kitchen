@@ -45,11 +45,17 @@ import {
 import {
   CATEGORIES,
   CATEGORY_OPTIONS,
+  STATE_OPTIONS,
   STATES,
   UNIT_OPTIONS,
   UNITS,
 } from "../constants";
-import type { Ingredient, IngredientCategory, IngredientUnit } from "../types";
+import type {
+  Ingredient,
+  IngredientCategory,
+  IngredientState,
+  IngredientUnit,
+} from "../types";
 import { isLowStock, isPerishable } from "../utils";
 
 const CATEGORY_ICONS: Record<IngredientCategory, React.ElementType> = {
@@ -82,6 +88,7 @@ export function InventoryRow({
   const [editedName, setEditedName] = useState(ingredient.name);
   const [isEditingUnit, setIsEditingUnit] = useState(false);
   const [isEditingCategory, setIsEditingCategory] = useState(false);
+  const [isEditingState, setIsEditingState] = useState(false);
 
   const CategoryIcon = CATEGORY_ICONS[ingredient.category];
   const lowStock = isLowStock(ingredient);
@@ -244,14 +251,48 @@ export function InventoryRow({
         )}
       </td>
       <td className="px-3 py-2">
-        <div className="flex items-center gap-1">
-          {ingredient.state === "frozen" && (
-            <SnowflakeIcon className="size-3 text-accent" />
-          )}
-          <span className="text-muted-foreground text-xs">
-            {STATES[ingredient.state].label}
-          </span>
-        </div>
+        {isEditingState ? (
+          <Select
+            value={ingredient.state}
+            onValueChange={(value) => {
+              if (value) {
+                onUpdate(ingredient.id, {
+                  state: value as IngredientState,
+                });
+              }
+              setIsEditingState(false);
+            }}
+            open={isEditingState}
+            onOpenChange={(open) => setIsEditingState(open)}
+          >
+            <SelectTrigger
+              size="sm"
+              className="h-5 border-none bg-transparent px-1 text-muted-foreground text-xs"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="start">
+              {STATE_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsEditingState(true)}
+            className="flex cursor-pointer items-center gap-1 underline-offset-2 hover:underline"
+          >
+            {ingredient.state === "frozen" && (
+              <SnowflakeIcon className="size-3 text-accent" />
+            )}
+            <span className="text-muted-foreground text-xs">
+              {STATES[ingredient.state].label}
+            </span>
+          </button>
+        )}
       </td>
       <td className="px-3 py-2">
         <div className="flex flex-wrap gap-1">
