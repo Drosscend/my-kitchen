@@ -66,7 +66,7 @@ export function RecipePage() {
 
   if (!recipe) {
     return (
-      <div className="mx-auto w-full max-w-4xl">
+      <div className="w-full">
         <div className="mb-4 flex justify-end">
           <Button
             variant="outline"

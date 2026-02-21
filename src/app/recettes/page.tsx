@@ -3,6 +3,7 @@
 import { CookingPotIcon } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { RecipePage } from "@/features/recipes/components/recipe-page";
+import { RecipeSidebar } from "@/features/recipes/components/recipe-sidebar";
 
 export default function RecettesPage() {
   return (
@@ -27,7 +28,17 @@ export default function RecettesPage() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        <RecipePage />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+          <div className="lg:hidden">
+            <RecipeSidebar />
+          </div>
+          <div className="order-2 lg:order-1">
+            <RecipePage />
+          </div>
+          <div className="order-1 hidden lg:order-2 lg:block">
+            <RecipeSidebar />
+          </div>
+        </div>
       </main>
     </div>
   );
