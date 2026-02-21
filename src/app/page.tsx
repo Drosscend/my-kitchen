@@ -1,6 +1,7 @@
 "use client";
 
 import { ClipboardListIcon } from "lucide-react";
+import { Navigation } from "@/components/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { InventoryActions } from "@/features/inventory/components/inventory-actions";
 import { InventoryTable } from "@/features/inventory/components/inventory-table";
@@ -40,18 +41,21 @@ export default function Home() {
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-border/50 border-b bg-paper/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <ClipboardListIcon className="size-5" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <ClipboardListIcon className="size-5" />
+              </div>
+              <div>
+                <h1 className="kraft-title font-bold text-xl">
+                  Mon Garde-Manger
+                </h1>
+                <p className="text-muted-foreground text-xs">
+                  Gérez vos ingrédients de cuisine
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="kraft-title font-bold text-xl">
-                Mon Garde-Manger
-              </h1>
-              <p className="text-muted-foreground text-xs">
-                Gérez vos ingrédients de cuisine
-              </p>
-            </div>
+            <Navigation />
           </div>
         </div>
       </header>
