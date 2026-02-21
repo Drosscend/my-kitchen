@@ -66,7 +66,7 @@ export function RecipeCard({
             {recipe.title}
           </h2>
           {recipe.description && (
-            <p className="mt-1 text-muted-foreground text-sm">
+            <p className="mt-1 text-base text-muted-foreground">
               {recipe.description}
             </p>
           )}
@@ -106,7 +106,7 @@ export function RecipeCard({
             <h3 className="mb-3 font-medium text-muted-foreground text-sm uppercase tracking-wider">
               Ingrédients
             </h3>
-            <ul className="space-y-2 text-foreground text-sm leading-relaxed">
+            <ul className="space-y-2 text-base text-foreground leading-relaxed">
               {recipe.ingredients.map((ing, i) => (
                 <li key={ing.id ?? i} className="flex items-baseline gap-2">
                   <span className="mt-2 size-1.5 shrink-0 rounded-full bg-accent/60" />
@@ -151,7 +151,7 @@ export function RecipeCard({
             <h3 className="mb-2 font-medium text-muted-foreground text-sm uppercase tracking-wider">
               Notes
             </h3>
-            <div className="text-foreground/80 leading-relaxed">
+            <div className="text-base text-foreground/80 leading-relaxed">
               <NotesRenderer notes={recipe.notes} />
             </div>
           </section>

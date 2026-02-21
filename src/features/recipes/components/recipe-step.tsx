@@ -112,7 +112,7 @@ export function RecipeStepDisplay({
         {isCompleted ? <CheckIcon className="size-4" /> : index + 1}
       </button>
       <div
-        className={`text-foreground text-sm leading-relaxed ${isCompleted ? "line-through decoration-muted-foreground" : ""}`}
+        className={`text-base text-foreground leading-relaxed ${isCompleted ? "line-through decoration-muted-foreground" : ""}`}
       >
         {step.title && <span className="font-semibold">{step.title} : </span>}
         {content}

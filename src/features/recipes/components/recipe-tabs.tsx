@@ -22,7 +22,7 @@ export function RecipeTabs({
         <button key={r.title} type="button" onClick={() => onSelect(i)}>
           <Badge
             variant={i === selectedIndex ? "default" : "outline"}
-            className="shrink-0 cursor-pointer whitespace-nowrap px-3 py-1"
+            className="h-auto shrink-0 cursor-pointer whitespace-nowrap px-4 py-1.5 text-sm"
           >
             {r.title}
           </Badge>

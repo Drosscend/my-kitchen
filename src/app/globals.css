@@ -52,7 +52,7 @@
 
 :root {
   /* Palette Kraft Rustique */
-  --background: oklch(0.83 0.04 75); /* Kraft beige */
+  --background: oklch(0.96 0.02 75); /* Blanc cassé chaud */
   --paper: oklch(0.91 0.03 75); /* Papier crème */
   --paper-light: oklch(0.95 0.02 75); /* Papier clair */
   --foreground: oklch(0.25 0.05 50); /* Brun foncé */
@@ -104,8 +104,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    background-blend-mode: overlay;
   }
 }
 
