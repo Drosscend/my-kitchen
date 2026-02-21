@@ -50,9 +50,10 @@ export function useTimers() {
 
   const startTimer = useCallback((id: string, duration: number) => {
     ensureAudioContext();
-    setActiveTimers({
+    setActiveTimers((prev) => ({
+      ...prev,
       [id]: { remaining: duration, total: duration, running: true },
-    });
+    }));
   }, []);
 
   const stopTimer = useCallback((id: string) => {

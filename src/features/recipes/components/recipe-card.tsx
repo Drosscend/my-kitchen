@@ -62,7 +62,7 @@ export function RecipeCard({
       <CardContent className="pt-4">
         {/* Title & Description */}
         <div className="mb-5">
-          <h2 className="kraft-title font-bold text-foreground text-xl">
+          <h2 className="kraft-title font-bold text-2xl text-foreground">
             {recipe.title}
           </h2>
           {recipe.description && (
@@ -103,10 +103,10 @@ export function RecipeCard({
         {/* Ingredients */}
         {recipe.ingredients.length > 0 && (
           <section className="mb-8">
-            <h3 className="mb-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">
+            <h3 className="mb-3 font-medium text-muted-foreground text-sm uppercase tracking-wider">
               Ingrédients
             </h3>
-            <ul className="space-y-1.5 text-foreground leading-relaxed">
+            <ul className="space-y-2 text-foreground text-sm leading-relaxed">
               {recipe.ingredients.map((ing, i) => (
                 <li key={ing.id ?? i} className="flex items-baseline gap-2">
                   <span className="mt-2 size-1.5 shrink-0 rounded-full bg-accent/60" />
@@ -120,7 +120,7 @@ export function RecipeCard({
         {/* Steps */}
         {recipe.steps.length > 0 && (
           <section className="mb-8">
-            <h3 className="mb-4 font-medium text-muted-foreground text-xs uppercase tracking-wider">
+            <h3 className="mb-4 font-medium text-muted-foreground text-sm uppercase tracking-wider">
               Étapes
             </h3>
             <div className="flex flex-col gap-4">
@@ -148,10 +148,10 @@ export function RecipeCard({
         {/* Notes */}
         {recipe.notes && (
           <section className="mt-8 rounded-lg bg-background/50 p-5">
-            <h3 className="mb-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">
+            <h3 className="mb-2 font-medium text-muted-foreground text-sm uppercase tracking-wider">
               Notes
             </h3>
-            <div className="text-foreground/80 text-sm leading-relaxed">
+            <div className="text-foreground/80 leading-relaxed">
               <NotesRenderer notes={recipe.notes} />
             </div>
           </section>

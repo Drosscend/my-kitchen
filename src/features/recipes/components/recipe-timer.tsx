@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckIcon, PlayIcon, SquareIcon } from "lucide-react";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import type { TimerState } from "../types";
@@ -79,7 +80,13 @@ export function RecipeTimer({
               : "bg-muted/60 text-muted-foreground hover:bg-muted"
         }`}
       >
-        {isDone ? "✓" : isRunning ? "■" : "▶"}
+        {isDone ? (
+          <CheckIcon className="size-3" />
+        ) : isRunning ? (
+          <SquareIcon className="size-3" />
+        ) : (
+          <PlayIcon className="size-3" />
+        )}
         {!isDone && (
           <span style={{ fontVariantNumeric: "tabular-nums" }}>
             {formatTimer(remaining)}

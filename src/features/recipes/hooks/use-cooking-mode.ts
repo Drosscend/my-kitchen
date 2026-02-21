@@ -23,6 +23,13 @@ export function useCookingMode(totalSteps: number) {
     setCurrentStepIndex((i) => Math.min(totalSteps - 1, i + 1));
   }, [totalSteps]);
 
+  const goToStep = useCallback(
+    (index: number) => {
+      setCurrentStepIndex(Math.max(-1, Math.min(totalSteps - 1, index)));
+    },
+    [totalSteps],
+  );
+
   // Lock body scroll
   useEffect(() => {
     if (isActive) {
@@ -61,5 +68,6 @@ export function useCookingMode(totalSteps: number) {
     exit,
     prevStep,
     nextStep,
+    goToStep,
   };
 }

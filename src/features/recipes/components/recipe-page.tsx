@@ -66,7 +66,7 @@ export function RecipePage() {
 
   if (!recipe) {
     return (
-      <div className="mx-auto w-full max-w-2xl">
+      <div className="mx-auto w-full max-w-4xl">
         <div className="mb-4 flex justify-end">
           <Button
             variant="outline"
@@ -84,7 +84,7 @@ export function RecipePage() {
             onClose={() => setEditMode(false)}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border py-16 text-center">
+          <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-border border-dashed py-16 text-center">
             <p className="text-muted-foreground text-sm">
               Aucune recette chargée.
             </p>
@@ -109,7 +109,11 @@ export function RecipePage() {
         activeTimers={activeTimers}
         onPrevStep={cookingMode.prevStep}
         onNextStep={cookingMode.nextStep}
-        onExit={cookingMode.exit}
+        onGoToStep={cookingMode.goToStep}
+        onExit={() => {
+          cookingMode.exit();
+          resetTimers();
+        }}
         onStartTimer={startTimer}
         onStopTimer={stopTimer}
       />
@@ -117,7 +121,7 @@ export function RecipePage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl">
+    <div className="mx-auto w-full max-w-4xl">
       {/* JSON Input Toggle */}
       <div className="mb-4 flex justify-end">
         <Button

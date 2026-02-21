@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckIcon } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import type {
   ActiveTimers,
@@ -21,8 +22,6 @@ interface RecipeStepProps {
   onStopTimer: (id: string) => void;
 }
 
-const TIMER_REGEX = /(\d+)\s*min/;
-
 export function RecipeStepDisplay({
   step,
   index,
@@ -41,9 +40,8 @@ export function RecipeStepDisplay({
 
   const content = useMemo(() => {
     let text = step.content;
-    const hasTimerPlaceholder = text.includes("{timer}");
-    if (step.timer_seconds && step.id && !hasTimerPlaceholder) {
-      text = text.replace(TIMER_REGEX, "{timer}");
+    if (step.timer_seconds && step.id && !text.includes("{timer}")) {
+      text = `${text} {timer}`;
     }
 
     const parts: (string | React.ReactElement)[] = [];
@@ -111,10 +109,10 @@ export function RecipeStepDisplay({
           isCompleted ? "Marquer comme non faite" : "Marquer comme faite"
         }
       >
-        {isCompleted ? "✓" : index + 1}
+        {isCompleted ? <CheckIcon className="size-4" /> : index + 1}
       </button>
       <div
-        className={`text-foreground leading-relaxed ${isCompleted ? "line-through decoration-muted-foreground" : ""}`}
+        className={`text-foreground text-sm leading-relaxed ${isCompleted ? "line-through decoration-muted-foreground" : ""}`}
       >
         {step.title && <span className="font-semibold">{step.title} : </span>}
         {content}

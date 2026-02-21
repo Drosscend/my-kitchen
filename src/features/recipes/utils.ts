@@ -186,7 +186,7 @@ export function playTimerSound(): void {
   const ctx = getAudioContext();
   const now = ctx.currentTime;
 
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 5; i++) {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain);
@@ -195,11 +195,11 @@ export function playTimerSound(): void {
     osc.frequency.value = 880;
     osc.type = "sine";
 
-    const start = now + i * 0.25;
+    const start = now + i * 0.35;
     gain.gain.setValueAtTime(0.3, start);
-    gain.gain.exponentialRampToValueAtTime(0.01, start + 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.01, start + 0.25);
 
     osc.start(start);
-    osc.stop(start + 0.15);
+    osc.stop(start + 0.25);
   }
 }

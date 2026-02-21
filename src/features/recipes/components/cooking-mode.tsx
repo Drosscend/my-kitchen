@@ -1,8 +1,16 @@
 "use client";
 
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CheckIcon,
+  TimerIcon,
+  XIcon,
+} from "lucide-react";
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import type { ActiveTimers, Recipe, RecipeIngredient } from "../types";
-import { formatAmount, formatDuration } from "../utils";
+import { formatAmount, formatDuration, formatTimer } from "../utils";
 import { RecipeIngredientDisplay } from "./recipe-ingredient";
 import { RecipeTimer } from "./recipe-timer";
 
@@ -15,6 +23,7 @@ interface CookingModeProps {
   activeTimers: ActiveTimers;
   onPrevStep: () => void;
   onNextStep: () => void;
+  onGoToStep: (index: number) => void;
   onExit: () => void;
   onStartTimer: (id: string, duration: number) => void;
   onStopTimer: (id: string) => void;
@@ -29,6 +38,7 @@ export function CookingMode({
   activeTimers,
   onPrevStep,
   onNextStep,
+  onGoToStep,
   onExit,
   onStartTimer,
   onStopTimer,
@@ -36,12 +46,27 @@ export function CookingMode({
   const isOnIngredients = currentStepIndex === -1;
   const currentStep = !isOnIngredients ? recipe.steps[currentStepIndex] : null;
 
+  const runningTimers = useMemo(() => {
+    return Object.entries(activeTimers)
+      .filter(([, t]) => t.running && t.remaining > 0)
+      .map(([id, t]) => {
+        const stepIndex = recipe.steps.findIndex((s) => s.id === id);
+        const step = stepIndex >= 0 ? recipe.steps[stepIndex] : null;
+        return {
+          id,
+          remaining: t.remaining,
+          label: step?.title ?? "Étape",
+          stepIndex,
+        };
+      });
+  }, [activeTimers, recipe.steps]);
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-paper">
       {/* Header */}
       <div className="flex items-center justify-between border-border border-b p-4">
         <Button variant="ghost" size="sm" onClick={onExit}>
-          ✕ Quitter
+          <XIcon data-icon="inline-start" /> Quitter
         </Button>
         <span className="text-muted-foreground text-sm">
           {isOnIngredients
@@ -112,6 +137,29 @@ export function CookingMode({
         </div>
       </div>
 
+      {/* Active timers bar */}
+      {runningTimers.length > 0 && (
+        <div className="flex items-center justify-center gap-4 border-border border-t bg-accent/10 px-4 py-2">
+          {runningTimers.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => onGoToStep(t.stepIndex)}
+              className="flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-accent text-sm transition-colors hover:bg-accent/20"
+            >
+              <TimerIcon className="size-3.5" />
+              <span className="font-medium">{t.label}</span>
+              <span
+                className="font-semibold"
+                style={{ fontVariantNumeric: "tabular-nums" }}
+              >
+                {formatTimer(t.remaining)}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Navigation */}
       <div className="flex items-center justify-between border-border border-t p-4">
         <Button
@@ -119,12 +167,20 @@ export function CookingMode({
           onClick={onPrevStep}
           disabled={isOnIngredients}
         >
-          ← Préc.
+          <ArrowLeftIcon data-icon="inline-start" /> Préc.
         </Button>
         <Button
           onClick={currentStepIndex >= totalSteps - 1 ? onExit : onNextStep}
         >
-          {currentStepIndex >= totalSteps - 1 ? "Terminer ✓" : "Suiv. →"}
+          {currentStepIndex >= totalSteps - 1 ? (
+            <>
+              Terminer <CheckIcon data-icon="inline-end" />
+            </>
+          ) : (
+            <>
+              Suiv. <ArrowRightIcon data-icon="inline-end" />
+            </>
+          )}
         </Button>
       </div>
     </div>
