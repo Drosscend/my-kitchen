@@ -183,24 +183,26 @@ export function InventoryActions({
 
           <Field orientation="horizontal">
             <Checkbox
+              id="filter-low-stock"
               checked={filters.lowStockOnly}
               onCheckedChange={(checked) =>
                 onUpdateFilters({ lowStockOnly: checked === true })
               }
             />
-            <FieldLabel className="cursor-pointer">
+            <FieldLabel htmlFor="filter-low-stock" className="cursor-pointer">
               Stock bas uniquement
             </FieldLabel>
           </Field>
 
           <Field orientation="horizontal">
             <Checkbox
+              id="filter-perishable"
               checked={filters.perishableOnly}
               onCheckedChange={(checked) =>
                 onUpdateFilters({ perishableOnly: checked === true })
               }
             />
-            <FieldLabel className="cursor-pointer">
+            <FieldLabel htmlFor="filter-perishable" className="cursor-pointer">
               Périssables uniquement
             </FieldLabel>
           </Field>
