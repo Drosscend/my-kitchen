@@ -13,6 +13,7 @@ export interface RecipeStep {
 }
 
 export interface Recipe {
+  id: string;
   title: string;
   description?: string;
   base_servings: number;

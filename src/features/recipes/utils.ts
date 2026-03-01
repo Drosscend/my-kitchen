@@ -86,6 +86,10 @@ export function parseRecipe(input: unknown): Recipe | null {
   if (ingredients.length === 0 && steps.length === 0) return null;
 
   return {
+    id:
+      typeof raw.id === "string" && raw.id.trim()
+        ? raw.id
+        : crypto.randomUUID(),
     title: raw.title as string,
     description:
       typeof raw.description === "string" ? raw.description : undefined,
@@ -97,6 +101,14 @@ export function parseRecipe(input: unknown): Recipe | null {
     steps,
     notes: typeof raw.notes === "string" ? raw.notes : undefined,
   };
+}
+
+export function isDuplicateRecipe(
+  existing: Recipe[],
+  candidate: Recipe,
+): boolean {
+  const candidateTitle = candidate.title.trim().toLowerCase();
+  return existing.some((r) => r.title.trim().toLowerCase() === candidateTitle);
 }
 
 // ─── localStorage ───────────────────────────────────────────────────

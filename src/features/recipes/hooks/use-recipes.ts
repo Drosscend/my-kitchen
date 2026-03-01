@@ -2,11 +2,22 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Recipe } from "../types";
-import { loadRecipes, parseRecipe, saveRecipes } from "../utils";
+import {
+  isDuplicateRecipe,
+  loadRecipes,
+  parseRecipe,
+  saveRecipes,
+} from "../utils";
+
+interface ImportResult {
+  error?: string;
+  added?: number;
+  skipped?: number;
+}
 
 export function useRecipes() {
   const [allRecipes, setAllRecipes] = useState<Recipe[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
   const [scale, setScale] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
@@ -20,53 +31,79 @@ export function useRecipes() {
     setIsLoading(false);
   }, []);
 
-  // Auto-save to localStorage
+  // Auto-save to localStorage (including empty array to persist deletions)
   useEffect(() => {
-    if (!isLoading && allRecipes.length > 0) {
+    if (!isLoading) {
       saveRecipes(allRecipes);
     }
   }, [allRecipes, isLoading]);
 
-  const recipe = allRecipes[selectedIndex] ?? null;
+  const selectedRecipe =
+    allRecipes.find((r) => r.id === selectedRecipeId) ?? null;
 
-  const selectRecipe = useCallback(
-    (index: number) => {
-      if (index >= 0 && index < allRecipes.length) {
-        setSelectedIndex(index);
+  const selectRecipe = useCallback((id: string) => {
+    setSelectedRecipeId(id);
+    setScale(1);
+    setCompletedSteps(new Set());
+  }, []);
+
+  const backToLibrary = useCallback(() => {
+    setSelectedRecipeId(null);
+    setScale(1);
+    setCompletedSteps(new Set());
+  }, []);
+
+  const importFromJson = useCallback(
+    (jsonString: string): ImportResult => {
+      try {
+        const parsed: unknown = JSON.parse(jsonString);
+        const candidates = Array.isArray(parsed)
+          ? (parsed.map((r) => parseRecipe(r)).filter(Boolean) as Recipe[])
+          : (() => {
+              const r = parseRecipe(parsed);
+              return r ? [r] : [];
+            })();
+
+        if (candidates.length === 0) {
+          return {
+            error:
+              "Aucune recette valide trouvée. Il faut au minimum un title et des ingredients ou steps.",
+          };
+        }
+
+        // Pre-compute counts against current state
+        let added = 0;
+        let skipped = 0;
+        const combined = [...allRecipes];
+        for (const candidate of candidates) {
+          if (isDuplicateRecipe(combined, candidate)) {
+            skipped++;
+          } else {
+            combined.push(candidate);
+            added++;
+          }
+        }
+
+        setAllRecipes(combined);
+        return { added, skipped };
+      } catch {
+        return { error: "Erreur de parsing JSON." };
+      }
+    },
+    [allRecipes],
+  );
+
+  const deleteRecipe = useCallback(
+    (id: string) => {
+      setAllRecipes((prev) => prev.filter((r) => r.id !== id));
+      if (selectedRecipeId === id) {
+        setSelectedRecipeId(null);
         setScale(1);
         setCompletedSteps(new Set());
       }
     },
-    [allRecipes.length],
+    [selectedRecipeId],
   );
-
-  const loadFromJson = useCallback((jsonString: string): string | null => {
-    try {
-      const parsed: unknown = JSON.parse(jsonString);
-      if (Array.isArray(parsed)) {
-        const recipes = parsed
-          .map((r) => parseRecipe(r))
-          .filter(Boolean) as Recipe[];
-        if (recipes.length === 0) {
-          return "Aucune recette valide trouvée dans le tableau.";
-        }
-        setAllRecipes(recipes);
-        setSelectedIndex(0);
-      } else {
-        const r = parseRecipe(parsed);
-        if (!r) {
-          return "JSON invalide : il faut au minimum un title et des ingredients ou steps.";
-        }
-        setAllRecipes([r]);
-        setSelectedIndex(0);
-      }
-      setScale(1);
-      setCompletedSteps(new Set());
-      return null;
-    } catch {
-      return "Erreur de parsing JSON.";
-    }
-  }, []);
 
   const toggleStep = useCallback((stepId: string) => {
     setCompletedSteps((prev) => {
@@ -82,14 +119,16 @@ export function useRecipes() {
 
   return {
     allRecipes,
-    recipe,
-    selectedIndex,
+    selectedRecipe,
+    selectedRecipeId,
     scale,
     completedSteps,
     isLoading,
     setScale,
     selectRecipe,
-    loadFromJson,
+    backToLibrary,
+    importFromJson,
+    deleteRecipe,
     toggleStep,
   };
 }
