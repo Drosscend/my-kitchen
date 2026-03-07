@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 interface ImportResult {
   error?: string;
   added?: number;
-  skipped?: number;
+  replaced?: number;
 }
 
 interface RecipeImportProps {
@@ -37,9 +37,9 @@ export function RecipeImport({ onImport }: RecipeImportProps) {
           `${result.added} recette${result.added > 1 ? "s" : ""} ajoutée${result.added > 1 ? "s" : ""}`,
         );
       }
-      if (result.skipped && result.skipped > 0) {
+      if (result.replaced && result.replaced > 0) {
         parts.push(
-          `${result.skipped} doublon${result.skipped > 1 ? "s" : ""} ignoré${result.skipped > 1 ? "s" : ""}`,
+          `${result.replaced} recette${result.replaced > 1 ? "s" : ""} remplacée${result.replaced > 1 ? "s" : ""}`,
         );
       }
       setFeedback({

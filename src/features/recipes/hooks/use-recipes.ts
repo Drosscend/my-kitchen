@@ -2,17 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Recipe } from "../types";
-import {
-  isDuplicateRecipe,
-  loadRecipes,
-  parseRecipe,
-  saveRecipes,
-} from "../utils";
+import { loadRecipes, parseRecipe, saveRecipes } from "../utils";
 
 interface ImportResult {
   error?: string;
   added?: number;
-  skipped?: number;
+  replaced?: number;
 }
 
 export function useRecipes() {
@@ -73,11 +68,15 @@ export function useRecipes() {
 
         // Pre-compute counts against current state
         let added = 0;
-        let skipped = 0;
+        let replaced = 0;
         const combined = [...allRecipes];
         for (const candidate of candidates) {
-          if (isDuplicateRecipe(combined, candidate)) {
-            skipped++;
+          const existingIndex = combined.findIndex(
+            (r) => r.id === candidate.id,
+          );
+          if (existingIndex !== -1) {
+            combined[existingIndex] = candidate;
+            replaced++;
           } else {
             combined.push(candidate);
             added++;
@@ -85,7 +84,7 @@ export function useRecipes() {
         }
 
         setAllRecipes(combined);
-        return { added, skipped };
+        return { added, replaced };
       } catch {
         return { error: "Erreur de parsing JSON." };
       }
