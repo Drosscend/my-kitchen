@@ -63,7 +63,7 @@ export function useCookingSession(
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [sessionId]);
+  }, [sessionId, initialSession]);
 
   // Polling every 500ms
   useEffect(() => {
@@ -87,7 +87,7 @@ export function useCookingSession(
       }
     }, 500);
     return () => clearInterval(interval);
-  }, [sessionId, !!data]);
+  }, [sessionId, data]);
 
   // Local timer tick (1s)
   useEffect(() => {
@@ -102,7 +102,7 @@ export function useCookingSession(
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [data?.state.activeTimers]);
+  }, [data?.state.activeTimers, data]);
 
   // Timer completion sound
   const onTimerComplete = useEffectEvent(() => {
@@ -122,7 +122,7 @@ export function useCookingSession(
 
   useEffect(() => {
     onTimerComplete();
-  }, [activeTimers]);
+  }, []);
 
   function updateState(partial: Partial<CookingSessionState>) {
     const current = dataRef.current;

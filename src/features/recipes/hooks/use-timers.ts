@@ -49,7 +49,7 @@ export function useTimers() {
 
   useEffect(() => {
     onTimerComplete();
-  }, [activeTimers]);
+  }, []);
 
   function startTimer(id: string, duration: number) {
     ensureAudioContext();

@@ -1,6 +1,6 @@
-import { Suspense } from "react";
 import { kv } from "@vercel/kv";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import type { CookingSession } from "@/features/recipes/types";
 import { CookContent } from "./cook-content";
 

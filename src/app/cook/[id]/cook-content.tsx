@@ -15,9 +15,7 @@ export function CookContent({
 }) {
   const session = useCookingSession(id, initialSession);
 
-  const ingredientMap = createIngredientMap(
-    session.recipe?.ingredients ?? [],
-  );
+  const ingredientMap = createIngredientMap(session.recipe?.ingredients ?? []);
 
   useEffect(() => {
     if (session.closed) {

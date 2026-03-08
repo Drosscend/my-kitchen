@@ -95,9 +95,7 @@ export function RecipePage() {
     setShowQR(false);
   }
 
-  const ingredientMap = createIngredientMap(
-    selectedRecipe?.ingredients ?? [],
-  );
+  const ingredientMap = createIngredientMap(selectedRecipe?.ingredients ?? []);
 
   const shareUrl =
     typeof window !== "undefined" && sessionId
