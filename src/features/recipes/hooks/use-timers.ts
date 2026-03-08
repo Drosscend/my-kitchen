@@ -36,7 +36,6 @@ export function useTimers() {
     const prev = prevTimersRef.current;
     for (const [id, timer] of Object.entries(activeTimers)) {
       if (
-        timer.running &&
         timer.remaining === 0 &&
         prev[id]?.remaining !== undefined &&
         prev[id].remaining > 0
@@ -50,13 +49,31 @@ export function useTimers() {
 
   const startTimer = useCallback((id: string, duration: number) => {
     ensureAudioContext();
-    setActiveTimers((prev) => ({
-      ...prev,
-      [id]: { remaining: duration, total: duration, running: true },
-    }));
+    setActiveTimers((prev) => {
+      const existing = prev[id];
+      const remaining =
+        existing && !existing.running && existing.remaining > 0
+          ? existing.remaining
+          : duration;
+      return {
+        ...prev,
+        [id]: { remaining, total: duration, running: true },
+      };
+    });
   }, []);
 
   const stopTimer = useCallback((id: string) => {
+    setActiveTimers((prev) => {
+      const timer = prev[id];
+      if (!timer) return prev;
+      return {
+        ...prev,
+        [id]: { ...timer, running: false },
+      };
+    });
+  }, []);
+
+  const resetTimer = useCallback((id: string) => {
     setActiveTimers((prev) => {
       const next = { ...prev };
       delete next[id];
@@ -68,5 +85,5 @@ export function useTimers() {
     setActiveTimers({});
   }, []);
 
-  return { activeTimers, startTimer, stopTimer, resetTimers };
+  return { activeTimers, startTimer, stopTimer, resetTimer, resetTimers };
 }

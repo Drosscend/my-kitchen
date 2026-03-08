@@ -4,10 +4,11 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   CheckIcon,
+  QrCodeIcon,
   TimerIcon,
   XIcon,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import type { ActiveTimers, Recipe, RecipeIngredient } from "../types";
 import { formatAmount, formatDuration, formatTimer } from "../utils";
@@ -27,6 +28,10 @@ interface CookingModeProps {
   onExit: () => void;
   onStartTimer: (id: string, duration: number) => void;
   onStopTimer: (id: string) => void;
+  onResetTimer?: (id: string) => void;
+  sessionId?: string;
+  onShowQR?: () => void;
+  creatingSession?: boolean;
 }
 
 export function CookingMode({
@@ -42,9 +47,39 @@ export function CookingMode({
   onExit,
   onStartTimer,
   onStopTimer,
+  onResetTimer,
+  sessionId,
+  onShowQR,
+  creatingSession,
 }: CookingModeProps) {
   const isOnIngredients = currentStepIndex === -1;
   const currentStep = !isOnIngredients ? recipe.steps[currentStepIndex] : null;
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+    };
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (!touchStartRef.current) return;
+      const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
+      const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
+      touchStartRef.current = null;
+
+      if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+
+      if (dx < 0) {
+        if (currentStepIndex < totalSteps - 1) onNextStep();
+      } else {
+        if (!isOnIngredients) onPrevStep();
+      }
+    },
+    [currentStepIndex, totalSteps, isOnIngredients, onNextStep, onPrevStep],
+  );
 
   const runningTimers = useMemo(() => {
     return Object.entries(activeTimers)
@@ -73,7 +108,19 @@ export function CookingMode({
             ? "Ingrédients"
             : `Étape ${currentStepIndex + 1} / ${totalSteps}`}
         </span>
-        <div className="w-16" />
+        <div className="flex w-16 justify-end">
+          {onShowQR && (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={onShowQR}
+              disabled={creatingSession}
+              title={sessionId ? "Afficher le QR code" : "Partager la session"}
+            >
+              <QrCodeIcon />
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -87,7 +134,11 @@ export function CookingMode({
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 items-center justify-center overflow-auto p-8">
+      <div
+        className="flex flex-1 items-center justify-center overflow-auto p-8"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <div className="w-full max-w-lg text-center">
           {isOnIngredients ? (
             <>
@@ -116,6 +167,7 @@ export function CookingMode({
                   timer={activeTimers[currentStep.id]}
                   onStart={onStartTimer}
                   onStop={onStopTimer}
+                  onReset={onResetTimer}
                   size="large"
                 />
               )}

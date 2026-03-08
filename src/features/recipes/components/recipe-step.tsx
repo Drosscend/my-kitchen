@@ -20,6 +20,7 @@ interface RecipeStepProps {
   activeTimers: ActiveTimers;
   onStartTimer: (id: string, duration: number) => void;
   onStopTimer: (id: string) => void;
+  onResetTimer?: (id: string) => void;
 }
 
 export function RecipeStepDisplay({
@@ -32,6 +33,7 @@ export function RecipeStepDisplay({
   activeTimers,
   onStartTimer,
   onStopTimer,
+  onResetTimer,
 }: RecipeStepProps) {
   const handleToggle = useCallback(
     () => onToggle(step.id),
@@ -62,6 +64,7 @@ export function RecipeStepDisplay({
             timer={activeTimers[step.id]}
             onStart={onStartTimer}
             onStop={onStopTimer}
+            onReset={onResetTimer}
           />,
         );
       } else {
@@ -91,6 +94,7 @@ export function RecipeStepDisplay({
     onStartTimer,
     onStopTimer,
     isCompleted,
+    onResetTimer,
   ]);
 
   return (

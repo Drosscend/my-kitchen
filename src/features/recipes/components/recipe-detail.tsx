@@ -25,6 +25,7 @@ interface RecipeDetailProps {
   activeTimers: ActiveTimers;
   onStartTimer: (id: string, duration: number) => void;
   onStopTimer: (id: string) => void;
+  onResetTimer?: (id: string) => void;
   onEnterCookingMode: () => void;
   onBack: () => void;
   onDelete: (id: string) => void;
@@ -39,6 +40,7 @@ export function RecipeDetail({
   activeTimers,
   onStartTimer,
   onStopTimer,
+  onResetTimer,
   onEnterCookingMode,
   onBack,
   onDelete,
@@ -94,6 +96,7 @@ export function RecipeDetail({
         activeTimers={activeTimers}
         onStartTimer={onStartTimer}
         onStopTimer={onStopTimer}
+        onResetTimer={onResetTimer}
         onEnterCookingMode={onEnterCookingMode}
       />
     </div>

@@ -20,6 +20,7 @@ interface RecipeCardProps {
   activeTimers: ActiveTimers;
   onStartTimer: (id: string, duration: number) => void;
   onStopTimer: (id: string) => void;
+  onResetTimer?: (id: string) => void;
   onEnterCookingMode: () => void;
 }
 
@@ -32,6 +33,7 @@ export function RecipeCard({
   activeTimers,
   onStartTimer,
   onStopTimer,
+  onResetTimer,
   onEnterCookingMode,
 }: RecipeCardProps) {
   const [copied, setCopied] = useState(false);
@@ -138,6 +140,7 @@ export function RecipeCard({
                     activeTimers={activeTimers}
                     onStartTimer={onStartTimer}
                     onStopTimer={onStopTimer}
+                    onResetTimer={onResetTimer}
                   />
                 );
               })}

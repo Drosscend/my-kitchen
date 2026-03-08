@@ -29,3 +29,23 @@ export interface TimerState {
 }
 
 export type ActiveTimers = Record<string, TimerState>;
+
+export interface SyncedTimer {
+  total: number;
+  startedAt: number;
+  pausedRemaining?: number;
+}
+
+export interface CookingSessionState {
+  currentStepIndex: number;
+  completedSteps: string[];
+  activeTimers: Record<string, SyncedTimer>;
+  closed: boolean;
+  updatedAt: number;
+}
+
+export interface CookingSession {
+  recipe: Recipe;
+  scale: number;
+  state: CookingSessionState;
+}
