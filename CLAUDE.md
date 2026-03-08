@@ -37,7 +37,6 @@ bun run typecheck # TypeScript type checking
 - **Framework**: Next.js 16 with App Router, React 19 + React Compiler
 - **UI Components**: Base UI (@base-ui/react) with shadcn style "base-mira"
 - **Styling**: Tailwind CSS 4, class-variance-authority (cva)
-- **Forms**: react-hook-form
 - **Icons**: lucide-react
 - **Real-time**: Vercel KV (@vercel/kv, Upstash Redis) for shared cooking sessions
 - **QR Code**: qrcode.react
@@ -51,7 +50,7 @@ bun run typecheck # TypeScript type checking
 - `src/app/api/cook/` - API routes for shared cooking sessions (KV)
 - `src/app/cook/` - Shared cooking session pages
 - `src/components/ui/` - Reusable UI primitives (Button, Card, Dialog, Select, etc.)
-- `src/components/forms/` - Form field wrappers for react-hook-form
+- `src/components/forms/` - Form field components
 - `src/features/` - Feature modules with domain logic
 - `src/lib/` - Shared utilities (cn function for class merging)
 

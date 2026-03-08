@@ -1,8 +1,7 @@
 "use client";
-"use no memo";
 
 import { PlusIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { type FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -35,38 +34,41 @@ interface FormData {
   state: IngredientState;
 }
 
+const DEFAULTS: FormData = {
+  name: "",
+  quantity: 100,
+  unit: "g",
+  category: "vegetables",
+  state: "fresh",
+};
+
 interface IngredientFormProps {
   onAdd: (data: FormData) => void;
 }
 
 export function IngredientForm({ onAdd }: IngredientFormProps) {
-  const { register, handleSubmit, reset, setValue, watch } = useForm<FormData>({
-    defaultValues: {
-      name: "",
-      quantity: 100,
-      unit: "g",
-      category: "vegetables",
-      state: "fresh",
-    },
-  });
+  const [form, setForm] = useState<FormData>(DEFAULTS);
 
-  const currentUnit = watch("unit");
-  const currentCategory = watch("category");
-  const currentState = watch("state");
+  const set = <K extends keyof FormData>(key: K, value: FormData[K]) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
 
-  const onSubmit = (data: FormData) => {
-    onAdd(data);
-    reset();
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!form.name.trim()) return;
+    onAdd({ ...form, name: form.name.trim() });
+    setForm(DEFAULTS);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+    <form onSubmit={handleSubmit} className="space-y-3">
       <Field>
         <FieldLabel htmlFor="name">Nom</FieldLabel>
         <Input
           id="name"
           placeholder="Ex: Tomates cerises"
-          {...register("name", { required: true })}
+          value={form.name}
+          onChange={(e) => set("name", e.target.value)}
+          required
         />
       </Field>
 
@@ -77,18 +79,20 @@ export function IngredientForm({ onAdd }: IngredientFormProps) {
             id="quantity"
             type="number"
             min={0}
-            {...register("quantity", { required: true, valueAsNumber: true })}
+            value={form.quantity}
+            onChange={(e) => set("quantity", Number(e.target.value))}
+            required
           />
         </Field>
 
         <Field>
           <FieldLabel>Unité</FieldLabel>
           <Select
-            value={currentUnit}
-            onValueChange={(value) => setValue("unit", value as IngredientUnit)}
+            value={form.unit}
+            onValueChange={(value) => set("unit", value as IngredientUnit)}
           >
             <SelectTrigger className="w-full">
-              <SelectValue>{getUnitLabel(currentUnit)}</SelectValue>
+              <SelectValue>{getUnitLabel(form.unit)}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {UNIT_OPTIONS.map((option) => (
@@ -104,13 +108,13 @@ export function IngredientForm({ onAdd }: IngredientFormProps) {
       <Field>
         <FieldLabel>Catégorie</FieldLabel>
         <Select
-          value={currentCategory}
+          value={form.category}
           onValueChange={(value) =>
-            setValue("category", value as IngredientCategory)
+            set("category", value as IngredientCategory)
           }
         >
           <SelectTrigger className="w-full">
-            <SelectValue>{getCategoryLabel(currentCategory)}</SelectValue>
+            <SelectValue>{getCategoryLabel(form.category)}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {CATEGORY_OPTIONS.map((option) => (
@@ -125,11 +129,11 @@ export function IngredientForm({ onAdd }: IngredientFormProps) {
       <Field>
         <FieldLabel>État</FieldLabel>
         <Select
-          value={currentState}
-          onValueChange={(value) => setValue("state", value as IngredientState)}
+          value={form.state}
+          onValueChange={(value) => set("state", value as IngredientState)}
         >
           <SelectTrigger className="w-full">
-            <SelectValue>{getStateLabel(currentState)}</SelectValue>
+            <SelectValue>{getStateLabel(form.state)}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {STATE_OPTIONS.map((option) => (
