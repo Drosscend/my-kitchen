@@ -8,7 +8,7 @@ import {
   TimerIcon,
   XIcon,
 } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import type { ActiveTimers, Recipe, RecipeIngredient } from "../types";
 import { formatAmount, formatDuration, formatTimer } from "../utils";
@@ -52,6 +52,26 @@ export function CookingMode({
   onShowQR,
   creatingSession,
 }: CookingModeProps) {
+  // Keyboard navigation
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        onPrevStep();
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        onNextStep();
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onExit();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onPrevStep, onNextStep, onExit]);
+
   const isOnIngredients = currentStepIndex === -1;
   const currentStep = !isOnIngredients ? recipe.steps[currentStepIndex] : null;
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);

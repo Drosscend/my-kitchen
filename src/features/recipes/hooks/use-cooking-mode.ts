@@ -37,27 +37,6 @@ export function useCookingMode(totalSteps: number) {
     }
   }, [isActive]);
 
-  // Keyboard navigation
-  useEffect(() => {
-    if (!isActive) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        setCurrentStepIndex((i) => Math.max(-1, i - 1));
-      }
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        setCurrentStepIndex((i) => Math.min(totalSteps - 1, i + 1));
-      }
-      if (e.key === "Escape") {
-        e.preventDefault();
-        setIsActive(false);
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [isActive, totalSteps]);
-
   return {
     isActive,
     currentStepIndex,
