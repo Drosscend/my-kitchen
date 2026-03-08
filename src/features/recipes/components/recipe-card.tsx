@@ -1,11 +1,11 @@
 "use client";
 
 import { ClipboardIcon, CookingPotIcon } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ActiveTimers, Recipe } from "../types";
-import { formatRecipeForClipboard } from "../utils";
+import { createIngredientMap, formatRecipeForClipboard } from "../utils";
 import { NotesRenderer } from "./notes-renderer";
 import { RecipeIngredientDisplay } from "./recipe-ingredient";
 import { RecipeStepDisplay } from "./recipe-step";
@@ -38,17 +38,11 @@ export function RecipeCard({
 }: RecipeCardProps) {
   const [copied, setCopied] = useState(false);
 
-  const ingredientMap = useMemo(() => {
-    const map = new Map<string, (typeof recipe.ingredients)[number]>();
-    for (const ing of recipe.ingredients) {
-      if (ing.id) map.set(ing.id, ing);
-    }
-    return map;
-  }, [recipe.ingredients]);
+  const ingredientMap = createIngredientMap(recipe.ingredients);
 
   const servings = Math.round(scale * (recipe.base_servings ?? 4) * 10) / 10;
 
-  const handleCopy = useCallback(async () => {
+  async function handleCopy() {
     try {
       const text = formatRecipeForClipboard(recipe, scale);
       await navigator.clipboard.writeText(text);
@@ -57,7 +51,7 @@ export function RecipeCard({
     } catch {
       // clipboard API not available
     }
-  }, [recipe, scale]);
+  }
 
   return (
     <Card className="kraft-card">

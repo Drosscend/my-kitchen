@@ -46,6 +46,18 @@ export function formatTimer(seconds: number): string {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
+// ─── Ingredient Map ─────────────────────────────────────────────────
+
+export function createIngredientMap(
+  ingredients: RecipeIngredient[],
+): Map<string, RecipeIngredient> {
+  const map = new Map<string, RecipeIngredient>();
+  for (const ing of ingredients) {
+    if (ing.id) map.set(ing.id, ing);
+  }
+  return map;
+}
+
 // ─── Parsing & Validation ───────────────────────────────────────────
 
 function isValidIngredient(ing: unknown): ing is RecipeIngredient {

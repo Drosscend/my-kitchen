@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { ActiveTimers } from "../types";
 import { ensureAudioContext, playTimerSound } from "../utils";
 
@@ -31,8 +31,8 @@ export function useTimers() {
     return () => clearInterval(interval);
   }, [hasRunningTimer]);
 
-  // Detect timer completion → play sound
-  useEffect(() => {
+  // Timer completion sound
+  const onTimerComplete = useEffectEvent(() => {
     const prev = prevTimersRef.current;
     for (const [id, timer] of Object.entries(activeTimers)) {
       if (
@@ -45,9 +45,13 @@ export function useTimers() {
       }
     }
     prevTimersRef.current = activeTimers;
+  });
+
+  useEffect(() => {
+    onTimerComplete();
   }, [activeTimers]);
 
-  const startTimer = useCallback((id: string, duration: number) => {
+  function startTimer(id: string, duration: number) {
     ensureAudioContext();
     setActiveTimers((prev) => {
       const existing = prev[id];
@@ -60,9 +64,9 @@ export function useTimers() {
         [id]: { remaining, total: duration, running: true },
       };
     });
-  }, []);
+  }
 
-  const stopTimer = useCallback((id: string) => {
+  function stopTimer(id: string) {
     setActiveTimers((prev) => {
       const timer = prev[id];
       if (!timer) return prev;
@@ -71,19 +75,19 @@ export function useTimers() {
         [id]: { ...timer, running: false },
       };
     });
-  }, []);
+  }
 
-  const resetTimer = useCallback((id: string) => {
+  function resetTimer(id: string) {
     setActiveTimers((prev) => {
       const next = { ...prev };
       delete next[id];
       return next;
     });
-  }, []);
+  }
 
-  const resetTimers = useCallback(() => {
+  function resetTimers() {
     setActiveTimers({});
-  }, []);
+  }
 
   return { activeTimers, startTimer, stopTimer, resetTimer, resetTimers };
 }

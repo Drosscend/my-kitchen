@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type {
   ActiveTimers,
   CookingSession,
@@ -28,17 +28,28 @@ function computeTimers(synced: Record<string, SyncedTimer>): ActiveTimers {
   return result;
 }
 
-export function useCookingSession(sessionId: string | null) {
-  const [data, setData] = useState<CookingSession | null>(null);
-  const [loading, setLoading] = useState(true);
+export function useCookingSession(
+  sessionId: string | null,
+  initialSession?: CookingSession,
+) {
+  const [data, setData] = useState<CookingSession | null>(
+    initialSession ?? null,
+  );
+  const [loading, setLoading] = useState(!initialSession);
   const [error, setError] = useState(false);
-  const [activeTimers, setActiveTimers] = useState<ActiveTimers>({});
-  const lastUpdateRef = useRef(0);
+  const [activeTimers, setActiveTimers] = useState<ActiveTimers>(
+    initialSession ? computeTimers(initialSession.state.activeTimers) : {},
+  );
+  const dataRef = useRef<CookingSession | null>(data);
+  const lastUpdateRef = useRef(initialSession?.state.updatedAt ?? 0);
   const prevTimersRef = useRef<ActiveTimers>({});
+  const pollingRef = useRef(false);
 
-  // Initial fetch
+  dataRef.current = data;
+
+  // Initial fetch (skipped when initialSession is provided)
   useEffect(() => {
-    if (!sessionId) {
+    if (!sessionId || initialSession) {
       setLoading(false);
       return;
     }
@@ -56,8 +67,10 @@ export function useCookingSession(sessionId: string | null) {
 
   // Polling every 500ms
   useEffect(() => {
-    if (!data || !sessionId) return;
+    if (!sessionId || !data) return;
     const interval = setInterval(async () => {
+      if (pollingRef.current) return;
+      pollingRef.current = true;
       try {
         const r = await fetch(`/api/cook/${sessionId}`);
         if (!r.ok) return;
@@ -68,27 +81,31 @@ export function useCookingSession(sessionId: string | null) {
           setActiveTimers(computeTimers(d.state.activeTimers));
         }
       } catch {
-        // ignore network errors during polling
+        // ignore network errors
+      } finally {
+        pollingRef.current = false;
       }
     }, 500);
     return () => clearInterval(interval);
-  }, [sessionId, data]);
+  }, [sessionId, !!data]);
 
-  // Local timer tick (1s) for smooth countdown
+  // Local timer tick (1s)
   useEffect(() => {
     if (!data) return;
-    const hasRunning = Object.values(activeTimers).some(
-      (t) => t.running && t.remaining > 0,
+    const hasSyncedRunning = Object.values(data.state.activeTimers).some(
+      (t) => t.pausedRemaining === undefined,
     );
-    if (!hasRunning) return;
+    if (!hasSyncedRunning) return;
     const interval = setInterval(() => {
-      setActiveTimers(computeTimers(data.state.activeTimers));
+      if (dataRef.current) {
+        setActiveTimers(computeTimers(dataRef.current.state.activeTimers));
+      }
     }, 1000);
     return () => clearInterval(interval);
-  }, [data, activeTimers]);
+  }, [data?.state.activeTimers]);
 
-  // Detect timer completion → play sound
-  useEffect(() => {
+  // Timer completion sound
+  const onTimerComplete = useEffectEvent(() => {
     const prev = prevTimersRef.current;
     for (const [id, timer] of Object.entries(activeTimers)) {
       if (
@@ -101,109 +118,102 @@ export function useCookingSession(sessionId: string | null) {
       }
     }
     prevTimersRef.current = activeTimers;
+  });
+
+  useEffect(() => {
+    onTimerComplete();
   }, [activeTimers]);
 
-  const updateState = useCallback(
-    async (partial: Partial<CookingSessionState>) => {
-      if (!data) return;
-      const now = Date.now();
-      const newState = { ...data.state, ...partial, updatedAt: now };
-      const newData = { ...data, state: newState };
+  function updateState(partial: Partial<CookingSessionState>) {
+    const current = dataRef.current;
+    if (!current) return;
+    const now = Date.now();
+    const newState = { ...current.state, ...partial, updatedAt: now };
 
-      setData(newData);
-      lastUpdateRef.current = now;
+    setData({ ...current, state: newState });
+    lastUpdateRef.current = now;
 
-      if (partial.activeTimers) {
-        setActiveTimers(computeTimers(partial.activeTimers));
-      }
+    if (partial.activeTimers) {
+      setActiveTimers(computeTimers(partial.activeTimers));
+    }
 
-      await fetch(`/api/cook/${sessionId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newState),
-      });
-    },
-    [data, sessionId],
-  );
-
-  const prevStep = useCallback(() => {
-    if (!data) return;
-    updateState({
-      currentStepIndex: Math.max(-1, data.state.currentStepIndex - 1),
+    fetch(`/api/cook/${sessionId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newState),
     });
-  }, [data, updateState]);
+  }
 
-  const nextStep = useCallback(() => {
-    if (!data) return;
+  function prevStep() {
+    const current = dataRef.current;
+    if (!current) return;
+    updateState({
+      currentStepIndex: Math.max(-1, current.state.currentStepIndex - 1),
+    });
+  }
+
+  function nextStep() {
+    const current = dataRef.current;
+    if (!current) return;
     updateState({
       currentStepIndex: Math.min(
-        data.recipe.steps.length - 1,
-        data.state.currentStepIndex + 1,
+        current.recipe.steps.length - 1,
+        current.state.currentStepIndex + 1,
       ),
     });
-  }, [data, updateState]);
+  }
 
-  const goToStep = useCallback(
-    (index: number) => {
-      if (!data) return;
-      updateState({
-        currentStepIndex: Math.max(
-          -1,
-          Math.min(data.recipe.steps.length - 1, index),
-        ),
-      });
-    },
-    [data, updateState],
-  );
+  function goToStep(index: number) {
+    const current = dataRef.current;
+    if (!current) return;
+    updateState({
+      currentStepIndex: Math.max(
+        -1,
+        Math.min(current.recipe.steps.length - 1, index),
+      ),
+    });
+  }
 
-  const startTimer = useCallback(
-    (id: string, duration: number) => {
-      if (!data) return;
-      ensureAudioContext();
-      const existing = data.state.activeTimers[id];
-      const resumeRemaining = existing?.pausedRemaining;
-      const now = Date.now();
-      const newTimers = {
-        ...data.state.activeTimers,
-        [id]: {
-          total: resumeRemaining ?? duration,
-          startedAt: now,
-        },
-      };
-      updateState({ activeTimers: newTimers });
-    },
-    [data, updateState],
-  );
+  function startTimer(id: string, duration: number) {
+    const current = dataRef.current;
+    if (!current) return;
+    ensureAudioContext();
+    const existing = current.state.activeTimers[id];
+    const resumeDuration = existing?.pausedRemaining ?? duration;
+    updateState({
+      activeTimers: {
+        ...current.state.activeTimers,
+        [id]: { total: resumeDuration, startedAt: Date.now() },
+      },
+    });
+  }
 
-  const stopTimer = useCallback(
-    (id: string) => {
-      if (!data) return;
-      const timer = data.state.activeTimers[id];
-      if (!timer) return;
-      const elapsed = Math.floor((Date.now() - timer.startedAt) / 1000);
-      const remaining = Math.max(0, timer.total - elapsed);
-      const newTimers = {
-        ...data.state.activeTimers,
+  function stopTimer(id: string) {
+    const current = dataRef.current;
+    if (!current) return;
+    const timer = current.state.activeTimers[id];
+    if (!timer) return;
+    const elapsed = Math.floor((Date.now() - timer.startedAt) / 1000);
+    const remaining = Math.max(0, timer.total - elapsed);
+    updateState({
+      activeTimers: {
+        ...current.state.activeTimers,
         [id]: { ...timer, pausedRemaining: remaining },
-      };
-      updateState({ activeTimers: newTimers });
-    },
-    [data, updateState],
-  );
+      },
+    });
+  }
 
-  const resetTimer = useCallback(
-    (id: string) => {
-      if (!data) return;
-      const newTimers = { ...data.state.activeTimers };
-      delete newTimers[id];
-      updateState({ activeTimers: newTimers });
-    },
-    [data, updateState],
-  );
+  function resetTimer(id: string) {
+    const current = dataRef.current;
+    if (!current) return;
+    const newTimers = { ...current.state.activeTimers };
+    delete newTimers[id];
+    updateState({ activeTimers: newTimers });
+  }
 
-  const close = useCallback(() => {
+  function close() {
     updateState({ closed: true });
-  }, [updateState]);
+  }
 
   return {
     loading,

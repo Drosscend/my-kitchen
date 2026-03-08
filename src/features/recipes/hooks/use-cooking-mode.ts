@@ -1,34 +1,31 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export function useCookingMode(totalSteps: number) {
   const [isActive, setIsActive] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
 
-  const enter = useCallback(() => {
+  function enter() {
     setCurrentStepIndex(-1);
     setIsActive(true);
-  }, []);
+  }
 
-  const exit = useCallback(() => {
+  function exit() {
     setIsActive(false);
-  }, []);
+  }
 
-  const prevStep = useCallback(() => {
+  function prevStep() {
     setCurrentStepIndex((i) => Math.max(-1, i - 1));
-  }, []);
+  }
 
-  const nextStep = useCallback(() => {
+  function nextStep() {
     setCurrentStepIndex((i) => Math.min(totalSteps - 1, i + 1));
-  }, [totalSteps]);
+  }
 
-  const goToStep = useCallback(
-    (index: number) => {
-      setCurrentStepIndex(Math.max(-1, Math.min(totalSteps - 1, index)));
-    },
-    [totalSteps],
-  );
+  function goToStep(index: number) {
+    setCurrentStepIndex(Math.max(-1, Math.min(totalSteps - 1, index)));
+  }
 
   // Lock body scroll
   useEffect(() => {

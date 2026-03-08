@@ -8,7 +8,7 @@ import {
   TimerIcon,
   XIcon,
 } from "lucide-react";
-import { useCallback, useMemo, useRef } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import type { ActiveTimers, Recipe, RecipeIngredient } from "../types";
 import { formatAmount, formatDuration, formatTimer } from "../utils";
@@ -56,45 +56,45 @@ export function CookingMode({
   const currentStep = !isOnIngredients ? recipe.steps[currentStepIndex] : null;
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+  function handleTouchStart(e: React.TouchEvent) {
     touchStartRef.current = {
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
     };
-  }, []);
+  }
 
-  const handleTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      if (!touchStartRef.current) return;
-      const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
-      const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
-      touchStartRef.current = null;
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (!touchStartRef.current) return;
+    const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
+    const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
 
-      if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+    if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
 
-      if (dx < 0) {
-        if (currentStepIndex < totalSteps - 1) onNextStep();
-      } else {
-        if (!isOnIngredients) onPrevStep();
-      }
-    },
-    [currentStepIndex, totalSteps, isOnIngredients, onNextStep, onPrevStep],
-  );
+    if (dx < 0) {
+      if (currentStepIndex < totalSteps - 1) onNextStep();
+    } else {
+      if (!isOnIngredients) onPrevStep();
+    }
+  }
 
-  const runningTimers = useMemo(() => {
-    return Object.entries(activeTimers)
-      .filter(([, t]) => t.running && t.remaining > 0)
-      .map(([id, t]) => {
-        const stepIndex = recipe.steps.findIndex((s) => s.id === id);
-        const step = stepIndex >= 0 ? recipe.steps[stepIndex] : null;
-        return {
-          id,
-          remaining: t.remaining,
-          label: step?.title ?? "Étape",
-          stepIndex,
-        };
-      });
-  }, [activeTimers, recipe.steps]);
+  const stepIndexById = new Map<string, number>();
+  for (let i = 0; i < recipe.steps.length; i++) {
+    stepIndexById.set(recipe.steps[i].id, i);
+  }
+
+  const runningTimers = Object.entries(activeTimers)
+    .filter(([, t]) => t.running && t.remaining > 0)
+    .map(([id, t]) => {
+      const stepIndex = stepIndexById.get(id) ?? -1;
+      const step = stepIndex >= 0 ? recipe.steps[stepIndex] : null;
+      return {
+        id,
+        remaining: t.remaining,
+        label: step?.title ?? "Étape",
+        stepIndex,
+      };
+    });
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-paper">

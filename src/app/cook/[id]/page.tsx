@@ -1,7 +1,26 @@
 import { Suspense } from "react";
+import { kv } from "@vercel/kv";
+import { notFound } from "next/navigation";
+import type { CookingSession } from "@/features/recipes/types";
 import { CookContent } from "./cook-content";
 
-export default function CookPage() {
+async function CookLoader({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const raw = await kv.get<string>(`cook:${id}`);
+
+  if (!raw) notFound();
+
+  const session: CookingSession =
+    typeof raw === "string" ? JSON.parse(raw) : raw;
+
+  return <CookContent id={id} initialSession={session} />;
+}
+
+export default function CookPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   return (
     <Suspense
       fallback={
@@ -12,7 +31,7 @@ export default function CookPage() {
         </div>
       }
     >
-      <CookContent />
+      <CookLoader params={params} />
     </Suspense>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { CheckIcon } from "lucide-react";
-import { useCallback, useMemo } from "react";
 import type {
   ActiveTimers,
   RecipeIngredient,
@@ -35,67 +34,55 @@ export function RecipeStepDisplay({
   onStopTimer,
   onResetTimer,
 }: RecipeStepProps) {
-  const handleToggle = useCallback(
-    () => onToggle(step.id),
-    [onToggle, step.id],
-  );
+  function handleToggle() {
+    onToggle(step.id);
+  }
 
-  const content = useMemo(() => {
-    let text = step.content;
-    if (step.timer_seconds && step.id && !text.includes("{timer}")) {
-      text = `${text} {timer}`;
-    }
+  let text = step.content;
+  if (step.timer_seconds && step.id && !text.includes("{timer}")) {
+    text = `${text} {timer}`;
+  }
 
-    const parts: (string | React.ReactElement)[] = [];
-    const regex = /\{([^}]+)\}/g;
-    let lastIndex = 0;
+  const contentParts: (string | React.ReactElement)[] = [];
+  const regex = /\{([^}]+)\}/g;
+  let lastIndex = 0;
 
-    for (const match of text.matchAll(regex)) {
-      if (match.index > lastIndex)
-        parts.push(text.slice(lastIndex, match.index));
-      const ref = match[1];
+  for (const match of text.matchAll(regex)) {
+    if (match.index > lastIndex)
+      contentParts.push(text.slice(lastIndex, match.index));
+    const ref = match[1];
 
-      if (ref === "timer" && step.timer_seconds) {
-        parts.push(
-          <RecipeTimer
-            key={`timer-${step.id}`}
-            id={step.id}
-            duration={step.timer_seconds}
-            timer={activeTimers[step.id]}
-            onStart={onStartTimer}
-            onStop={onStopTimer}
-            onReset={onResetTimer}
+    if (ref === "timer" && step.timer_seconds) {
+      contentParts.push(
+        <RecipeTimer
+          key={`timer-${step.id}`}
+          id={step.id}
+          duration={step.timer_seconds}
+          timer={activeTimers[step.id]}
+          onStart={onStartTimer}
+          onStop={onStopTimer}
+          onReset={onResetTimer}
+        />,
+      );
+    } else {
+      const ing = ingredientMap.get(ref);
+      if (ing) {
+        contentParts.push(
+          <RecipeIngredientDisplay
+            key={`step-${step.id}-${ing.id}`}
+            ingredient={ing}
+            scale={scale}
+            isCompleted={isCompleted}
           />,
         );
       } else {
-        const ing = ingredientMap.get(ref);
-        if (ing) {
-          parts.push(
-            <RecipeIngredientDisplay
-              key={`step-${step.id}-${ing.id}`}
-              ingredient={ing}
-              scale={scale}
-              isCompleted={isCompleted}
-            />,
-          );
-        } else {
-          parts.push(`{${ref}}`);
-        }
+        contentParts.push(`{${ref}}`);
       }
-      lastIndex = match.index + match[0].length;
     }
-    if (lastIndex < text.length) parts.push(text.slice(lastIndex));
-    return <>{parts}</>;
-  }, [
-    step,
-    ingredientMap,
-    scale,
-    activeTimers,
-    onStartTimer,
-    onStopTimer,
-    isCompleted,
-    onResetTimer,
-  ]);
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) contentParts.push(text.slice(lastIndex));
+  const content = <>{contentParts}</>;
 
   return (
     <div

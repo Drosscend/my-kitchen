@@ -1,7 +1,7 @@
 "use client";
 
 import { QRCodeSVG } from "qrcode.react";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import { useCookingMode } from "../hooks/use-cooking-mode";
 import { useCookingSession } from "../hooks/use-cooking-session";
 import { useRecipes } from "../hooks/use-recipes";
 import { useTimers } from "../hooks/use-timers";
+import { createIngredientMap } from "../utils";
 import { CookingMode } from "./cooking-mode";
 import { RecipeDetail } from "./recipe-detail";
 import { RecipeImport } from "./recipe-import";
@@ -33,30 +34,50 @@ export function RecipePage() {
     toggleStep,
   } = useRecipes();
 
-  const { activeTimers, startTimer, stopTimer, resetTimer, resetTimers } =
-    useTimers();
+  const localTimers = useTimers();
   const totalSteps = selectedRecipe?.steps.length ?? 0;
   const cookingMode = useCookingMode(totalSteps);
   const [showImport, setShowImport] = useState(false);
 
-  // Shared session state
+  // Shared session
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
   const [creatingSession, setCreatingSession] = useState(false);
-
   const session = useCookingSession(sessionId);
 
-  const handleCreateSession = useCallback(async () => {
+  const isShared = sessionId !== null && !session.loading;
+
+  // Pick synced or local controls
+  const controls = isShared
+    ? {
+        currentStepIndex: session.currentStepIndex,
+        activeTimers: session.activeTimers,
+        prevStep: session.prevStep,
+        nextStep: session.nextStep,
+        goToStep: session.goToStep,
+        startTimer: session.startTimer,
+        stopTimer: session.stopTimer,
+        resetTimer: session.resetTimer,
+      }
+    : {
+        currentStepIndex: cookingMode.currentStepIndex,
+        activeTimers: localTimers.activeTimers,
+        prevStep: cookingMode.prevStep,
+        nextStep: cookingMode.nextStep,
+        goToStep: cookingMode.goToStep,
+        startTimer: localTimers.startTimer,
+        stopTimer: localTimers.stopTimer,
+        resetTimer: localTimers.resetTimer,
+      };
+
+  async function handleCreateSession() {
     if (!selectedRecipe || creatingSession) return;
     setCreatingSession(true);
     try {
       const r = await fetch("/api/cook", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          recipe: selectedRecipe,
-          scale,
-        }),
+        body: JSON.stringify({ recipe: selectedRecipe, scale }),
       });
       const { id } = await r.json();
       setSessionId(id);
@@ -64,26 +85,19 @@ export function RecipePage() {
     } finally {
       setCreatingSession(false);
     }
-  }, [selectedRecipe, scale, creatingSession]);
+  }
 
-  const handleExitCooking = useCallback(() => {
-    if (sessionId) {
-      session.close();
-    }
+  function handleExitCooking() {
+    if (sessionId) session.close();
     cookingMode.exit();
-    resetTimers();
+    localTimers.resetTimers();
     setSessionId(null);
     setShowQR(false);
-  }, [sessionId, session, cookingMode, resetTimers]);
+  }
 
-  const ingredientMap = useMemo(() => {
-    if (!selectedRecipe) return new Map();
-    const map = new Map<string, (typeof selectedRecipe.ingredients)[number]>();
-    for (const ing of selectedRecipe.ingredients) {
-      if (ing.id) map.set(ing.id, ing);
-    }
-    return map;
-  }, [selectedRecipe]);
+  const ingredientMap = createIngredientMap(
+    selectedRecipe?.ingredients ?? [],
+  );
 
   const shareUrl =
     typeof window !== "undefined" && sessionId
@@ -98,38 +112,33 @@ export function RecipePage() {
     );
   }
 
-  // Cooking mode: use synced state if session exists, local state otherwise
+  // Cooking mode
   if (
     cookingMode.isActive &&
     selectedRecipe &&
     selectedRecipe.steps.length > 0
   ) {
-    const isShared = sessionId !== null && !session.loading;
-
     return (
       <>
         <CookingMode
           recipe={selectedRecipe}
-          currentStepIndex={
-            isShared ? session.currentStepIndex : cookingMode.currentStepIndex
-          }
+          currentStepIndex={controls.currentStepIndex}
           totalSteps={totalSteps}
           ingredientMap={ingredientMap}
           scale={scale}
-          activeTimers={isShared ? session.activeTimers : activeTimers}
-          onPrevStep={isShared ? session.prevStep : cookingMode.prevStep}
-          onNextStep={isShared ? session.nextStep : cookingMode.nextStep}
-          onGoToStep={isShared ? session.goToStep : cookingMode.goToStep}
+          activeTimers={controls.activeTimers}
+          onPrevStep={controls.prevStep}
+          onNextStep={controls.nextStep}
+          onGoToStep={controls.goToStep}
           onExit={handleExitCooking}
-          onStartTimer={isShared ? session.startTimer : startTimer}
-          onStopTimer={isShared ? session.stopTimer : stopTimer}
-          onResetTimer={isShared ? session.resetTimer : resetTimer}
+          onStartTimer={controls.startTimer}
+          onStopTimer={controls.stopTimer}
+          onResetTimer={controls.resetTimer}
           sessionId={sessionId ?? undefined}
           onShowQR={sessionId ? () => setShowQR(true) : handleCreateSession}
           creatingSession={creatingSession}
         />
 
-        {/* QR Code dialog */}
         <Dialog open={showQR && !!sessionId} onOpenChange={setShowQR}>
           <DialogContent className="text-center">
             <DialogHeader>
@@ -165,18 +174,18 @@ export function RecipePage() {
           onScaleChange={setScale}
           completedSteps={completedSteps}
           onToggleStep={toggleStep}
-          activeTimers={activeTimers}
-          onStartTimer={startTimer}
-          onStopTimer={stopTimer}
-          onResetTimer={resetTimer}
+          activeTimers={localTimers.activeTimers}
+          onStartTimer={localTimers.startTimer}
+          onStopTimer={localTimers.stopTimer}
+          onResetTimer={localTimers.resetTimer}
           onEnterCookingMode={cookingMode.enter}
           onBack={() => {
             backToLibrary();
-            resetTimers();
+            localTimers.resetTimers();
           }}
           onDelete={(id) => {
             deleteRecipe(id);
-            resetTimers();
+            localTimers.resetTimers();
           }}
         />
       </div>
@@ -196,7 +205,7 @@ export function RecipePage() {
         recipes={allRecipes}
         onSelect={(id) => {
           selectRecipe(id);
-          resetTimers();
+          localTimers.resetTimers();
         }}
         onDelete={deleteRecipe}
         onShowImport={() => setShowImport((v) => !v)}

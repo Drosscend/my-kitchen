@@ -1,22 +1,23 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { useParams } from "next/navigation";
+import { useEffect } from "react";
 import { CookingMode } from "@/features/recipes/components/cooking-mode";
 import { useCookingSession } from "@/features/recipes/hooks/use-cooking-session";
+import type { CookingSession } from "@/features/recipes/types";
+import { createIngredientMap } from "@/features/recipes/utils";
 
-export function CookContent() {
-  const { id } = useParams<{ id: string }>();
-  const session = useCookingSession(id);
+export function CookContent({
+  id,
+  initialSession,
+}: {
+  id: string;
+  initialSession: CookingSession;
+}) {
+  const session = useCookingSession(id, initialSession);
 
-  const ingredientMap = useMemo(() => {
-    if (!session.recipe) return new Map();
-    const map = new Map<string, (typeof session.recipe.ingredients)[number]>();
-    for (const ing of session.recipe.ingredients) {
-      if (ing.id) map.set(ing.id, ing);
-    }
-    return map;
-  }, [session.recipe]);
+  const ingredientMap = createIngredientMap(
+    session.recipe?.ingredients ?? [],
+  );
 
   useEffect(() => {
     if (session.closed) {
@@ -24,17 +25,7 @@ export function CookContent() {
     }
   }, [session.closed]);
 
-  if (session.loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-paper">
-        <div className="animate-pulse text-muted-foreground">
-          Chargement...
-        </div>
-      </div>
-    );
-  }
-
-  if (session.error || !session.recipe) {
+  if (!session.recipe) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-paper">
         <p className="text-foreground text-lg">Session introuvable</p>
