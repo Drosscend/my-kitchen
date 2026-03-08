@@ -5,7 +5,6 @@ import type {
   Ingredient,
   InventoryFilters,
   InventorySort,
-  SortDirection,
   SortField,
 } from "../types";
 import { isLowStock, isPerishable } from "../utils";
@@ -88,10 +87,6 @@ export function useInventoryFilter(ingredients: Ingredient[]) {
     }));
   }, []);
 
-  const setSortDirection = useCallback((direction: SortDirection) => {
-    setSort((prev) => ({ ...prev, direction }));
-  }, []);
-
   const resetFilters = useCallback(() => {
     setFilters(DEFAULT_FILTERS);
   }, []);
@@ -102,7 +97,6 @@ export function useInventoryFilter(ingredients: Ingredient[]) {
     filteredIngredients,
     updateFilters,
     updateSort,
-    setSortDirection,
     resetFilters,
   };
 }

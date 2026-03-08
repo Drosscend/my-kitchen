@@ -1,4 +1,4 @@
-import { CATEGORIES, STATES, STORAGE_KEY, UNITS } from "./constants";
+import { CATEGORIES, STATES, UNITS } from "./constants";
 import type { Ingredient, IngredientCategory } from "./types";
 
 export function generateId(): string {
@@ -23,29 +23,6 @@ export function isPerishable(ingredient: Ingredient): boolean {
     return false;
   }
   return CATEGORIES[ingredient.category].isPerishable;
-}
-
-export function loadInventory(): Ingredient[] {
-  if (typeof window === "undefined") return [];
-
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return [];
-    return JSON.parse(data) as Ingredient[];
-  } catch {
-    console.error("Erreur lors du chargement de l'inventaire");
-    return [];
-  }
-}
-
-export function saveInventory(ingredients: Ingredient[]): void {
-  if (typeof window === "undefined") return;
-
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
-  } catch {
-    console.error("Erreur lors de la sauvegarde de l'inventaire");
-  }
 }
 
 export function formatForClipboard(ingredients: Ingredient[]): string {

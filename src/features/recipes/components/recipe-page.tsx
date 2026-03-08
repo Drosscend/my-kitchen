@@ -2,6 +2,7 @@
 
 import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -74,14 +75,42 @@ export function RecipePage() {
     if (!selectedRecipe || creatingSession) return;
     setCreatingSession(true);
     try {
+      // Convert local timers to synced format
+      const syncedTimers: Record<
+        string,
+        { total: number; startedAt: number; pausedRemaining?: number }
+      > = {};
+      for (const [id, t] of Object.entries(localTimers.activeTimers)) {
+        if (t.running && t.remaining > 0) {
+          syncedTimers[id] = {
+            total: t.remaining,
+            startedAt: Date.now(),
+          };
+        } else if (!t.running && t.remaining > 0) {
+          syncedTimers[id] = {
+            total: t.total,
+            startedAt: Date.now(),
+            pausedRemaining: t.remaining,
+          };
+        }
+      }
+
       const r = await fetch("/api/cook", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recipe: selectedRecipe, scale }),
+        body: JSON.stringify({
+          recipe: selectedRecipe,
+          scale,
+          currentStepIndex: cookingMode.currentStepIndex,
+          activeTimers:
+            Object.keys(syncedTimers).length > 0 ? syncedTimers : undefined,
+        }),
       });
       const { id } = await r.json();
       setSessionId(id);
       setShowQR(true);
+    } catch {
+      toast.error("Impossible de créer la session.");
     } finally {
       setCreatingSession(false);
     }

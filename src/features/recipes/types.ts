@@ -1,26 +1,19 @@
-export interface RecipeIngredient {
-  id: string;
-  name: string;
-  amount?: number;
-  unit?: string;
-}
+import type { z } from "zod/v4";
+import type {
+  CookingSessionSchema,
+  CookingSessionStateSchema,
+  RecipeIngredientSchema,
+  RecipeSchema,
+  RecipeStepSchema,
+  SyncedTimerSchema,
+} from "./schemas";
 
-export interface RecipeStep {
-  id: string;
-  title?: string;
-  content: string;
-  timer_seconds?: number;
-}
-
-export interface Recipe {
-  id: string;
-  title: string;
-  description?: string;
-  base_servings: number;
-  ingredients: RecipeIngredient[];
-  steps: RecipeStep[];
-  notes?: string;
-}
+export type RecipeIngredient = z.infer<typeof RecipeIngredientSchema>;
+export type RecipeStep = z.infer<typeof RecipeStepSchema>;
+export type Recipe = z.infer<typeof RecipeSchema>;
+export type SyncedTimer = z.infer<typeof SyncedTimerSchema>;
+export type CookingSessionState = z.infer<typeof CookingSessionStateSchema>;
+export type CookingSession = z.infer<typeof CookingSessionSchema>;
 
 export interface TimerState {
   remaining: number;
@@ -29,23 +22,3 @@ export interface TimerState {
 }
 
 export type ActiveTimers = Record<string, TimerState>;
-
-export interface SyncedTimer {
-  total: number;
-  startedAt: number;
-  pausedRemaining?: number;
-}
-
-export interface CookingSessionState {
-  currentStepIndex: number;
-  completedSteps: string[];
-  activeTimers: Record<string, SyncedTimer>;
-  closed: boolean;
-  updatedAt: number;
-}
-
-export interface CookingSession {
-  recipe: Recipe;
-  scale: number;
-  state: CookingSessionState;
-}

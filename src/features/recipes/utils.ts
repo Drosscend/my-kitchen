@@ -1,5 +1,4 @@
-import { RECIPES_STORAGE_KEY } from "./constants";
-import type { Recipe, RecipeIngredient, RecipeStep } from "./types";
+import type { Recipe, RecipeIngredient } from "./types";
 
 // ─── Formatting ─────────────────────────────────────────────────────
 
@@ -56,94 +55,6 @@ export function createIngredientMap(
     if (ing.id) map.set(ing.id, ing);
   }
   return map;
-}
-
-// ─── Parsing & Validation ───────────────────────────────────────────
-
-function isValidIngredient(ing: unknown): ing is RecipeIngredient {
-  return (
-    ing !== null &&
-    typeof ing === "object" &&
-    typeof (ing as RecipeIngredient).name === "string" &&
-    (ing as RecipeIngredient).name.trim() !== ""
-  );
-}
-
-function isValidStep(step: unknown): step is RecipeStep {
-  return (
-    step !== null &&
-    typeof step === "object" &&
-    typeof (step as RecipeStep).content === "string" &&
-    (step as RecipeStep).content.trim() !== ""
-  );
-}
-
-export function parseRecipe(input: unknown): Recipe | null {
-  if (
-    !input ||
-    typeof input !== "object" ||
-    typeof (input as Recipe).title !== "string" ||
-    !(input as Recipe).title.trim()
-  )
-    return null;
-
-  const raw = input as Record<string, unknown>;
-  const ingredients = Array.isArray(raw.ingredients)
-    ? (raw.ingredients as unknown[]).filter(isValidIngredient)
-    : [];
-  const steps = Array.isArray(raw.steps)
-    ? (raw.steps as unknown[]).filter(isValidStep)
-    : [];
-
-  if (ingredients.length === 0 && steps.length === 0) return null;
-
-  return {
-    id:
-      typeof raw.id === "string" && raw.id.trim()
-        ? raw.id
-        : crypto.randomUUID(),
-    title: raw.title as string,
-    description:
-      typeof raw.description === "string" ? raw.description : undefined,
-    base_servings:
-      typeof raw.base_servings === "number" && raw.base_servings > 0
-        ? raw.base_servings
-        : 4,
-    ingredients,
-    steps,
-    notes: typeof raw.notes === "string" ? raw.notes : undefined,
-  };
-}
-
-export function isDuplicateRecipe(
-  existing: Recipe[],
-  candidate: Recipe,
-): boolean {
-  const candidateTitle = candidate.title.trim().toLowerCase();
-  return existing.some((r) => r.title.trim().toLowerCase() === candidateTitle);
-}
-
-// ─── localStorage ───────────────────────────────────────────────────
-
-export function loadRecipes(): Recipe[] | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(RECIPES_STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as unknown[];
-    return parsed.map(parseRecipe).filter(Boolean) as Recipe[];
-  } catch {
-    return null;
-  }
-}
-
-export function saveRecipes(recipes: Recipe[]): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(RECIPES_STORAGE_KEY, JSON.stringify(recipes));
-  } catch {
-    // quota exceeded — silently ignore
-  }
 }
 
 // ─── Clipboard Export ───────────────────────────────────────────────

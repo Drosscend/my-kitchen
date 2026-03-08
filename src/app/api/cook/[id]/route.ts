@@ -1,4 +1,5 @@
 import { kv } from "@vercel/kv";
+import { CookingSessionStateSchema } from "@/features/recipes/schemas";
 import type {
   CookingSession,
   CookingSessionState,
@@ -33,7 +34,18 @@ export async function PATCH(
 
   const session: CookingSession =
     typeof raw === "string" ? JSON.parse(raw) : raw;
-  const updates: Partial<CookingSessionState> = await request.json();
+
+  const body = await request.json();
+  const result = CookingSessionStateSchema.partial().safeParse(body);
+
+  if (!result.success) {
+    return Response.json(
+      { error: "Données invalides", details: result.error.issues },
+      { status: 400 },
+    );
+  }
+
+  const updates: Partial<CookingSessionState> = result.data;
 
   if (updates.updatedAt && updates.updatedAt <= session.state.updatedAt) {
     return Response.json(session);

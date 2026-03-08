@@ -1,5 +1,14 @@
 import { kv } from "@vercel/kv";
+import { z } from "zod/v4";
+import { RecipeSchema, SyncedTimerSchema } from "@/features/recipes/schemas";
 import type { CookingSession } from "@/features/recipes/types";
+
+const CreateSessionSchema = z.object({
+  recipe: RecipeSchema,
+  scale: z.number().positive(),
+  currentStepIndex: z.number().optional(),
+  activeTimers: z.record(z.string(), SyncedTimerSchema).optional(),
+});
 
 async function generateUniqueCode(): Promise<string> {
   for (let i = 0; i < 10; i++) {
@@ -11,16 +20,26 @@ async function generateUniqueCode(): Promise<string> {
 }
 
 export async function POST(request: Request) {
-  const { recipe, scale } = await request.json();
+  const body = await request.json();
+  const result = CreateSessionSchema.safeParse(body);
+
+  if (!result.success) {
+    return Response.json(
+      { error: "Données invalides", details: result.error.issues },
+      { status: 400 },
+    );
+  }
+
+  const { recipe, scale, currentStepIndex, activeTimers } = result.data;
 
   const id = await generateUniqueCode();
   const session: CookingSession = {
     recipe,
     scale,
     state: {
-      currentStepIndex: -1,
+      currentStepIndex: currentStepIndex ?? -1,
       completedSteps: [],
-      activeTimers: {},
+      activeTimers: activeTimers ?? {},
       closed: false,
       updatedAt: Date.now(),
     },

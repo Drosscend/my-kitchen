@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { toast } from "sonner";
 import type {
   ActiveTimers,
   CookingSession,
@@ -61,7 +62,10 @@ export function useCookingSession(
         lastUpdateRef.current = d.state.updatedAt;
         setActiveTimers(computeTimers(d.state.activeTimers));
       })
-      .catch(() => setError(true))
+      .catch(() => {
+        setError(true);
+        toast.error("Session introuvable ou expirée.");
+      })
       .finally(() => setLoading(false));
   }, [sessionId, initialSession]);
 
@@ -141,7 +145,7 @@ export function useCookingSession(
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newState),
-    });
+    }).catch(() => toast.error("Erreur de synchronisation."));
   }
 
   function prevStep() {

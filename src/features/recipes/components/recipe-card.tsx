@@ -1,7 +1,7 @@
 "use client";
 
 import { ClipboardIcon, CookingPotIcon } from "lucide-react";
-import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ActiveTimers, Recipe } from "../types";
@@ -36,8 +36,6 @@ export function RecipeCard({
   onResetTimer,
   onEnterCookingMode,
 }: RecipeCardProps) {
-  const [copied, setCopied] = useState(false);
-
   const ingredientMap = createIngredientMap(recipe.ingredients);
 
   const servings = Math.round(scale * (recipe.base_servings ?? 4) * 10) / 10;
@@ -46,10 +44,9 @@ export function RecipeCard({
     try {
       const text = formatRecipeForClipboard(recipe, scale);
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      toast.success("Recette copiée !");
     } catch {
-      // clipboard API not available
+      toast.error("Impossible de copier.");
     }
   }
 
@@ -86,7 +83,6 @@ export function RecipeCard({
             >
               <ClipboardIcon />
             </Button>
-            {copied && <span className="text-accent text-xs">Copié !</span>}
             {recipe.steps.length > 0 && (
               <Button onClick={onEnterCookingMode} className="ml-1">
                 <CookingPotIcon data-icon="inline-start" />

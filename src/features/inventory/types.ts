@@ -1,32 +1,20 @@
-export type IngredientCategory =
-  | "vegetables"
-  | "fruits"
-  | "meat"
-  | "fish"
-  | "dairy"
-  | "spices"
-  | "starches"
-  | "other";
+import type { z } from "zod/v4";
+import type {
+  IngredientCategorySchema,
+  IngredientSchema,
+  IngredientStateSchema,
+  IngredientUnitSchema,
+} from "./schemas";
+
+export type IngredientCategory = z.infer<typeof IngredientCategorySchema>;
+export type IngredientUnit = z.infer<typeof IngredientUnitSchema>;
+export type IngredientState = z.infer<typeof IngredientStateSchema>;
+export type Ingredient = z.infer<typeof IngredientSchema>;
 
 export interface CategoryConfig {
   label: string;
   lowStockThreshold: number;
   isPerishable: boolean;
-}
-
-export type IngredientUnit = "g" | "kg" | "mL" | "L" | "unit" | "piece";
-
-export type IngredientState = "fresh" | "frozen";
-
-export interface Ingredient {
-  id: string;
-  name: string;
-  quantity: number;
-  unit: IngredientUnit;
-  category: IngredientCategory;
-  state: IngredientState;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface InventoryFilters {

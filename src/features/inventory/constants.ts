@@ -5,8 +5,6 @@ import type {
   IngredientUnit,
 } from "./types";
 
-export const STORAGE_KEY = "my-kitchen-inventory";
-
 export const CATEGORIES: Record<IngredientCategory, CategoryConfig> = {
   vegetables: { label: "Légumes", lowStockThreshold: 200, isPerishable: true },
   fruits: { label: "Fruits", lowStockThreshold: 200, isPerishable: true },
