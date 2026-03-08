@@ -1,8 +1,8 @@
 export type UnitId = "g" | "kg" | "mL" | "cL" | "L" | "cac" | "cas";
 
-export type Dimension = "mass" | "volume";
+type Dimension = "mass" | "volume";
 
-export interface UnitDef {
+interface UnitDef {
   id: UnitId;
   label: string;
   dimension: Dimension;
@@ -24,7 +24,7 @@ export const UNIT_MAP = Object.fromEntries(
   UNITS.map((u) => [u.id, u]),
 ) as Record<UnitId, UnitDef>;
 
-export interface IngredientDensity {
+interface IngredientDensity {
   name: string;
   /** Density in g/mL */
   density: number;

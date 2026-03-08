@@ -14,7 +14,7 @@ import {
   Trash2Icon,
   WheatIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,6 +57,14 @@ import type {
   IngredientUnit,
 } from "../types";
 import { isLowStock, isPerishable } from "../utils";
+
+function NameInput(props: React.ComponentProps<typeof Input>) {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    ref.current?.focus();
+  }, []);
+  return <Input ref={ref} {...props} className="h-6 text-xs" />;
+}
 
 const CATEGORY_ICONS: Record<IngredientCategory, React.ElementType> = {
   vegetables: CarrotIcon,
@@ -122,13 +130,11 @@ export function InventoryRow({
         <div className="flex items-center gap-2">
           <CategoryIcon className="size-4 shrink-0 text-muted-foreground" />
           {isEditingName ? (
-            <Input
+            <NameInput
               value={editedName}
               onChange={(e) => setEditedName(e.target.value)}
               onBlur={handleNameBlur}
               onKeyDown={handleNameKeyDown}
-              autoFocus
-              className="h-6 text-xs"
             />
           ) : (
             <button

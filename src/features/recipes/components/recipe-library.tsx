@@ -90,14 +90,16 @@ export function RecipeLibrary({
             </CardContent>
 
             {/* Delete button */}
-            <div
-              className="absolute top-3 right-3"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <span className="absolute top-3 right-3">
               <AlertDialog>
                 <AlertDialogTrigger
                   render={
-                    <Button variant="ghost" size="icon-xs" title="Supprimer">
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      title="Supprimer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <Trash2Icon className="size-3.5 text-muted-foreground" />
                     </Button>
                   }
@@ -121,7 +123,7 @@ export function RecipeLibrary({
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-            </div>
+            </span>
           </Card>
         ))}
       </div>

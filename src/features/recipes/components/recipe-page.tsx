@@ -74,27 +74,28 @@ export function RecipePage() {
   async function handleCreateSession() {
     if (!selectedRecipe || creatingSession) return;
     setCreatingSession(true);
-    try {
-      // Convert local timers to synced format
-      const syncedTimers: Record<
-        string,
-        { total: number; startedAt: number; pausedRemaining?: number }
-      > = {};
-      for (const [id, t] of Object.entries(localTimers.activeTimers)) {
-        if (t.running && t.remaining > 0) {
-          syncedTimers[id] = {
-            total: t.remaining,
-            startedAt: Date.now(),
-          };
-        } else if (!t.running && t.remaining > 0) {
-          syncedTimers[id] = {
-            total: t.total,
-            startedAt: Date.now(),
-            pausedRemaining: t.remaining,
-          };
-        }
-      }
 
+    // Convert local timers to synced format
+    const syncedTimers: Record<
+      string,
+      { total: number; startedAt: number; pausedRemaining?: number }
+    > = {};
+    for (const [id, t] of Object.entries(localTimers.activeTimers)) {
+      if (t.running && t.remaining > 0) {
+        syncedTimers[id] = {
+          total: t.remaining,
+          startedAt: Date.now(),
+        };
+      } else if (!t.running && t.remaining > 0) {
+        syncedTimers[id] = {
+          total: t.total,
+          startedAt: Date.now(),
+          pausedRemaining: t.remaining,
+        };
+      }
+    }
+
+    try {
       const r = await fetch("/api/cook", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -111,9 +112,8 @@ export function RecipePage() {
       setShowQR(true);
     } catch {
       toast.error("Impossible de créer la session.");
-    } finally {
-      setCreatingSession(false);
     }
+    setCreatingSession(false);
   }
 
   function handleExitCooking() {

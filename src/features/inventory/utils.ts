@@ -1,10 +1,6 @@
 import { CATEGORIES, STATES, UNITS } from "./constants";
 import type { Ingredient, IngredientCategory } from "./types";
 
-export function generateId(): string {
-  return crypto.randomUUID();
-}
-
 export function isLowStock(ingredient: Ingredient): boolean {
   const threshold = CATEGORIES[ingredient.category].lowStockThreshold;
   let quantityInGrams = ingredient.quantity;
