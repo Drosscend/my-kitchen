@@ -5,20 +5,18 @@ import { Navigation } from "@/components/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { InventoryActions } from "@/features/inventory/components/inventory-actions";
 import { InventoryTable } from "@/features/inventory/components/inventory-table";
-import { useInventory } from "@/features/inventory/hooks/use-inventory";
 import { useInventoryFilter } from "@/features/inventory/hooks/use-inventory-filter";
+import { useInventoryStore } from "@/features/inventory/store";
 
 export default function Home() {
-  const {
-    ingredients,
-    isLoading,
-    add,
-    update,
-    remove,
-    increment,
-    decrement,
-    importIngredients,
-  } = useInventory();
+  const ingredients = useInventoryStore((s) => s.ingredients);
+  const isHydrated = useInventoryStore((s) => s.isHydrated);
+  const add = useInventoryStore((s) => s.add);
+  const update = useInventoryStore((s) => s.update);
+  const remove = useInventoryStore((s) => s.remove);
+  const increment = useInventoryStore((s) => s.increment);
+  const decrement = useInventoryStore((s) => s.decrement);
+  const importIngredients = useInventoryStore((s) => s.importIngredients);
 
   const {
     filters,
@@ -29,7 +27,7 @@ export default function Home() {
     resetFilters,
   } = useInventoryFilter(ingredients);
 
-  if (isLoading) {
+  if (!isHydrated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Chargement...</div>

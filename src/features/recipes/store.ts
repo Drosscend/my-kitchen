@@ -1,4 +1,3 @@
-import { toast } from "sonner";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { RecipeSchema } from "./schemas";
@@ -37,10 +36,10 @@ export const useRecipeStore = create<RecipeState>()(
           }
 
           if (candidates.length === 0) {
-            const message =
-              "Aucune recette valide trouvée. Il faut au minimum un title et des ingredients ou steps.";
-            toast.error(message);
-            return { error: message };
+            return {
+              error:
+                "Aucune recette valide trouvée. Il faut au minimum un title et des ingredients ou steps.",
+            };
           }
 
           const current = [...get().recipes];
@@ -61,17 +60,9 @@ export const useRecipeStore = create<RecipeState>()(
           }
 
           set({ recipes: current });
-
-          const parts: string[] = [];
-          if (added > 0) parts.push(`${added} ajoutée(s)`);
-          if (replaced > 0) parts.push(`${replaced} remplacée(s)`);
-          toast.success(`${parts.join(", ")} !`);
-
           return { added, replaced };
         } catch {
-          const message = "Erreur de parsing JSON.";
-          toast.error(message);
-          return { error: message };
+          return { error: "Erreur de parsing JSON." };
         }
       },
 

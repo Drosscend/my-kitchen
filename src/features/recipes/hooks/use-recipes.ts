@@ -1,12 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { useRecipeStore } from "../store";
 
 export function useRecipes() {
   const allRecipes = useRecipeStore((s) => s.recipes);
   const isHydrated = useRecipeStore((s) => s.isHydrated);
-  const importFromJson = useRecipeStore((s) => s.importFromJson);
+  const storeImport = useRecipeStore((s) => s.importFromJson);
+
+  function importFromJson(jsonString: string) {
+    const result = storeImport(jsonString);
+    if (result.error) {
+      toast.error(result.error);
+    } else {
+      const parts: string[] = [];
+      if (result.added) parts.push(`${result.added} ajoutée(s)`);
+      if (result.replaced) parts.push(`${result.replaced} remplacée(s)`);
+      toast.success(`${parts.join(", ")} !`);
+    }
+    return result;
+  }
   const storeDeleteRecipe = useRecipeStore((s) => s.deleteRecipe);
 
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
