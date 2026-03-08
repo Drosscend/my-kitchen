@@ -137,4 +137,9 @@ export function playTimerSound(): void {
     osc.start(start);
     osc.stop(start + 0.25);
   }
+
+  // Haptic feedback on mobile
+  if (navigator.vibrate) {
+    navigator.vibrate([200, 100, 200, 100, 200]);
+  }
 }
