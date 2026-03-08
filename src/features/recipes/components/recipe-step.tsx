@@ -6,6 +6,7 @@ import type {
   RecipeIngredient,
   RecipeStep as RecipeStepType,
 } from "../types";
+import { formatDuration } from "../utils";
 import { RecipeIngredientDisplay } from "./recipe-ingredient";
 import { RecipeTimer } from "./recipe-timer";
 
@@ -16,9 +17,9 @@ interface RecipeStepProps {
   onToggle: (stepId: string) => void;
   ingredientMap: Map<string, RecipeIngredient>;
   scale: number;
-  activeTimers: ActiveTimers;
-  onStartTimer: (id: string, duration: number) => void;
-  onStopTimer: (id: string) => void;
+  activeTimers?: ActiveTimers;
+  onStartTimer?: (id: string, duration: number) => void;
+  onStopTimer?: (id: string) => void;
   onResetTimer?: (id: string) => void;
 }
 
@@ -34,6 +35,8 @@ export function RecipeStepDisplay({
   onStopTimer,
   onResetTimer,
 }: RecipeStepProps) {
+  const hasTimerControls = activeTimers && onStartTimer && onStopTimer;
+
   function handleToggle() {
     onToggle(step.id);
   }
@@ -53,17 +56,21 @@ export function RecipeStepDisplay({
     const ref = match[1];
 
     if (ref === "timer" && step.timer_seconds) {
-      contentParts.push(
-        <RecipeTimer
-          key={`timer-${step.id}`}
-          id={step.id}
-          duration={step.timer_seconds}
-          timer={activeTimers[step.id]}
-          onStart={onStartTimer}
-          onStop={onStopTimer}
-          onReset={onResetTimer}
-        />,
-      );
+      if (hasTimerControls) {
+        contentParts.push(
+          <RecipeTimer
+            key={`timer-${step.id}`}
+            id={step.id}
+            duration={step.timer_seconds}
+            timer={activeTimers[step.id]}
+            onStart={onStartTimer}
+            onStop={onStopTimer}
+            onReset={onResetTimer}
+          />,
+        );
+      } else {
+        contentParts.push(formatDuration(step.timer_seconds));
+      }
     } else {
       const ing = ingredientMap.get(ref);
       if (ing) {

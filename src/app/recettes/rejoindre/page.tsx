@@ -17,7 +17,7 @@ export default function CookJoinPage() {
 
     const r = await fetch(`/api/cook/${trimmed}`);
     if (r.ok) {
-      router.push(`/cook/${trimmed}`);
+      router.push(`/recettes/cuisiner/${trimmed}`);
     } else {
       setError(true);
     }

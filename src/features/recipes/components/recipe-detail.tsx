@@ -13,7 +13,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import type { ActiveTimers, Recipe } from "../types";
+import type { Recipe } from "../types";
 import { RecipeCard } from "./recipe-card";
 
 interface RecipeDetailProps {
@@ -22,11 +22,8 @@ interface RecipeDetailProps {
   onScaleChange: (scale: number) => void;
   completedSteps: Set<string>;
   onToggleStep: (stepId: string) => void;
-  activeTimers: ActiveTimers;
-  onStartTimer: (id: string, duration: number) => void;
-  onStopTimer: (id: string) => void;
-  onResetTimer?: (id: string) => void;
   onEnterCookingMode: () => void;
+  startingSession?: boolean;
   onBack: () => void;
   onDelete: (id: string) => void;
 }
@@ -37,11 +34,8 @@ export function RecipeDetail({
   onScaleChange,
   completedSteps,
   onToggleStep,
-  activeTimers,
-  onStartTimer,
-  onStopTimer,
-  onResetTimer,
   onEnterCookingMode,
+  startingSession,
   onBack,
   onDelete,
 }: RecipeDetailProps) {
@@ -93,11 +87,8 @@ export function RecipeDetail({
         onScaleChange={onScaleChange}
         completedSteps={completedSteps}
         onToggleStep={onToggleStep}
-        activeTimers={activeTimers}
-        onStartTimer={onStartTimer}
-        onStopTimer={onStopTimer}
-        onResetTimer={onResetTimer}
         onEnterCookingMode={onEnterCookingMode}
+        startingSession={startingSession}
       />
     </div>
   );

@@ -8,8 +8,8 @@ import {
   TimerIcon,
   XIcon,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { useCookingNavigation } from "../hooks/use-cooking-navigation";
 import type { ActiveTimers, Recipe, RecipeIngredient } from "../types";
 import { formatAmount, formatDuration, formatTimer } from "../utils";
 import { RecipeIngredientDisplay } from "./recipe-ingredient";
@@ -29,9 +29,7 @@ interface CookingModeProps {
   onStartTimer: (id: string, duration: number) => void;
   onStopTimer: (id: string) => void;
   onResetTimer?: (id: string) => void;
-  sessionId?: string;
-  onShowQR?: () => void;
-  creatingSession?: boolean;
+  onShare?: () => void;
 }
 
 export function CookingMode({
@@ -48,55 +46,18 @@ export function CookingMode({
   onStartTimer,
   onStopTimer,
   onResetTimer,
-  sessionId,
-  onShowQR,
-  creatingSession,
+  onShare,
 }: CookingModeProps) {
-  // Keyboard navigation
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        onPrevStep();
-      }
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        onNextStep();
-      }
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onExit();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [onPrevStep, onNextStep, onExit]);
-
   const isOnIngredients = currentStepIndex === -1;
   const currentStep = !isOnIngredients ? recipe.steps[currentStepIndex] : null;
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  function handleTouchStart(e: React.TouchEvent) {
-    touchStartRef.current = {
-      x: e.touches[0].clientX,
-      y: e.touches[0].clientY,
-    };
-  }
-
-  function handleTouchEnd(e: React.TouchEvent) {
-    if (!touchStartRef.current) return;
-    const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
-    const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
-    touchStartRef.current = null;
-
-    if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
-
-    if (dx < 0) {
-      if (currentStepIndex < totalSteps - 1) onNextStep();
-    } else {
-      if (!isOnIngredients) onPrevStep();
-    }
-  }
+  const { handleTouchStart, handleTouchEnd } = useCookingNavigation({
+    onPrev: onPrevStep,
+    onNext: onNextStep,
+    onExit,
+    canGoPrev: !isOnIngredients,
+    canGoNext: currentStepIndex < totalSteps - 1,
+  });
 
   const stepIndexById = new Map<string, number>();
   for (let i = 0; i < recipe.steps.length; i++) {
@@ -129,13 +90,12 @@ export function CookingMode({
             : `Étape ${currentStepIndex + 1} / ${totalSteps}`}
         </span>
         <div className="flex w-16 justify-end">
-          {onShowQR && (
+          {onShare && (
             <Button
               variant="ghost"
               size="icon-sm"
-              onClick={onShowQR}
-              disabled={creatingSession}
-              title={sessionId ? "Afficher le QR code" : "Partager la session"}
+              onClick={onShare}
+              title="Partager la session"
             >
               <QrCodeIcon />
             </Button>

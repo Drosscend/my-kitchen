@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import type { RecipeIngredient } from "../types";
 import { formatAmount } from "../utils";
 
@@ -13,10 +12,8 @@ export function RecipeIngredientDisplay({
   scale,
   isCompleted,
 }: RecipeIngredientProps) {
-  const display = useMemo(() => {
-    const amount = formatAmount((ingredient.amount ?? 0) * scale);
-    return `${amount} ${ingredient.unit ?? ""} ${ingredient.name}`;
-  }, [ingredient.amount, ingredient.unit, ingredient.name, scale]);
+  const amount = formatAmount((ingredient.amount ?? 0) * scale);
+  const display = `${amount} ${ingredient.unit ?? ""} ${ingredient.name}`;
 
   return (
     <span

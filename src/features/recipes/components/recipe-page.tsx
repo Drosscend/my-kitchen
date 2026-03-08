@@ -1,26 +1,15 @@
 "use client";
 
-import { QRCodeSVG } from "qrcode.react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useCookingMode } from "../hooks/use-cooking-mode";
-import { useCookingSession } from "../hooks/use-cooking-session";
 import { useRecipes } from "../hooks/use-recipes";
-import { useTimers } from "../hooks/use-timers";
-import { createIngredientMap } from "../utils";
-import { CookingMode } from "./cooking-mode";
 import { RecipeDetail } from "./recipe-detail";
 import { RecipeImport } from "./recipe-import";
 import { RecipeLibrary } from "./recipe-library";
 
 export function RecipePage() {
+  const router = useRouter();
   const {
     allRecipes,
     selectedRecipe,
@@ -35,101 +24,25 @@ export function RecipePage() {
     toggleStep,
   } = useRecipes();
 
-  const localTimers = useTimers();
-  const totalSteps = selectedRecipe?.steps.length ?? 0;
-  const cookingMode = useCookingMode(totalSteps);
   const [showImport, setShowImport] = useState(false);
+  const [startingSession, setStartingSession] = useState(false);
 
-  // Shared session
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [showQR, setShowQR] = useState(false);
-  const [creatingSession, setCreatingSession] = useState(false);
-  const session = useCookingSession(sessionId);
-
-  const isShared = sessionId !== null && !session.loading;
-
-  // Pick synced or local controls
-  const controls = isShared
-    ? {
-        currentStepIndex: session.currentStepIndex,
-        activeTimers: session.activeTimers,
-        prevStep: session.prevStep,
-        nextStep: session.nextStep,
-        goToStep: session.goToStep,
-        startTimer: session.startTimer,
-        stopTimer: session.stopTimer,
-        resetTimer: session.resetTimer,
-      }
-    : {
-        currentStepIndex: cookingMode.currentStepIndex,
-        activeTimers: localTimers.activeTimers,
-        prevStep: cookingMode.prevStep,
-        nextStep: cookingMode.nextStep,
-        goToStep: cookingMode.goToStep,
-        startTimer: localTimers.startTimer,
-        stopTimer: localTimers.stopTimer,
-        resetTimer: localTimers.resetTimer,
-      };
-
-  async function handleCreateSession() {
-    if (!selectedRecipe || creatingSession) return;
-    setCreatingSession(true);
-
-    // Convert local timers to synced format
-    const syncedTimers: Record<
-      string,
-      { total: number; startedAt: number; pausedRemaining?: number }
-    > = {};
-    for (const [id, t] of Object.entries(localTimers.activeTimers)) {
-      if (t.running && t.remaining > 0) {
-        syncedTimers[id] = {
-          total: t.remaining,
-          startedAt: Date.now(),
-        };
-      } else if (!t.running && t.remaining > 0) {
-        syncedTimers[id] = {
-          total: t.total,
-          startedAt: Date.now(),
-          pausedRemaining: t.remaining,
-        };
-      }
-    }
-
+  async function handleStartCooking() {
+    if (!selectedRecipe || startingSession) return;
+    setStartingSession(true);
     try {
       const r = await fetch("/api/cook", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          recipe: selectedRecipe,
-          scale,
-          currentStepIndex: cookingMode.currentStepIndex,
-          activeTimers:
-            Object.keys(syncedTimers).length > 0 ? syncedTimers : undefined,
-        }),
+        body: JSON.stringify({ recipe: selectedRecipe, scale }),
       });
       const { id } = await r.json();
-      setSessionId(id);
-      setShowQR(true);
+      router.push(`/recettes/cuisiner/${id}`);
     } catch {
-      toast.error("Impossible de créer la session.");
+      toast.error("Impossible de lancer la session.");
     }
-    setCreatingSession(false);
+    setStartingSession(false);
   }
-
-  function handleExitCooking() {
-    if (sessionId) session.close();
-    cookingMode.exit();
-    localTimers.resetTimers();
-    setSessionId(null);
-    setShowQR(false);
-  }
-
-  const ingredientMap = createIngredientMap(selectedRecipe?.ingredients ?? []);
-
-  const shareUrl =
-    typeof window !== "undefined" && sessionId
-      ? `${window.location.origin}/cook/${sessionId}`
-      : "";
 
   if (isLoading) {
     return (
@@ -139,59 +52,6 @@ export function RecipePage() {
     );
   }
 
-  // Cooking mode
-  if (
-    cookingMode.isActive &&
-    selectedRecipe &&
-    selectedRecipe.steps.length > 0
-  ) {
-    return (
-      <>
-        <CookingMode
-          recipe={selectedRecipe}
-          currentStepIndex={controls.currentStepIndex}
-          totalSteps={totalSteps}
-          ingredientMap={ingredientMap}
-          scale={scale}
-          activeTimers={controls.activeTimers}
-          onPrevStep={controls.prevStep}
-          onNextStep={controls.nextStep}
-          onGoToStep={controls.goToStep}
-          onExit={handleExitCooking}
-          onStartTimer={controls.startTimer}
-          onStopTimer={controls.stopTimer}
-          onResetTimer={controls.resetTimer}
-          sessionId={sessionId ?? undefined}
-          onShowQR={sessionId ? () => setShowQR(true) : handleCreateSession}
-          creatingSession={creatingSession}
-        />
-
-        <Dialog open={showQR && !!sessionId} onOpenChange={setShowQR}>
-          <DialogContent className="text-center">
-            <DialogHeader>
-              <DialogTitle className="kraft-title text-lg">
-                Scanner pour rejoindre
-              </DialogTitle>
-              <DialogDescription>
-                Scannez le QR code ou entrez le code sur un autre appareil
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex justify-center rounded-lg bg-white p-4">
-              <QRCodeSVG value={shareUrl} size={200} level="M" />
-            </div>
-            <p className="font-bold font-mono text-2xl text-foreground tracking-[0.3em]">
-              {sessionId}
-            </p>
-            <p className="break-all text-muted-foreground text-xs">
-              {shareUrl}
-            </p>
-          </DialogContent>
-        </Dialog>
-      </>
-    );
-  }
-
-  // Detail view
   if (selectedRecipe) {
     return (
       <div className="mx-auto w-full max-w-4xl">
@@ -201,25 +61,15 @@ export function RecipePage() {
           onScaleChange={setScale}
           completedSteps={completedSteps}
           onToggleStep={toggleStep}
-          activeTimers={localTimers.activeTimers}
-          onStartTimer={localTimers.startTimer}
-          onStopTimer={localTimers.stopTimer}
-          onResetTimer={localTimers.resetTimer}
-          onEnterCookingMode={cookingMode.enter}
-          onBack={() => {
-            backToLibrary();
-            localTimers.resetTimers();
-          }}
-          onDelete={(id) => {
-            deleteRecipe(id);
-            localTimers.resetTimers();
-          }}
+          onEnterCookingMode={handleStartCooking}
+          startingSession={startingSession}
+          onBack={backToLibrary}
+          onDelete={deleteRecipe}
         />
       </div>
     );
   }
 
-  // Library view
   return (
     <div className="mx-auto w-full max-w-4xl">
       {showImport && (
@@ -230,10 +80,7 @@ export function RecipePage() {
 
       <RecipeLibrary
         recipes={allRecipes}
-        onSelect={(id) => {
-          selectRecipe(id);
-          localTimers.resetTimers();
-        }}
+        onSelect={selectRecipe}
         onDelete={deleteRecipe}
         onShowImport={() => setShowImport((v) => !v)}
       />

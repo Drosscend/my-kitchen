@@ -1,10 +1,10 @@
 "use client";
 
-import { ClipboardIcon, CookingPotIcon } from "lucide-react";
+import { ClipboardIcon, CookingPotIcon, LoaderIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { ActiveTimers, Recipe } from "../types";
+import type { Recipe } from "../types";
 import { createIngredientMap, formatRecipeForClipboard } from "../utils";
 import { NotesRenderer } from "./notes-renderer";
 import { RecipeIngredientDisplay } from "./recipe-ingredient";
@@ -17,11 +17,8 @@ interface RecipeCardProps {
   onScaleChange: (scale: number) => void;
   completedSteps: Set<string>;
   onToggleStep: (stepId: string) => void;
-  activeTimers: ActiveTimers;
-  onStartTimer: (id: string, duration: number) => void;
-  onStopTimer: (id: string) => void;
-  onResetTimer?: (id: string) => void;
   onEnterCookingMode: () => void;
+  startingSession?: boolean;
 }
 
 export function RecipeCard({
@@ -30,11 +27,8 @@ export function RecipeCard({
   onScaleChange,
   completedSteps,
   onToggleStep,
-  activeTimers,
-  onStartTimer,
-  onStopTimer,
-  onResetTimer,
   onEnterCookingMode,
+  startingSession,
 }: RecipeCardProps) {
   const ingredientMap = createIngredientMap(recipe.ingredients);
 
@@ -84,8 +78,19 @@ export function RecipeCard({
               <ClipboardIcon />
             </Button>
             {recipe.steps.length > 0 && (
-              <Button onClick={onEnterCookingMode} className="ml-1">
-                <CookingPotIcon data-icon="inline-start" />
+              <Button
+                onClick={onEnterCookingMode}
+                disabled={startingSession}
+                className="ml-1"
+              >
+                {startingSession ? (
+                  <LoaderIcon
+                    className="animate-spin"
+                    data-icon="inline-start"
+                  />
+                ) : (
+                  <CookingPotIcon data-icon="inline-start" />
+                )}
                 Cuisiner !
               </Button>
             )}
@@ -127,10 +132,6 @@ export function RecipeCard({
                     onToggle={onToggleStep}
                     ingredientMap={ingredientMap}
                     scale={scale}
-                    activeTimers={activeTimers}
-                    onStartTimer={onStartTimer}
-                    onStopTimer={onStopTimer}
-                    onResetTimer={onResetTimer}
                   />
                 );
               })}

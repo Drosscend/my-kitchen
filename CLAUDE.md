@@ -48,7 +48,8 @@ bun run typecheck # TypeScript type checking
 
 - `src/app/` - Next.js App Router pages and layouts
 - `src/app/api/cook/` - API routes for shared cooking sessions (KV)
-- `src/app/cook/` - Shared cooking session pages
+- `src/app/recettes/cuisiner/[id]/` - Cooking session page (synced via KV)
+- `src/app/recettes/rejoindre/` - Join session page (enter 6-digit code)
 - `src/components/ui/` - Reusable UI primitives (Button, Card, Dialog, Select, etc.)
 - `src/components/forms/` - Form field components
 - `src/features/` - Feature modules with domain logic
@@ -65,7 +66,7 @@ Features are organized in `src/features/{feature-name}/` with:
 
 ### Shared Cooking Sessions
 
-Flow: PC enters cooking mode → clicks QR button → creates KV session (6-digit code, 24h TTL) → phone scans QR or enters code at `/cook` → both devices sync via polling (500ms). Session state in KV: step index, timers (with `startedAt` timestamps), closed flag. Initial session data is fetched server-side (Partial Prerender).
+Flow: User clicks "Cuisiner" on recipe detail → creates KV session (6-digit code, 24h TTL) → redirects to `/recettes/cuisiner/[id]` → can share QR from there. Phone scans QR or enters code at `/recettes/rejoindre` → both devices sync via polling (500ms). Session state in KV: step index, timers (with `startedAt` timestamps), closed flag. Initial session data is fetched server-side (Partial Prerender).
 
 ### UI Component Conventions
 
