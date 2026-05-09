@@ -22,8 +22,9 @@ export function isPerishable(ingredient: Ingredient): boolean {
 }
 
 export function formatForClipboard(ingredients: Ingredient[]): string {
-  const freshIngredients = ingredients.filter((i) => i.state === "fresh");
-  const frozenIngredients = ingredients.filter((i) => i.state === "frozen");
+  const inStock = ingredients.filter((i) => i.quantity > 0);
+  const freshIngredients = inStock.filter((i) => i.state === "fresh");
+  const frozenIngredients = inStock.filter((i) => i.state === "frozen");
 
   const formatSection = (items: Ingredient[], title: string): string => {
     if (items.length === 0) return "";
