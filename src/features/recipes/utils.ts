@@ -106,19 +106,17 @@ export function formatRecipeForClipboard(
 
 let audioCtx: AudioContext | null = null;
 
-function getAudioContext(): AudioContext {
-  if (!audioCtx) {
-    audioCtx = new AudioContext();
-  }
+// Lazily create and resume the AudioContext. Must be called inside a user
+// gesture — Chromium mobile and iOS Safari create the context "suspended"
+// and only let it resume from a click/touch handler.
+export function ensureAudioContext(): AudioContext {
+  if (!audioCtx) audioCtx = new AudioContext();
+  if (audioCtx.state === "suspended") audioCtx.resume();
   return audioCtx;
 }
 
-export function ensureAudioContext(): void {
-  getAudioContext();
-}
-
 export function playTimerSound(): void {
-  const ctx = getAudioContext();
+  const ctx = ensureAudioContext();
   const now = ctx.currentTime;
 
   for (let i = 0; i < 5; i++) {
@@ -138,8 +136,26 @@ export function playTimerSound(): void {
     osc.stop(start + 0.25);
   }
 
-  // Haptic feedback on mobile
-  if (navigator.vibrate) {
-    navigator.vibrate([200, 100, 200, 100, 200]);
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+}
+
+// ─── Screen Wake Lock ───────────────────────────────────────────────
+
+let wakeLock: WakeLockSentinel | null = null;
+
+export async function acquireWakeLock(): Promise<void> {
+  if (!("wakeLock" in navigator) || wakeLock) return;
+  try {
+    wakeLock = await navigator.wakeLock.request("screen");
+    wakeLock.addEventListener("release", () => {
+      wakeLock = null;
+    });
+  } catch {
+    // ignore (page hidden, permission denied)
   }
+}
+
+export function releaseWakeLock(): void {
+  wakeLock?.release();
+  wakeLock = null;
 }

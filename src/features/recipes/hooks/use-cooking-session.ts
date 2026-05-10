@@ -8,7 +8,12 @@ import type {
   CookingSessionState,
   SyncedTimer,
 } from "../types";
-import { ensureAudioContext, playTimerSound } from "../utils";
+import {
+  acquireWakeLock,
+  ensureAudioContext,
+  playTimerSound,
+  releaseWakeLock,
+} from "../utils";
 
 function useTimerCompletionSound(synced: Record<string, SyncedTimer>) {
   useEffect(() => {
@@ -18,7 +23,22 @@ function useTimerCompletionSound(synced: Record<string, SyncedTimer>) {
       const delay = t.startedAt + t.total * 1000 - Date.now();
       if (delay > 0) timeouts.push(setTimeout(playTimerSound, delay));
     }
-    return () => timeouts.forEach(clearTimeout);
+    if (timeouts.length === 0) return () => {};
+
+    // Keep the screen on while a timer runs, otherwise mobile throttles
+    // setTimeout and blocks navigator.vibrate. The browser auto-releases
+    // the lock when the tab is hidden, so reacquire on visibility change.
+    acquireWakeLock();
+    function onVisibility() {
+      if (document.visibilityState === "visible") acquireWakeLock();
+    }
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      timeouts.forEach(clearTimeout);
+      document.removeEventListener("visibilitychange", onVisibility);
+      releaseWakeLock();
+    };
   }, [synced]);
 }
 
@@ -144,6 +164,7 @@ export function useCookingSession(
   function prevStep() {
     const current = dataRef.current;
     if (!current) return;
+    ensureAudioContext();
     updateState({
       currentStepIndex: Math.max(-1, current.state.currentStepIndex - 1),
     });
@@ -152,6 +173,7 @@ export function useCookingSession(
   function nextStep() {
     const current = dataRef.current;
     if (!current) return;
+    ensureAudioContext();
     updateState({
       currentStepIndex: Math.min(
         current.recipe.steps.length - 1,
@@ -163,6 +185,7 @@ export function useCookingSession(
   function goToStep(index: number) {
     const current = dataRef.current;
     if (!current) return;
+    ensureAudioContext();
     updateState({
       currentStepIndex: Math.max(
         -1,
