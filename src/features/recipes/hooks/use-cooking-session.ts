@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import type {
   ActiveTimers,
@@ -9,6 +9,18 @@ import type {
   SyncedTimer,
 } from "../types";
 import { ensureAudioContext, playTimerSound } from "../utils";
+
+function useTimerCompletionSound(synced: Record<string, SyncedTimer>) {
+  useEffect(() => {
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    for (const t of Object.values(synced)) {
+      if (t.pausedRemaining !== undefined) continue;
+      const delay = t.startedAt + t.total * 1000 - Date.now();
+      if (delay > 0) timeouts.push(setTimeout(playTimerSound, delay));
+    }
+    return () => timeouts.forEach(clearTimeout);
+  }, [synced]);
+}
 
 function computeTimers(synced: Record<string, SyncedTimer>): ActiveTimers {
   const now = Date.now();
@@ -43,7 +55,6 @@ export function useCookingSession(
   );
   const dataRef = useRef<CookingSession | null>(data);
   const lastUpdateRef = useRef(initialSession?.state.updatedAt ?? 0);
-  const prevTimersRef = useRef<ActiveTimers>({});
   const pollingRef = useRef(false);
 
   dataRef.current = data;
@@ -108,25 +119,7 @@ export function useCookingSession(
     return () => clearInterval(interval);
   }, [data?.state.activeTimers, data]);
 
-  // Timer completion sound
-  const onTimerComplete = useEffectEvent(() => {
-    const prev = prevTimersRef.current;
-    for (const [id, timer] of Object.entries(activeTimers)) {
-      if (
-        timer.remaining === 0 &&
-        prev[id]?.remaining !== undefined &&
-        prev[id].remaining > 0
-      ) {
-        playTimerSound();
-        break;
-      }
-    }
-    prevTimersRef.current = activeTimers;
-  });
-
-  useEffect(() => {
-    onTimerComplete();
-  }, []);
+  useTimerCompletionSound(data?.state.activeTimers ?? {});
 
   function updateState(partial: Partial<CookingSessionState>) {
     const current = dataRef.current;
