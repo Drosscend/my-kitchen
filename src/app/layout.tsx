@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Kalam } from "next/font/google";
+import Script from "next/script";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -24,6 +25,11 @@ export default function RootLayout({
       <body className="min-h-screen antialiased">
         {children}
         <Toaster />
+        <Script
+          src="https://analytics.kevin-dev.com/script.js"
+          data-website-id="53aa53cc-5844-4e2b-b73f-0cae810eb3b4"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
