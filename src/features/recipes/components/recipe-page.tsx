@@ -31,12 +31,24 @@ export function RecipePage() {
     if (!selectedRecipe || startingSession) return;
     setStartingSession(true);
     try {
-      const r = await fetch("/api/cook", {
+      // Session creation lives outside /api/cook so Traefik can rate limit it
+      // without throttling the polling on /api/cook/<id>.
+      const r = await fetch("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ recipe: selectedRecipe, scale }),
       });
+
+      if (r.status === 429) {
+        toast.error("Trop de sessions lancées. Réessayez dans une minute.");
+        setStartingSession(false);
+        return;
+      }
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+
       const { id } = await r.json();
+      if (!id) throw new Error("Réponse sans identifiant de session");
+
       router.push(`/recettes/cuisiner/${id}`);
     } catch {
       toast.error("Impossible de lancer la session.");
