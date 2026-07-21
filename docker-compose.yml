@@ -31,7 +31,19 @@ services:
   redis:
     image: redis:8-alpine
     restart: always
-    command: ["redis-server", "--appendonly", "yes"]
+    # /api/cook is unauthenticated, so session writes are bounded here rather
+    # than trusted: Redis never grows past its cap and evicts the sessions
+    # closest to expiry first.
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--maxmemory",
+        "256mb",
+        "--maxmemory-policy",
+        "volatile-ttl",
+      ]
     volumes:
       - redis-data:/data
     networks:
