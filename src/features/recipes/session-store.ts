@@ -21,8 +21,23 @@ function connect(): Promise<RedisClientType> {
 }
 
 function redis(): Promise<RedisClientType> {
-  globalThis.__redisClient ??= connect();
+  // A rejected promise must not stay cached, or every later call inherits the
+  // failure and the process never recovers once Redis comes back.
+  globalThis.__redisClient ??= connect().catch((error) => {
+    globalThis.__redisClient = undefined;
+    throw error;
+  });
   return globalThis.__redisClient;
+}
+
+export async function pingRedis(): Promise<boolean> {
+  try {
+    const client = await redis();
+    return (await client.ping()) === "PONG";
+  } catch (error) {
+    console.error("[redis] ping failed", error);
+    return false;
+  }
 }
 
 export async function readSession(id: string): Promise<CookingSession | null> {
