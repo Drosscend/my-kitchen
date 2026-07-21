@@ -1,6 +1,6 @@
-import { kv } from "@vercel/kv";
 import { z } from "zod/v4";
 import { RecipeSchema, SyncedTimerSchema } from "@/features/recipes/schemas";
+import { sessionExists, writeSession } from "@/features/recipes/session-store";
 import type { CookingSession } from "@/features/recipes/types";
 
 const CreateSessionSchema = z.object({
@@ -13,8 +13,7 @@ const CreateSessionSchema = z.object({
 async function generateUniqueCode(): Promise<string> {
   for (let i = 0; i < 10; i++) {
     const code = String(Math.floor(100000 + Math.random() * 900000));
-    const existing = await kv.exists(`cook:${code}`);
-    if (!existing) return code;
+    if (!(await sessionExists(code))) return code;
   }
   return String(Math.floor(100000 + Math.random() * 900000));
 }
@@ -45,7 +44,7 @@ export async function POST(request: Request) {
     },
   };
 
-  await kv.set(`cook:${id}`, JSON.stringify(session), { ex: 86400 });
+  await writeSession(id, session);
 
   return Response.json({ id });
 }

@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mon Garde-Manger
 
-## Getting Started
+Inventaire d'ingrédients et gestion de recettes. Next.js 16, React 19, Bun.
 
-First, run the development server:
+L'inventaire et les recettes vivent dans le **localStorage** du navigateur.
+Seules les **sessions de cuisine partagées** ont un état serveur : des clés
+`cook:<code>` dans Redis, avec un TTL de 24 h.
+
+## Développement
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun dev          # http://localhost:3000
+bun run build    # build de production
+bun run check    # lint + format (Biome, auto-fix)
+bun run typecheck
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Une instance Redis est nécessaire pour les sessions partagées :
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+docker run -d --name my-kitchen-redis -p 6379:6379 redis:8-alpine
+echo 'REDIS_URL=redis://localhost:6379' >> .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Le reste de l'application fonctionne sans.
 
-## Learn More
+## Déploiement
 
-To learn more about Next.js, take a look at the following resources:
+Hébergé sur le VPS via Dokploy, sur `my-kitchen.kevin-dev.com`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Le `docker-compose.yml` décrit deux services : `app` (build depuis le
+`Dockerfile`, sortie Next `standalone`) et `redis` (persistance AOF sur le
+volume `redis-data`). Redis n'est joint qu'au réseau `internal` — il n'est
+joignable ni depuis Internet ni depuis les autres projets du VPS.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Variables d'environnement : `REDIS_URL`, définie dans le compose puisqu'elle
+ne contient aucun secret.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Le déploiement se déclenche au push sur `main`. La procédure et l'exploitation
+sont documentées dans le dépôt Homelab.

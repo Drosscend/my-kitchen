@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.github
+.vercel
+.claude
+data
+*.tsbuildinfo
+.env*
+README.md
+CLAUDE.md
