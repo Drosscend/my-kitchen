@@ -1,17 +1,13 @@
-import { kv } from "@vercel/kv";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import type { CookingSession } from "@/features/recipes/types";
+import { readSession } from "@/features/recipes/session-store";
 import { CookContent } from "./cook-content";
 
 async function CookLoader({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const raw = await kv.get<string>(`cook:${id}`);
+  const session = await readSession(id);
 
-  if (!raw) notFound();
-
-  const session: CookingSession =
-    typeof raw === "string" ? JSON.parse(raw) : raw;
+  if (!session) notFound();
 
   return <CookContent id={id} initialSession={session} />;
 }

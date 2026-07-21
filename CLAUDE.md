@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Mode cuisine immersif (étape par étape, timers, navigation clavier + swipe)
 - Session de cuisine partagée via QR code / code 6 chiffres (sync temps réel entre appareils)
 - Convertisseur d'unités avec densités d'ingrédients
-- Persistance localStorage (inventaire, recettes) + Vercel KV (sessions partagées)
+- Persistance localStorage (inventaire, recettes) + Redis (sessions partagées)
 
 ### Design
 Thème "Kraft Rustique" : fond papier kraft beige, palette OKLCH (terracotta, brun doré, vert olive), police manuscrite Kalam, texture noise.
@@ -38,7 +38,9 @@ bun run typecheck # TypeScript type checking
 - **UI Components**: Base UI (@base-ui/react) with shadcn style "base-mira"
 - **Styling**: Tailwind CSS 4, class-variance-authority (cva)
 - **Icons**: lucide-react
-- **Real-time**: Vercel KV (@vercel/kv, Upstash Redis) for shared cooking sessions
+- **Real-time**: Redis (`redis` client) for shared cooking sessions, accessed
+  only through `src/features/recipes/session-store.ts`
+- **Deployment**: self-hosted on the VPS via Dokploy (Dockerfile + compose)
 - **QR Code**: qrcode.react
 - **Linting/Formatting**: Biome (not ESLint)
 
@@ -47,8 +49,8 @@ bun run typecheck # TypeScript type checking
 ### Directory Structure
 
 - `src/app/` - Next.js App Router pages and layouts
-- `src/app/api/cook/` - API routes for shared cooking sessions (KV)
-- `src/app/recettes/cuisiner/[id]/` - Cooking session page (synced via KV)
+- `src/app/api/cook/` - API routes for shared cooking sessions (Redis)
+- `src/app/recettes/cuisiner/[id]/` - Cooking session page (synced via Redis)
 - `src/app/recettes/rejoindre/` - Join session page (enter 6-digit code)
 - `src/components/ui/` - Reusable UI primitives (Button, Card, Dialog, Select, etc.)
 - `src/components/forms/` - Form field components
@@ -66,7 +68,7 @@ Features are organized in `src/features/{feature-name}/` with:
 
 ### Shared Cooking Sessions
 
-Flow: User clicks "Cuisiner" on recipe detail → creates KV session (6-digit code, 24h TTL) → redirects to `/recettes/cuisiner/[id]` → can share QR from there. Phone scans QR or enters code at `/recettes/rejoindre` → both devices sync via polling (500ms). Session state in KV: step index, timers (with `startedAt` timestamps), closed flag. Initial session data is fetched server-side (Partial Prerender).
+Flow: User clicks "Cuisiner" on recipe detail → creates a Redis session (6-digit code, 24h TTL) → redirects to `/recettes/cuisiner/[id]` → can share QR from there. Phone scans QR or enters code at `/recettes/rejoindre` → both devices sync via polling (500ms). Session state in Redis: step index, timers (with `startedAt` timestamps), closed flag. Initial session data is fetched server-side (Partial Prerender).
 
 ### UI Component Conventions
 
