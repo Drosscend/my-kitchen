@@ -30,6 +30,7 @@ bun dev          # Start development server (http://localhost:3000)
 bun run build    # Production build
 bun run check    # Lint and format with Biome (auto-fix enabled)
 bun run typecheck # TypeScript type checking
+bun run test     # Run tests (bun:test, colocated `*.test.ts` files)
 ```
 
 ## Tech Stack

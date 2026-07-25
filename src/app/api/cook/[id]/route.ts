@@ -36,11 +36,11 @@ export async function PATCH(
     );
   }
 
-  // updatedAt est posé ici et nulle part ailleurs. C'est la seule horloge que
-  // tous les appareils d'une session partagent : celle du client peut dériver
-  // de plusieurs secondes, et une mise à jour serait alors ignorée à tort.
-  // Seuls les champs réellement modifiés arrivent, ce qui évite qu'un appareil
-  // en retard réécrive par mégarde ce qu'un autre vient de changer.
+  // updatedAt is stamped here and nowhere else: this is the only clock every
+  // device in a session shares. A browser clock can lag by seconds, which used
+  // to get its updates dropped as stale. Only the fields that actually changed
+  // reach us, so a device holding an outdated view cannot overwrite what
+  // another one just changed.
   session.state = { ...session.state, ...result.data, updatedAt: Date.now() };
   await writeSession(id, session);
 

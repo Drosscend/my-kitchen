@@ -17,8 +17,8 @@ export type CookingSessionState = z.infer<typeof CookingSessionStateSchema>;
 export type CookingSessionUpdate = z.infer<typeof CookingSessionUpdateSchema>;
 export type CookingSession = z.infer<typeof CookingSessionSchema>;
 
-// Chaque réponse porte l'heure du serveur : c'est ce qui permet à un appareil
-// de mesurer la dérive de sa propre horloge et de raisonner en temps serveur.
+// Every response carries the server clock, which is how a device measures its
+// own drift and keeps reasoning in server time.
 export type CookingSessionResponse = CookingSession & { serverNow: number };
 
 export interface TimerState {

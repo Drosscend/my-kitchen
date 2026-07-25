@@ -84,10 +84,10 @@ export function useCookingSession(
   );
   const [loading, setLoading] = useState(!initialSession);
   const [error, setError] = useState(false);
-  // Écart entre l'horloge du serveur et celle de l'appareil. Toutes les dates
-  // d'une session (updatedAt, startedAt des timers) sont en temps serveur : les
-  // appareils qui la partagent n'ont pas d'autre référence commune, et une
-  // horloge locale dérive facilement de plusieurs secondes.
+  // Gap between the server clock and this device's. Every date in a session
+  // (updatedAt, timer startedAt) is expressed in server time: devices sharing
+  // a session have no other common reference, and a local clock easily drifts
+  // by several seconds.
   const clockOffsetRef = useRef(
     initialServerNow ? initialServerNow - Date.now() : 0,
   );
@@ -102,8 +102,8 @@ export function useCookingSession(
   const dataRef = useRef<CookingSession | null>(data);
   const lastUpdateRef = useRef(initialSession?.state.updatedAt ?? 0);
   const pollingRef = useRef(false);
-  // Nombre de PATCH en vol. Une réponse de poll partie avant eux décrit un état
-  // antérieur : l'appliquer ferait reculer l'étape qu'on vient de changer.
+  // In-flight PATCH count. A poll response that left before them describes an
+  // earlier state, and applying it would undo the step we just changed.
   const pendingRef = useRef(0);
 
   dataRef.current = data;
@@ -153,8 +153,8 @@ export function useCookingSession(
         const r = await fetch(`/api/cook/${sessionId}`);
         if (!r.ok) return;
         const d: CookingSessionResponse = await r.json();
-        // Une modification locale partie pendant la requête décrit un état plus
-        // récent que cette réponse : elle prime.
+        // A local change sent while this request was in flight describes a more
+        // recent state, so it wins.
         if (pendingRef.current > 0) return;
         if (d.state.updatedAt > lastUpdateRef.current) applyRemote(d);
       } catch {
@@ -192,8 +192,8 @@ export function useCookingSession(
     const current = dataRef.current;
     if (!current || !sessionId) return;
 
-    // Mise à jour optimiste : l'écran réagit tout de suite, le serveur
-    // horodate et confirme. updatedAt garde sa valeur serveur en attendant.
+    // Optimistic update: the screen reacts at once, the server stamps and
+    // confirms. updatedAt keeps its server value in the meantime.
     setData({ ...current, state: { ...current.state, ...update } });
     if (update.activeTimers) {
       setActiveTimers(computeTimers(update.activeTimers, serverNow()));
@@ -207,14 +207,14 @@ export function useCookingSession(
     })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d: CookingSessionResponse) => {
-        // L'état confirmé arrivera par le poll, qui reprend dès que plus rien
-        // n'est en vol. Seul le recalage d'horloge se fait ici.
+        // The confirmed state comes back through the poll, which resumes as
+        // soon as nothing is in flight. Only the clock is calibrated here.
         clockOffsetRef.current = d.serverNow - Date.now();
       })
       .catch(() => {
         toast.error("Erreur de synchronisation.");
-        // L'état local n'a pas été accepté : le prochain poll doit réappliquer
-        // celui du serveur, même s'il n'a pas changé depuis.
+        // The local state was never accepted, so the next poll has to reapply
+        // the server one even though it has not changed since.
         lastUpdateRef.current = 0;
       })
       .finally(() => {
