@@ -9,7 +9,11 @@ async function CookLoader({ params }: { params: Promise<{ id: string }> }) {
 
   if (!session) notFound();
 
-  return <CookContent id={id} initialSession={session} />;
+  // L'heure du serveur voyage avec la session : le navigateur cale son horloge
+  // dessus dès le premier rendu, sans attendre le premier poll.
+  return (
+    <CookContent id={id} initialSession={session} serverNow={Date.now()} />
+  );
 }
 
 export default function CookPage({

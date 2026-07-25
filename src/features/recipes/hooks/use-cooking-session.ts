@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  type RefObject,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 import { toast } from "sonner";
 import type {
   ActiveTimers,
   CookingSession,
-  CookingSessionState,
+  CookingSessionResponse,
+  CookingSessionUpdate,
   SyncedTimer,
 } from "../types";
 import {
@@ -15,12 +22,16 @@ import {
   releaseWakeLock,
 } from "../utils";
 
-function useTimerCompletionSound(synced: Record<string, SyncedTimer>) {
+function useTimerCompletionSound(
+  synced: Record<string, SyncedTimer>,
+  clockOffsetRef: RefObject<number>,
+) {
   useEffect(() => {
     const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const now = Date.now() + clockOffsetRef.current;
     for (const t of Object.values(synced)) {
       if (t.pausedRemaining !== undefined) continue;
-      const delay = t.startedAt + t.total * 1000 - Date.now();
+      const delay = t.startedAt + t.total * 1000 - now;
       if (delay > 0) timeouts.push(setTimeout(playTimerSound, delay));
     }
     if (timeouts.length === 0) return () => {};
@@ -39,11 +50,13 @@ function useTimerCompletionSound(synced: Record<string, SyncedTimer>) {
       document.removeEventListener("visibilitychange", onVisibility);
       releaseWakeLock();
     };
-  }, [synced]);
+  }, [synced, clockOffsetRef]);
 }
 
-function computeTimers(synced: Record<string, SyncedTimer>): ActiveTimers {
-  const now = Date.now();
+function computeTimers(
+  synced: Record<string, SyncedTimer>,
+  now: number,
+): ActiveTimers {
   const result: ActiveTimers = {};
   for (const [id, t] of Object.entries(synced)) {
     if (t.pausedRemaining !== undefined) {
@@ -64,20 +77,52 @@ function computeTimers(synced: Record<string, SyncedTimer>): ActiveTimers {
 export function useCookingSession(
   sessionId: string | null,
   initialSession?: CookingSession,
+  initialServerNow?: number,
 ) {
   const [data, setData] = useState<CookingSession | null>(
     initialSession ?? null,
   );
   const [loading, setLoading] = useState(!initialSession);
   const [error, setError] = useState(false);
+  // Écart entre l'horloge du serveur et celle de l'appareil. Toutes les dates
+  // d'une session (updatedAt, startedAt des timers) sont en temps serveur : les
+  // appareils qui la partagent n'ont pas d'autre référence commune, et une
+  // horloge locale dérive facilement de plusieurs secondes.
+  const clockOffsetRef = useRef(
+    initialServerNow ? initialServerNow - Date.now() : 0,
+  );
   const [activeTimers, setActiveTimers] = useState<ActiveTimers>(
-    initialSession ? computeTimers(initialSession.state.activeTimers) : {},
+    initialSession
+      ? computeTimers(
+          initialSession.state.activeTimers,
+          Date.now() + clockOffsetRef.current,
+        )
+      : {},
   );
   const dataRef = useRef<CookingSession | null>(data);
   const lastUpdateRef = useRef(initialSession?.state.updatedAt ?? 0);
   const pollingRef = useRef(false);
+  // Nombre de PATCH en vol. Une réponse de poll partie avant eux décrit un état
+  // antérieur : l'appliquer ferait reculer l'étape qu'on vient de changer.
+  const pendingRef = useRef(0);
 
   dataRef.current = data;
+
+  function serverNow() {
+    return Date.now() + clockOffsetRef.current;
+  }
+
+  const applyRemote = useEffectEvent((session: CookingSessionResponse) => {
+    clockOffsetRef.current = session.serverNow - Date.now();
+    setData(session);
+    lastUpdateRef.current = session.state.updatedAt;
+    setActiveTimers(
+      computeTimers(
+        session.state.activeTimers,
+        Date.now() + clockOffsetRef.current,
+      ),
+    );
+  });
 
   // Initial fetch (skipped when initialSession is provided)
   useEffect(() => {
@@ -88,10 +133,8 @@ export function useCookingSession(
     setLoading(true);
     fetch(`/api/cook/${sessionId}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d: CookingSession) => {
-        setData(d);
-        lastUpdateRef.current = d.state.updatedAt;
-        setActiveTimers(computeTimers(d.state.activeTimers));
+      .then((d: CookingSessionResponse) => {
+        applyRemote(d);
       })
       .catch(() => {
         setError(true);
@@ -104,17 +147,16 @@ export function useCookingSession(
   useEffect(() => {
     if (!sessionId || !data) return;
     const interval = setInterval(async () => {
-      if (pollingRef.current) return;
+      if (pollingRef.current || pendingRef.current > 0) return;
       pollingRef.current = true;
       try {
         const r = await fetch(`/api/cook/${sessionId}`);
         if (!r.ok) return;
-        const d: CookingSession = await r.json();
-        if (d.state.updatedAt > lastUpdateRef.current) {
-          setData(d);
-          lastUpdateRef.current = d.state.updatedAt;
-          setActiveTimers(computeTimers(d.state.activeTimers));
-        }
+        const d: CookingSessionResponse = await r.json();
+        // Une modification locale partie pendant la requête décrit un état plus
+        // récent que cette réponse : elle prime.
+        if (pendingRef.current > 0) return;
+        if (d.state.updatedAt > lastUpdateRef.current) applyRemote(d);
       } catch {
         // ignore network errors
       } finally {
@@ -133,32 +175,51 @@ export function useCookingSession(
     if (!hasSyncedRunning) return;
     const interval = setInterval(() => {
       if (dataRef.current) {
-        setActiveTimers(computeTimers(dataRef.current.state.activeTimers));
+        setActiveTimers(
+          computeTimers(
+            dataRef.current.state.activeTimers,
+            Date.now() + clockOffsetRef.current,
+          ),
+        );
       }
     }, 1000);
     return () => clearInterval(interval);
   }, [data?.state.activeTimers, data]);
 
-  useTimerCompletionSound(data?.state.activeTimers ?? {});
+  useTimerCompletionSound(data?.state.activeTimers ?? {}, clockOffsetRef);
 
-  function updateState(partial: Partial<CookingSessionState>) {
+  function updateState(update: CookingSessionUpdate) {
     const current = dataRef.current;
-    if (!current) return;
-    const now = Date.now();
-    const newState = { ...current.state, ...partial, updatedAt: now };
+    if (!current || !sessionId) return;
 
-    setData({ ...current, state: newState });
-    lastUpdateRef.current = now;
-
-    if (partial.activeTimers) {
-      setActiveTimers(computeTimers(partial.activeTimers));
+    // Mise à jour optimiste : l'écran réagit tout de suite, le serveur
+    // horodate et confirme. updatedAt garde sa valeur serveur en attendant.
+    setData({ ...current, state: { ...current.state, ...update } });
+    if (update.activeTimers) {
+      setActiveTimers(computeTimers(update.activeTimers, serverNow()));
     }
 
+    pendingRef.current += 1;
     fetch(`/api/cook/${sessionId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newState),
-    }).catch(() => toast.error("Erreur de synchronisation."));
+      body: JSON.stringify(update),
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d: CookingSessionResponse) => {
+        // L'état confirmé arrivera par le poll, qui reprend dès que plus rien
+        // n'est en vol. Seul le recalage d'horloge se fait ici.
+        clockOffsetRef.current = d.serverNow - Date.now();
+      })
+      .catch(() => {
+        toast.error("Erreur de synchronisation.");
+        // L'état local n'a pas été accepté : le prochain poll doit réappliquer
+        // celui du serveur, même s'il n'a pas changé depuis.
+        lastUpdateRef.current = 0;
+      })
+      .finally(() => {
+        pendingRef.current -= 1;
+      });
   }
 
   function prevStep() {
@@ -203,7 +264,7 @@ export function useCookingSession(
     updateState({
       activeTimers: {
         ...current.state.activeTimers,
-        [id]: { total: resumeDuration, startedAt: Date.now() },
+        [id]: { total: resumeDuration, startedAt: serverNow() },
       },
     });
   }
@@ -213,7 +274,7 @@ export function useCookingSession(
     if (!current) return;
     const timer = current.state.activeTimers[id];
     if (!timer) return;
-    const elapsed = Math.floor((Date.now() - timer.startedAt) / 1000);
+    const elapsed = Math.floor((serverNow() - timer.startedAt) / 1000);
     const remaining = Math.max(0, timer.total - elapsed);
     updateState({
       activeTimers: {

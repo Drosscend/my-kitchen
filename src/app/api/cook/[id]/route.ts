@@ -1,6 +1,5 @@
-import { CookingSessionStateSchema } from "@/features/recipes/schemas";
+import { CookingSessionUpdateSchema } from "@/features/recipes/schemas";
 import { readSession, writeSession } from "@/features/recipes/session-store";
-import type { CookingSessionState } from "@/features/recipes/types";
 
 export async function GET(
   _request: Request,
@@ -13,7 +12,7 @@ export async function GET(
     return Response.json({ error: "Session introuvable" }, { status: 404 });
   }
 
-  return Response.json(session);
+  return Response.json({ ...session, serverNow: Date.now() });
 }
 
 export async function PATCH(
@@ -28,7 +27,7 @@ export async function PATCH(
   }
 
   const body = await request.json();
-  const result = CookingSessionStateSchema.partial().safeParse(body);
+  const result = CookingSessionUpdateSchema.safeParse(body);
 
   if (!result.success) {
     return Response.json(
@@ -37,14 +36,13 @@ export async function PATCH(
     );
   }
 
-  const updates: Partial<CookingSessionState> = result.data;
-
-  if (updates.updatedAt && updates.updatedAt <= session.state.updatedAt) {
-    return Response.json(session);
-  }
-
-  session.state = { ...session.state, ...updates };
+  // updatedAt est posé ici et nulle part ailleurs. C'est la seule horloge que
+  // tous les appareils d'une session partagent : celle du client peut dériver
+  // de plusieurs secondes, et une mise à jour serait alors ignorée à tort.
+  // Seuls les champs réellement modifiés arrivent, ce qui évite qu'un appareil
+  // en retard réécrive par mégarde ce qu'un autre vient de changer.
+  session.state = { ...session.state, ...result.data, updatedAt: Date.now() };
   await writeSession(id, session);
 
-  return Response.json(session);
+  return Response.json({ ...session, serverNow: Date.now() });
 }

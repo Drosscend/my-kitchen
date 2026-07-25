@@ -49,6 +49,12 @@ export const CookingSessionStateSchema = z.object({
   updatedAt: z.number(),
 });
 
+// Le client ne décide pas de updatedAt : le serveur l'horodate lui-même, sinon
+// deux horloges incomparables se retrouvent dans le même champ.
+export const CookingSessionUpdateSchema = CookingSessionStateSchema.omit({
+  updatedAt: true,
+}).partial();
+
 export const CookingSessionSchema = z.object({
   recipe: RecipeSchema,
   scale: z.number(),

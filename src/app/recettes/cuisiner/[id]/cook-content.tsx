@@ -18,12 +18,14 @@ import { createIngredientMap } from "@/features/recipes/utils";
 export function CookContent({
   id,
   initialSession,
+  serverNow,
 }: {
   id: string;
   initialSession: CookingSession;
+  serverNow: number;
 }) {
   const router = useRouter();
-  const session = useCookingSession(id, initialSession);
+  const session = useCookingSession(id, initialSession, serverNow);
   const [showQR, setShowQR] = useState(false);
 
   const ingredientMap = createIngredientMap(session.recipe?.ingredients ?? []);
