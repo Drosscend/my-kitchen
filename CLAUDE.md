@@ -43,7 +43,6 @@ bun run test     # Run tests (bun:test, colocated `*.test.ts` files)
   only through `src/features/recipes/session-store.ts`
 - **Deployment**: self-hosted on the VPS via Dokploy (Dockerfile + compose)
 - **QR Code**: qrcode.react
-- **Linting/Formatting**: Biome (not ESLint)
 
 ## Architecture
 
@@ -80,7 +79,4 @@ Flow: User clicks "Cuisiner" on recipe detail → creates a Redis session (6-dig
 
 ## Code Style
 
-- Biome enforces double quotes, 2-space indent, sorted Tailwind classes
-- Imports are auto-organized by Biome
-- French labels in UI, English identifiers in code
 - React Compiler is enabled: do NOT use manual `useMemo`/`useCallback` for optimization (the compiler handles it). Use plain functions instead. Use `useEffectEvent` for callbacks referenced in effects that should not re-trigger the effect.
