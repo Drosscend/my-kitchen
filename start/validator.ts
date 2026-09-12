@@ -11,13 +11,13 @@
 |
 */
 
-import { VineDate } from '@vinejs/vine';
-import { DateTime } from 'luxon';
+import { VineDate } from '@vinejs/vine'
+import { DateTime } from 'luxon'
 
 declare module '@vinejs/vine/types' {
-	interface VineGlobalTransforms {
-		date: DateTime;
-	}
+  interface VineGlobalTransforms {
+    date: DateTime
+  }
 }
 
-VineDate.transform((value) => DateTime.fromJSDate(value));
+VineDate.transform((value) => DateTime.fromJSDate(value))

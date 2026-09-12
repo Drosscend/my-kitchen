@@ -1,6 +1,6 @@
 import { Form, Link } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
-import { AuthShell } from '~/components/auth-shell'
+import { AuthShell } from '~/components/auth_shell'
 import { Button } from '~/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'

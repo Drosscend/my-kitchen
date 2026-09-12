@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react'
-import { ErrorPage } from '~/components/error-page'
+import { ErrorPage } from '~/components/error_page'
 
 export default function NotFound() {
   return (

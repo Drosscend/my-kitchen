@@ -22,7 +22,12 @@ export default function Home({ user }: InertiaProps) {
               <Button size="lg" nativeButton={false} render={<Link route="new_account.create" />}>
                 Créer un compte
               </Button>
-              <Button size="lg" variant="outline" nativeButton={false} render={<Link route="session.create" />}>
+              <Button
+                size="lg"
+                variant="outline"
+                nativeButton={false}
+                render={<Link route="session.create" />}
+              >
                 Se connecter
               </Button>
             </>

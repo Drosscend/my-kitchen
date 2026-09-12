@@ -34,7 +34,12 @@ export default function Layout({ children }: { children: ReactElement }) {
           <nav className="flex items-center gap-1" aria-label="Compte">
             {props.user ? (
               <>
-                <Button variant="ghost" size="sm" nativeButton={false} render={<Link route="account.show" />}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  nativeButton={false}
+                  render={<Link route="account.show" />}
+                >
                   <UserRoundIcon data-icon="inline-start" />
                   Mon compte
                 </Button>
@@ -47,7 +52,12 @@ export default function Layout({ children }: { children: ReactElement }) {
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm" nativeButton={false} render={<Link route="session.create" />}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  nativeButton={false}
+                  render={<Link route="session.create" />}
+                >
                   Se connecter
                 </Button>
                 <Button size="sm" nativeButton={false} render={<Link route="new_account.create" />}>

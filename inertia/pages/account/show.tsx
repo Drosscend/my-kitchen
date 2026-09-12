@@ -1,5 +1,5 @@
-import { type Data } from '@generated/data'
 import { Head } from '@inertiajs/react'
+import { type Data } from '@generated/data'
 import { type InertiaProps } from '~/types'
 
 type PageProps = InertiaProps<{ account: Data.Identity.AccountDetails }>

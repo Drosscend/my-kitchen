@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Mon Garde-Manger** - Application web d'inventaire d'ingrédients de cuisine et de gestion de recettes.
 
 ### Fonctionnalités
+
 - CRUD ingrédients avec édition inline et boutons +/- pour les quantités
 - 8 catégories (légumes, fruits, viandes, poissons, laitiers, épices, féculents, autres)
 - 6 unités (g, kg, mL, L, unité, pièce) et 2 états (frais, congelé)
@@ -21,6 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Persistance localStorage (inventaire, recettes) + Redis (sessions partagées)
 
 ### Design
+
 Thème "Kraft Rustique" : fond papier kraft beige, palette OKLCH (terracotta, brun doré, vert olive), police manuscrite Kalam, texture noise.
 
 ## Commands
@@ -60,6 +62,7 @@ bun run test     # Run tests (bun:test, colocated `*.test.ts` files)
 ### Feature Module Pattern
 
 Features are organized in `src/features/{feature-name}/` with:
+
 - `types.ts` - TypeScript types and interfaces
 - `constants.ts` - Static data, labels, configuration
 - `utils.ts` - Pure helper functions
