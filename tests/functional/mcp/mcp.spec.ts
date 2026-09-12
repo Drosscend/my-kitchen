@@ -23,9 +23,16 @@ interface ToolCall {
   arguments: object
 }
 
-type RpcParams = ToolCall | Record<string, never>
+interface InitializeParams {
+  protocolVersion: string
+  capabilities: object
+  clientInfo: { name: string; version: string }
+}
+
+type RpcParams = ToolCall | InitializeParams | Record<string, never>
 
 interface RpcResult {
+  serverInfo?: { title?: string; websiteUrl?: string; icons?: { src: string }[] }
   tools?: { name: string }[]
   isError?: boolean
   content?: { text: string }[]
@@ -88,6 +95,23 @@ test.group('MCP', (group) => {
     missing.assertStatus(401)
     missing.assertHeader('www-authenticate')
     wrong.assertStatus(401)
+  })
+
+  test('introduces itself with the site name and icon', async ({ client, assert }) => {
+    const ada = await createUser('ada@example.com')
+    const token = await issueToken(ada)
+
+    const response = await rpc(client, token, 'initialize', {
+      protocolVersion: '2025-11-25',
+      capabilities: {},
+      clientInfo: { name: 'tests', version: '0' },
+    })
+
+    response.assertStatus(200)
+    const serverInfo = rpcResult(response).serverInfo
+    assert.equal(serverInfo?.title, 'Mon Garde-Manger')
+    assert.equal(serverInfo?.websiteUrl, 'http://localhost:3333')
+    assert.equal(serverInfo?.icons?.[0]?.src, 'http://localhost:3333/favicon-192.png')
   })
 
   test('lists the tools and reads the pantry of the token owner only', async ({

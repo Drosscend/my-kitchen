@@ -3,6 +3,7 @@ import { toNodeHandler } from '@modelcontextprotocol/node'
 import { createMcpHandler, McpServer } from '@modelcontextprotocol/server'
 import { registerInventoryTools } from '#app/mcp/tools/inventory_tools'
 import { registerRecipeTools } from '#app/mcp/tools/recipe_tools'
+import { appUrl } from '#config/app'
 import { UserIdentifier } from '#identity/domain/user_identifier'
 
 /**
@@ -16,7 +17,19 @@ export const mcpHandler = createMcpHandler(
     }
 
     const userId = UserIdentifier.fromString(authInfo.clientId)
-    const server = new McpServer({ name: 'mon-garde-manger', version: '1.0.0' })
+    const server = new McpServer({
+      name: 'mon-garde-manger',
+      title: 'Mon Garde-Manger',
+      version: '1.0.0',
+      websiteUrl: appUrl,
+      icons: [
+        {
+          src: new URL('/favicon-192.png', appUrl).href,
+          mimeType: 'image/png',
+          sizes: ['192x192'],
+        },
+      ],
+    })
     await registerInventoryTools(server, userId)
     await registerRecipeTools(server, userId)
 
