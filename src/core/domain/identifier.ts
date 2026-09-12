@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import { createId } from '@paralleldrive/cuid2'
 import { ValueObject } from '#core/domain/value_object'
 
 export class Identifier<TType extends string> extends ValueObject<{ value: string }> {
@@ -11,7 +11,7 @@ export class Identifier<TType extends string> extends ValueObject<{ value: strin
   static generate<TIdentifier extends Identifier<string>>(
     this: new (properties: { value: string }) => TIdentifier
   ): TIdentifier {
-    return new this({ value: randomUUID() })
+    return new this({ value: createId() })
   }
 
   static fromString<TIdentifier extends Identifier<string>>(
