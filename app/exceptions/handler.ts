@@ -1,6 +1,7 @@
 import { errors as authErrors } from '@adonisjs/auth'
 import { ExceptionHandler, type HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
+import { errors as limiterErrors } from '@adonisjs/limiter'
 import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
@@ -33,6 +34,20 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     if (error instanceof authErrors.E_UNAUTHORIZED_ACCESS && ctx.session) {
       ctx.session.flash('error', 'Connecte-toi pour continuer')
       return ctx.response.redirect().withIntendedUrl().toRoute('session.create')
+    }
+
+    /**
+     * A throttled form submission comes back to the form with a
+     * message, instead of the bare 429 page the limiter would send.
+     */
+    if (
+      error instanceof limiterErrors.E_TOO_MANY_REQUESTS &&
+      ctx.session &&
+      ctx.request.method() !== 'GET' &&
+      ctx.request.accepts(['html', 'json']) === 'html'
+    ) {
+      ctx.session.flash('error', 'Trop de tentatives, réessaie dans quelques minutes')
+      return ctx.response.redirect().back()
     }
 
     return super.handle(error, ctx)

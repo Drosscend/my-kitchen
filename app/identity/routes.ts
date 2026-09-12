@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { loginThrottle, mailThrottle, signupThrottle } from '#start/limiter'
 
 const LoginController = () => import('#app/identity/controllers/login_controller')
 const RegisterUserController = () => import('#app/identity/controllers/register_user_controller')
@@ -15,11 +16,17 @@ const ResetPasswordController = () => import('#app/identity/controllers/reset_pa
 router
   .group(() => {
     router.get('signup', [RegisterUserController, 'render']).as('new_account.create')
-    router.post('signup', [RegisterUserController, 'execute']).as('new_account.store')
+    router
+      .post('signup', [RegisterUserController, 'execute'])
+      .as('new_account.store')
+      .use(signupThrottle)
     router.get('login', [LoginController, 'render']).as('session.create')
-    router.post('login', [LoginController, 'execute']).as('session.store')
+    router.post('login', [LoginController, 'execute']).as('session.store').use(loginThrottle)
     router.get('forgot-password', [ForgotPasswordController, 'render']).as('password.forgot')
-    router.post('forgot-password', [ForgotPasswordController, 'execute']).as('password.email')
+    router
+      .post('forgot-password', [ForgotPasswordController, 'execute'])
+      .as('password.email')
+      .use(mailThrottle)
     router.get('reset-password/:token', [ResetPasswordController, 'render']).as('password.reset')
     router.post('reset-password', [ResetPasswordController, 'execute']).as('password.update')
   })
@@ -36,6 +43,7 @@ router
     router
       .post('verify-email/resend', [EmailVerificationController, 'execute'])
       .as('verification.resend')
+      .use(mailThrottle)
     router.post('logout', [LogoutController, 'execute']).as('session.destroy')
   })
   .use(middleware.auth())
