@@ -1,0 +1,14 @@
+node_modules
+build
+tmp
+.git
+.claude
+.env
+.env.*
+!.env.example
+docs
+data
+compose.yaml
+Dockerfile
+.dockerignore
+*.md

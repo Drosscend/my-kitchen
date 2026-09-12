@@ -35,6 +35,13 @@ const env = await Env.create(new URL('../', import.meta.url), {
   SMTP_PASSWORD: Env.schema.string.optional(),
   MAIL_FROM_ADDRESS: Env.schema.string(),
   MAIL_FROM_NAME: Env.schema.string(),
+
+  // Umami analytics, tracking script of the self-hosted instance
+  UMAMI_SCRIPT_URL: Env.schema.string.optional(),
+  UMAMI_WEBSITE_ID: Env.schema.string.optional(),
+
+  // Guards the detailed /health report
+  MONITORING_SECRET: Env.schema.string.optional(),
 })
 
 try {

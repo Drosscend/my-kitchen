@@ -1,0 +1,78 @@
+# Production stack, built and deployed on push to main. Local
+# development uses compose.yaml instead, which only runs Postgres and
+# Mailpit, and `docker compose up -d` picks that one up first.
+#
+# Conventions this file follows:
+#   - no `ports:` and no routing labels: the reverse proxy reaches the
+#     app through the shared network, the domain is configured outside
+#     this file;
+#   - no secret in here, every variable is referenced as ${VAR} and set
+#     in the deployment platform's own environment settings.
+#
+# The database ships in this compose, isolated on the `internal`
+# network so only `app` can reach it. The `mail` network carries
+# outgoing SMTP and is never exposed publicly.
+
+services:
+  app:
+    build: .
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dokploy-network
+      - internal
+      - mail
+    environment:
+      - TZ=UTC
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - APP_KEY=${APP_KEY}
+      - APP_URL=${APP_URL}
+      - SESSION_DRIVER=cookie
+
+      # Database (the `db` service below, internal network only)
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_DATABASE}
+
+      # Account mails, relayed by the SMTP host reachable on the
+      # `mail` network.
+      - SMTP_HOST=mailbridge
+      - SMTP_PORT=25
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+
+      # Umami analytics
+      - UMAMI_SCRIPT_URL=${UMAMI_SCRIPT_URL}
+      - UMAMI_WEBSITE_ID=${UMAMI_WEBSITE_ID}
+
+      # Guards the detailed /health report
+      - MONITORING_SECRET=${MONITORING_SECRET}
+
+  db:
+    image: postgres:17-alpine
+    restart: always
+    networks:
+      - internal
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  dokploy-network:
+    external: true
+  mail:
+    external: true
+  internal:

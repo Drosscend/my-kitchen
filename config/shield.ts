@@ -1,24 +1,38 @@
+import app from '@adonisjs/core/services/app'
 import { defineConfig } from '@adonisjs/shield'
+import env from '#start/env'
+
+/**
+ * Origin of the self-hosted Umami instance, allowed as a script and
+ * beacon source when configured.
+ */
+const umamiScriptUrl = env.get('UMAMI_SCRIPT_URL')
+const umamiOrigin = umamiScriptUrl ? new URL(umamiScriptUrl).origin : null
 
 const shieldConfig = defineConfig({
   /**
-   * Configure CSP policies for your app. Refer documentation
-   * to learn more.
+   * Content-Security-Policy, production only: the Vite dev server
+   * relies on inline scripts (React refresh preamble) that a strict
+   * policy would block.
    */
   csp: {
-    /**
-     * Enable the Content-Security-Policy header.
-     */
-    enabled: false,
+    enabled: app.inProduction,
 
-    /**
-     * Per-resource CSP directives.
-     */
-    directives: {},
+    directives: {
+      defaultSrc: [`'self'`],
+      scriptSrc: [`'self'`, '@nonce', ...(umamiOrigin ? [umamiOrigin] : [])],
+      /**
+       * unsafe-inline is required for style attributes: Base UI and
+       * the toaster position their elements with inline styles.
+       */
+      styleSrc: [`'self'`, `'unsafe-inline'`],
+      imgSrc: [`'self'`, 'data:'],
+      connectSrc: [`'self'`, ...(umamiOrigin ? [umamiOrigin] : [])],
+      objectSrc: [`'none'`],
+      baseUri: [`'self'`],
+      formAction: [`'self'`],
+    },
 
-    /**
-     * Report violations without blocking resources.
-     */
     reportOnly: false,
   },
 

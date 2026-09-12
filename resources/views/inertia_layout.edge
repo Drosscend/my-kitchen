@@ -9,6 +9,10 @@
     @vite(['inertia/app.tsx'])
     @inertiaHead()
     @stack('dumper')
+
+    @if(umamiScriptUrl && umamiWebsiteId)
+      <script defer src="{{ umamiScriptUrl }}" data-website-id="{{ umamiWebsiteId }}"></script>
+    @end
   </head>
 
   <body>

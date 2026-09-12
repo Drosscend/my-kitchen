@@ -18,4 +18,7 @@ export const controllers = {
     UpdateProfile: () => import('#app/identity/controllers/update_profile_controller'),
     VerifyEmail: () => import('#app/identity/controllers/verify_email_controller'),
   },
+  shared: {
+    HealthChecks: () => import('#app/shared/controllers/health_checks_controller'),
+  },
 }
