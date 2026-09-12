@@ -29,3 +29,9 @@ createInertiaApp({
     color: 'oklch(0.55 0.15 35)',
   },
 })
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch((error) => {
+    console.error('service worker registration failed:', error)
+  })
+}
