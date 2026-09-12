@@ -3,7 +3,7 @@ import { generateSecureToken, hashSecureToken } from '#identity/domain/secure_to
 const TOKEN_PREFIX = 'mk_'
 const VISIBLE_LENGTH = 11
 
-export interface IssuedMcpToken {
+interface IssuedMcpToken {
   /**
    * Shown once, at creation; only its hash is kept.
    */
@@ -18,10 +18,6 @@ export interface IssuedMcpToken {
 export function generateMcpToken(): IssuedMcpToken {
   const value = `${TOKEN_PREFIX}${generateSecureToken().value}`
   return { value, hash: hashSecureToken(value), prefix: value.slice(0, VISIBLE_LENGTH) }
-}
-
-export function hashMcpToken(value: string) {
-  return hashSecureToken(value)
 }
 
 export function looksLikeMcpToken(value: string) {

@@ -1,13 +1,17 @@
 import { createHash, randomBytes } from 'node:crypto'
 
-export interface SecureToken {
+interface SecureToken {
   value: string
   hash: string
 }
 
+export interface InvalidTokenError {
+  type: 'invalid_token'
+}
+
 /**
- * The clear value travels in the e-mail link, only its hash is stored:
- * a database leak does not hand out usable links.
+ * The clear value is handed to the caller once, only its hash is stored:
+ * a database leak does not hand out usable tokens.
  */
 export function generateSecureToken(): SecureToken {
   const value = randomBytes(32).toString('base64url')

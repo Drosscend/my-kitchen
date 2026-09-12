@@ -1,9 +1,13 @@
 import { inject } from '@adonisjs/core'
 import { err, ok, type Result } from '#core/result'
-import { hashMcpToken, looksLikeMcpToken } from '#identity/domain/mcp_token'
+import { looksLikeMcpToken } from '#identity/domain/mcp_token'
+import { hashSecureToken, type InvalidTokenError } from '#identity/domain/secure_token'
 import { UserIdentifier } from '#identity/domain/user_identifier'
 import { McpTokenRepository } from '#identity/repositories/mcp_token_repository'
-import type { InvalidTokenError } from '#identity/actions/verify_email'
+
+export interface VerifyMcpTokenParams {
+  token: string
+}
 
 export type VerifyMcpTokenResult = Result<UserIdentifier, InvalidTokenError>
 
@@ -11,12 +15,12 @@ export type VerifyMcpTokenResult = Result<UserIdentifier, InvalidTokenError>
 export class VerifyMcpToken {
   constructor(private readonly tokens: McpTokenRepository) {}
 
-  async execute(value: string): Promise<VerifyMcpTokenResult> {
-    if (!looksLikeMcpToken(value)) {
+  async execute(params: VerifyMcpTokenParams): Promise<VerifyMcpTokenResult> {
+    if (!looksLikeMcpToken(params.token)) {
       return err({ type: 'invalid_token' })
     }
 
-    const token = await this.tokens.findByHash(hashMcpToken(value))
+    const token = await this.tokens.findByHash(hashSecureToken(params.token))
 
     if (!token) {
       return err({ type: 'invalid_token' })

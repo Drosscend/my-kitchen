@@ -11,7 +11,7 @@ interface InsertTokenPayload {
   tokenHash: string
 }
 
-export interface McpTokenOwner {
+interface McpTokenOwner {
   id: string
   userId: string
 }
@@ -58,7 +58,7 @@ export class McpTokenRepository {
    * Returns whether a row was deleted: a foreign or unknown token is a
    * no-op the caller reports.
    */
-  async deleteForUser(userId: UserIdentifier, id: string) {
+  async delete(userId: UserIdentifier, id: string) {
     const result = await this.transactions
       .currentDatabase()
       .deleteFrom('mcp_tokens')

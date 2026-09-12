@@ -1,7 +1,7 @@
 import { inject } from '@adonisjs/core'
 import { err, ok, type Result } from '#core/result'
 import { EmailAddress } from '#identity/domain/email_address'
-import { hashSecureToken } from '#identity/domain/secure_token'
+import { hashSecureToken, type InvalidTokenError } from '#identity/domain/secure_token'
 import { UserIdentifier } from '#identity/domain/user_identifier'
 import { EmailVerificationTokenRepository } from '#identity/repositories/email_verification_token_repository'
 import { UserRepository, type EmailAlreadyTakenError } from '#identity/repositories/user_repository'
@@ -12,9 +12,6 @@ export interface VerifyEmailParams {
   token: string
 }
 
-export interface InvalidTokenError {
-  type: 'invalid_token'
-}
 export type VerifyEmailError = InvalidTokenError | EmailAlreadyTakenError
 export type VerifyEmailResult = Result<User, VerifyEmailError>
 
@@ -42,10 +39,6 @@ export class VerifyEmail {
 
       if (!user.ok) {
         return err(user.error)
-      }
-
-      if (!user.value) {
-        return err({ type: 'invalid_token' })
       }
 
       await this.tokens.deleteForUser(userId)

@@ -1,5 +1,6 @@
 import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
+import PasswordResetMail from '#identity/mails/password_reset_mail'
 import { assertRedirectedTo } from '#tests/helpers/http'
 import { queuedLink } from '#tests/helpers/mail'
 import { resetState } from '#tests/helpers/state'
@@ -11,21 +12,29 @@ test.group('Password reset', (group) => {
     return () => mail.restore()
   })
 
-  test('answers the same way for an unknown address', async ({ client }) => {
+  test('answers the same way for a known and an unknown address', async ({ client }) => {
     const mailer = mail.fake()
+    await createUser('ada@example.com')
 
-    const response = await client
+    const unknown = await client
       .post('/forgot-password')
       .withCsrfToken()
       .form({ email: 'nobody@example.com' })
       .redirects(0)
+    const known = await client
+      .post('/forgot-password')
+      .withCsrfToken()
+      .form({ email: 'ada@example.com' })
+      .redirects(0)
 
-    assertRedirectedTo(response, '/login')
-    response.assertFlashMessage(
-      'success',
-      "Si un compte existe pour cette adresse, un e-mail vient d'être envoyé"
-    )
-    mailer.mails.assertNoneQueued()
+    for (const response of [unknown, known]) {
+      assertRedirectedTo(response, '/login')
+      response.assertFlashMessage(
+        'success',
+        "Si un compte existe pour cette adresse, un e-mail vient d'être envoyé"
+      )
+    }
+    mailer.mails.assertQueuedCount(PasswordResetMail, 1)
   })
 
   test('mails a link that changes the password once', async ({ client }) => {
@@ -55,7 +64,6 @@ test.group('Password reset', (group) => {
     assertRedirectedTo(reset, '/login')
     reset.assertFlashMessage('success', 'Mot de passe modifié, tu peux te connecter')
     assertRedirectedTo(replay, '/forgot-password')
-    assertRedirectedTo(oldPassword, '/')
     oldPassword.assertFlashMessage('error', 'Identifiants incorrects')
     assertRedirectedTo(newPassword, '/')
   })

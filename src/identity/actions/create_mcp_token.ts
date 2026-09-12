@@ -2,6 +2,7 @@ import { inject } from '@adonisjs/core'
 import { err, ok, type Result } from '#core/result'
 import { generateMcpToken } from '#identity/domain/mcp_token'
 import { TokenIdentifier } from '#identity/domain/token_identifier'
+import { MAX_NAME_LENGTH } from '#identity/domain/user'
 import { McpTokenRepository } from '#identity/repositories/mcp_token_repository'
 import type { UserIdentifier } from '#identity/domain/user_identifier'
 
@@ -15,9 +16,6 @@ export interface InvalidTokenNameError {
 }
 export type CreateMcpTokenResult = Result<string, InvalidTokenNameError>
 
-/**
- * The clear value is returned once and never stored.
- */
 @inject()
 export class CreateMcpToken {
   constructor(private readonly tokens: McpTokenRepository) {}
@@ -25,7 +23,7 @@ export class CreateMcpToken {
   async execute(params: CreateMcpTokenParams): Promise<CreateMcpTokenResult> {
     const name = params.name.trim()
 
-    if (!name || name.length > 100) {
+    if (!name || name.length > MAX_NAME_LENGTH) {
       return err({ type: 'invalid_token_name' })
     }
 

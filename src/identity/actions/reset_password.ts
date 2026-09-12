@@ -2,12 +2,11 @@ import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
 import { err, ok, type Result } from '#core/result'
 import { validatePassword, type InvalidPasswordError } from '#identity/domain/password'
-import { hashSecureToken } from '#identity/domain/secure_token'
+import { hashSecureToken, type InvalidTokenError } from '#identity/domain/secure_token'
 import { UserIdentifier } from '#identity/domain/user_identifier'
 import { PasswordResetTokenRepository } from '#identity/repositories/password_reset_token_repository'
 import { UserRepository } from '#identity/repositories/user_repository'
 import { TransactionManager } from '#shared/services/transaction_manager'
-import type { InvalidTokenError } from '#identity/actions/verify_email'
 import type { User } from '#identity/domain/user'
 
 export interface ResetPasswordParams {
@@ -44,11 +43,6 @@ export class ResetPassword {
 
       const userId = UserIdentifier.fromString(token.userId)
       const user = await this.users.updatePassword(userId, await hash.make(password.value))
-
-      if (!user) {
-        return err({ type: 'invalid_token' })
-      }
-
       await this.tokens.deleteForUser(userId)
       return ok(user)
     })

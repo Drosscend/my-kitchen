@@ -1,13 +1,14 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
+import { emailField, passwordField } from '#app/identity/validators'
 import { VerifyUserCredentials } from '#identity/actions/verify_user_credentials'
 import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class LoginController {
   static readonly validator = vine.create({
-    email: vine.string().trim().email().maxLength(254),
-    password: vine.string().minLength(8).maxLength(72),
+    email: emailField,
+    password: passwordField,
   })
 
   constructor(private readonly verifyUserCredentials: VerifyUserCredentials) {}

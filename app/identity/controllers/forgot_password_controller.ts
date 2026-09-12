@@ -1,12 +1,13 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
+import { emailField } from '#app/identity/validators'
 import { RequestPasswordReset } from '#identity/actions/request_password_reset'
 import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class ForgotPasswordController {
   static readonly validator = vine.create({
-    email: vine.string().trim().email().maxLength(254),
+    email: emailField,
   })
 
   constructor(private readonly requestPasswordReset: RequestPasswordReset) {}

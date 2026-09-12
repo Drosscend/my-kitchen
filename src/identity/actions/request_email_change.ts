@@ -1,10 +1,9 @@
 import { inject } from '@adonisjs/core'
-import hash from '@adonisjs/core/services/hash'
 import { err, ok, type Result } from '#core/result'
 import { SendEmailVerification } from '#identity/actions/send_email_verification'
 import { EmailAddress, type InvalidEmailAddressError } from '#identity/domain/email_address'
+import { verifyPassword, type InvalidCredentialsError } from '#identity/domain/password'
 import { UserRepository, type EmailAlreadyTakenError } from '#identity/repositories/user_repository'
-import type { InvalidCredentialsError } from '#identity/actions/verify_user_credentials'
 import type { User } from '#identity/domain/user'
 
 export interface RequestEmailChangeParams {
@@ -34,8 +33,10 @@ export class RequestEmailChange {
   ) {}
 
   async execute(params: RequestEmailChangeParams): Promise<RequestEmailChangeResult> {
-    if (!(await hash.verify(params.user.passwordHash, params.password))) {
-      return err({ type: 'invalid_credentials' })
+    const credentials = await verifyPassword(params.user.passwordHash, params.password)
+
+    if (!credentials.ok) {
+      return err(credentials.error)
     }
 
     const email = EmailAddress.create(params.email)

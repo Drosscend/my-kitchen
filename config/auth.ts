@@ -20,7 +20,8 @@ const authConfig = defineConfig({
       useRememberMeTokens: false,
 
       provider: configProvider.create(async (app) => {
-        const { makeSessionKyselyUserProvider } = await import('#identity/session_user_provider')
+        const { makeSessionKyselyUserProvider } =
+          await import('#app/identity/session_user_provider')
         return makeSessionKyselyUserProvider(app)
       }),
     }),

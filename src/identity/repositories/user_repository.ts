@@ -8,15 +8,7 @@ import { TransactionManager } from '#shared/services/transaction_manager'
 import type { Users } from '#types/db'
 import type { Selectable } from 'kysely'
 
-const userColumns = [
-  'id',
-  'name',
-  'email',
-  'password',
-  'email_verified_at',
-  'created_at',
-  'updated_at',
-] as const
+const userColumns = ['id', 'name', 'email', 'password', 'email_verified_at'] as const
 type UserRecord = Pick<Selectable<Users>, (typeof userColumns)[number]>
 
 interface CreateUserPayload {
@@ -46,18 +38,13 @@ export class UserRepository {
           email: payload.email.toString(),
           password: payload.passwordHash,
           email_verified_at: payload.emailVerifiedAt,
-          updated_at: null,
         })
         .returning(userColumns)
         .executeTakeFirstOrThrow()
 
       return ok(this.#toDomain(record))
     } catch (error) {
-      if (
-        error instanceof postgres.PostgresError &&
-        error.code === '23505' &&
-        error.constraint_name === 'users_email_unique'
-      ) {
+      if (this.#isEmailTaken(error)) {
         return err({ type: 'email_already_taken' })
       }
       throw error
@@ -75,12 +62,12 @@ export class UserRepository {
     return record ? this.#toDomain(record) : null
   }
 
-  async findUserById(id: string) {
+  async findUserById(id: UserIdentifier) {
     const record = await this.transactions
       .currentDatabase()
       .selectFrom('users')
       .select(userColumns)
-      .where('id', '=', id)
+      .where('id', '=', id.toString())
       .executeTakeFirst()
 
     return record ? this.#toDomain(record) : null
@@ -94,7 +81,7 @@ export class UserRepository {
     id: UserIdentifier,
     email: EmailAddress,
     verifiedAt: Date
-  ): Promise<Result<User | null, EmailAlreadyTakenError>> {
+  ): Promise<Result<User, EmailAlreadyTakenError>> {
     try {
       const record = await this.transactions
         .currentDatabase()
@@ -102,15 +89,11 @@ export class UserRepository {
         .set({ email: email.toString(), email_verified_at: verifiedAt, updated_at: verifiedAt })
         .where('id', '=', id.toString())
         .returning(userColumns)
-        .executeTakeFirst()
+        .executeTakeFirstOrThrow()
 
-      return ok(record ? this.#toDomain(record) : null)
+      return ok(this.#toDomain(record))
     } catch (error) {
-      if (
-        error instanceof postgres.PostgresError &&
-        error.code === '23505' &&
-        error.constraint_name === 'users_email_unique'
-      ) {
+      if (this.#isEmailTaken(error)) {
         return err({ type: 'email_already_taken' })
       }
       throw error
@@ -118,15 +101,12 @@ export class UserRepository {
   }
 
   async updateName(id: UserIdentifier, name: string | null) {
-    const record = await this.transactions
+    await this.transactions
       .currentDatabase()
       .updateTable('users')
       .set({ name, updated_at: new Date() })
       .where('id', '=', id.toString())
-      .returning(userColumns)
-      .executeTakeFirst()
-
-    return record ? this.#toDomain(record) : null
+      .execute()
   }
 
   async updatePassword(id: UserIdentifier, passwordHash: string) {
@@ -136,9 +116,9 @@ export class UserRepository {
       .set({ password: passwordHash, updated_at: new Date() })
       .where('id', '=', id.toString())
       .returning(userColumns)
-      .executeTakeFirst()
+      .executeTakeFirstOrThrow()
 
-    return record ? this.#toDomain(record) : null
+    return this.#toDomain(record)
   }
 
   async deleteUser(id: UserIdentifier) {
@@ -147,6 +127,14 @@ export class UserRepository {
       .deleteFrom('users')
       .where('id', '=', id.toString())
       .execute()
+  }
+
+  #isEmailTaken(cause: unknown) {
+    return (
+      cause instanceof postgres.PostgresError &&
+      cause.code === '23505' &&
+      cause.constraint_name === 'users_email_unique'
+    )
   }
 
   #toDomain(record: UserRecord) {
@@ -162,8 +150,6 @@ export class UserRepository {
       email: email.value,
       passwordHash: record.password,
       emailVerifiedAt: record.email_verified_at,
-      createdAt: record.created_at,
-      updatedAt: record.updated_at,
     })
   }
 }

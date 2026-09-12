@@ -1,5 +1,6 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
+import { identityErrorMessages } from '#app/identity/error_messages'
 import { DeleteAccount } from '#identity/actions/delete_account'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -16,7 +17,7 @@ export default class DeleteAccountController {
     const result = await this.deleteAccount.execute({ user: auth.getUserOrFail(), ...params })
 
     if (!result.ok) {
-      session.flash('error', 'Mot de passe incorrect')
+      session.flash('error', identityErrorMessages[result.error.type])
       return response.redirect().toRoute('account.show')
     }
 

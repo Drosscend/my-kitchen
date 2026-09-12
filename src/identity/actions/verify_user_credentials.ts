@@ -2,6 +2,7 @@ import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
 import { err, ok, type Result } from '#core/result'
 import { EmailAddress } from '#identity/domain/email_address'
+import { verifyPassword, type InvalidCredentialsError } from '#identity/domain/password'
 import { UserRepository } from '#identity/repositories/user_repository'
 import type { User } from '#identity/domain/user'
 
@@ -10,9 +11,6 @@ export interface VerifyUserCredentialsParams {
   password: string
 }
 
-export interface InvalidCredentialsError {
-  type: 'invalid_credentials'
-}
 export type VerifyUserCredentialsResult = Result<User, InvalidCredentialsError>
 
 @inject()
@@ -28,10 +26,7 @@ export class VerifyUserCredentials {
       return err({ type: 'invalid_credentials' })
     }
 
-    if (!(await hash.verify(user.passwordHash, params.password))) {
-      return err({ type: 'invalid_credentials' })
-    }
-
-    return ok(user)
+    const credentials = await verifyPassword(user.passwordHash, params.password)
+    return credentials.ok ? ok(user) : err(credentials.error)
   }
 }

@@ -3,13 +3,14 @@ import { RegisterUser } from '#identity/actions/register_user'
 import { EmailAddress } from '#identity/domain/email_address'
 import { User } from '#identity/domain/user'
 import { UserIdentifier } from '#identity/domain/user_identifier'
+import { db } from '#shared/services/db'
 
 export const TEST_PASSWORD = 'a-secure-password'
 
 /**
  * An in-memory user for unit tests, never persisted.
  */
-export function makeUser(overrides: Partial<{ email: string; emailVerifiedAt: Date | null }> = {}) {
+export function makeUser(overrides: Partial<{ id: UserIdentifier; email: string }> = {}) {
   const email = EmailAddress.create(overrides.email ?? 'ada@example.com')
 
   if (!email.ok) {
@@ -17,18 +18,16 @@ export function makeUser(overrides: Partial<{ email: string; emailVerifiedAt: Da
   }
 
   return User.create({
-    id: UserIdentifier.generate(),
+    id: overrides.id ?? UserIdentifier.generate(),
     name: 'Ada Lovelace',
     email: email.value,
     passwordHash: 'hashed',
-    emailVerifiedAt: overrides.emailVerifiedAt ?? new Date('2026-01-01T00:00:00Z'),
-    createdAt: new Date('2026-01-01T00:00:00Z'),
-    updatedAt: null,
+    emailVerifiedAt: new Date('2026-01-01T00:00:00Z'),
   })
 }
 
 /**
- * A persisted user for functional tests.
+ * A persisted user for tests that go through the database.
  */
 export async function createUser(email: string, emailVerified = true) {
   const registerUser = await app.container.make(RegisterUser)
@@ -44,4 +43,12 @@ export async function createUser(email: string, emailVerified = true) {
   }
 
   return result.value
+}
+
+export function storedUser(email: string) {
+  return db
+    .selectFrom('users')
+    .select(['id', 'name', 'email', 'email_verified_at'])
+    .where('email', '=', email)
+    .executeTakeFirst()
 }

@@ -1,19 +1,14 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
+import { identityErrorMessages } from '#app/identity/error_messages'
+import { emailField } from '#app/identity/validators'
 import { RequestEmailChange } from '#identity/actions/request_email_change'
 import type { HttpContext } from '@adonisjs/core/http'
-
-const errorMessages = {
-  invalid_credentials: 'Mot de passe incorrect',
-  invalid_email_address: "L'adresse e-mail n'est pas valide",
-  same_email: "C'est déjà l'adresse du compte",
-  email_already_taken: 'Un compte existe déjà pour cette adresse',
-} as const
 
 @inject()
 export default class RequestEmailChangeController {
   static readonly validator = vine.create({
-    email: vine.string().trim().email().maxLength(254),
+    email: emailField,
     password: vine.string(),
   })
 
@@ -24,7 +19,7 @@ export default class RequestEmailChangeController {
     const result = await this.requestEmailChange.execute({ user: auth.getUserOrFail(), ...params })
 
     if (!result.ok) {
-      session.flash('error', errorMessages[result.error.type])
+      session.flash('error', identityErrorMessages[result.error.type])
       return response.redirect().toRoute('account.show')
     }
 

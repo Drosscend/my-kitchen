@@ -10,7 +10,7 @@ export interface InvalidEmailAddressError {
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u
-const MAX_EMAIL_LENGTH = 254
+export const MAX_EMAIL_LENGTH = 254
 
 export class EmailAddress extends ValueObject<EmailAddressProperties> {
   static create(value: string): Result<EmailAddress, InvalidEmailAddressError> {

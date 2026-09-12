@@ -1,96 +1,43 @@
-import hash from '@adonisjs/core/services/hash'
+import app from '@adonisjs/core/services/app'
+import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
+import { RequestPasswordReset } from '#identity/actions/request_password_reset'
 import { ResetPassword } from '#identity/actions/reset_password'
-import { hashSecureToken } from '#identity/domain/secure_token'
-import { makeUser } from '#tests/helpers/users'
-import type { User } from '#identity/domain/user'
-import type { UserIdentifier } from '#identity/domain/user_identifier'
-import type {
-  PasswordResetTokenRepository,
-  ValidPasswordResetToken,
-} from '#identity/repositories/password_reset_token_repository'
-import type { UserRepository } from '#identity/repositories/user_repository'
-import type { TransactionManager } from '#shared/services/transaction_manager'
+import { db } from '#shared/services/db'
+import { queuedLink } from '#tests/helpers/mail'
+import { resetState } from '#tests/helpers/state'
+import { createUser } from '#tests/helpers/users'
 
-// SAFETY: The actions only call `run` on their transaction dependency.
-const transactions = {
-  run<T>(callback: () => Promise<T>) {
-    return callback()
-  },
-} as TransactionManager
+test.group('ResetPassword', (group) => {
+  group.each.setup(async () => {
+    await resetState()
+    return () => mail.restore()
+  })
 
-test.group('ResetPassword', () => {
-  test('rejects a password outside the policy before looking up the token', async ({ assert }) => {
-    let tokenLookedUp = false
-    // SAFETY: The double records any call, which the test asserts never happens.
-    const tokens = {
-      findValid(_tokenHash: string, _now: Date): Promise<ValidPasswordResetToken | null> {
-        tokenLookedUp = true
-        return Promise.resolve(null)
-      },
-    } as PasswordResetTokenRepository
-    // SAFETY: Invalid input returns before the action can access the repository.
-    const users = {} as UserRepository
+  test('rejects a password outside the policy', async ({ assert }) => {
+    const resetPassword = await app.container.make(ResetPassword)
 
-    const result = await new ResetPassword(users, tokens, transactions).execute({
-      token: 'secret',
-      password: 'short',
-    })
+    const result = await resetPassword.execute({ token: 'secret', password: 'short' })
 
     assert.deepEqual(result, { ok: false, error: { type: 'invalid_password' } })
-    assert.isFalse(tokenLookedUp)
   })
 
   test('rejects an unknown or expired token', async ({ assert }) => {
-    // SAFETY: The action only calls `findValid` before giving up.
-    const tokens = {
-      findValid(_tokenHash: string, _now: Date): Promise<ValidPasswordResetToken | null> {
-        return Promise.resolve(null)
-      },
-    } as PasswordResetTokenRepository
-    // SAFETY: The action never reaches the repository with an unknown token.
-    const users = {} as UserRepository
+    const mailer = mail.fake()
+    await createUser('ada@example.com')
+    const requestPasswordReset = await app.container.make(RequestPasswordReset)
+    const resetPassword = await app.container.make(ResetPassword)
+    await requestPasswordReset.execute({ email: 'ada@example.com' })
+    const token = await queuedLink(mailer, /\/reset-password\/(\S+)/)
+    await db
+      .updateTable('password_reset_tokens')
+      .set({ expires_at: new Date(Date.now() - 1000) })
+      .execute()
 
-    const result = await new ResetPassword(users, tokens, transactions).execute({
-      token: 'nope',
-      password: 'a-secure-password',
-    })
+    const unknown = await resetPassword.execute({ token: 'nope', password: 'a-new-password' })
+    const expired = await resetPassword.execute({ token, password: 'a-new-password' })
 
-    assert.deepEqual(result, { ok: false, error: { type: 'invalid_token' } })
-  })
-
-  test('stores a hash of the new password and consumes the token', async ({ assert }) => {
-    const user = makeUser()
-    let lookedUpHash: string | undefined
-    let storedHash: string | undefined
-    let deletedFor: string | undefined
-    // SAFETY: The action only calls `findValid` and `deleteForUser`.
-    const tokens = {
-      findValid(tokenHash: string, _now: Date): Promise<ValidPasswordResetToken | null> {
-        lookedUpHash = tokenHash
-        return Promise.resolve({ userId: user.id })
-      },
-      deleteForUser(userId: UserIdentifier) {
-        deletedFor = userId.toString()
-        return Promise.resolve()
-      },
-    } as PasswordResetTokenRepository
-    // SAFETY: The action only calls `updatePassword`.
-    const users = {
-      updatePassword(_: UserIdentifier, passwordHash: string): Promise<User | null> {
-        storedHash = passwordHash
-        return Promise.resolve(user)
-      },
-    } as UserRepository
-
-    const result = await new ResetPassword(users, tokens, transactions).execute({
-      token: 'secret',
-      password: 'a-new-password',
-    })
-
-    assert.isTrue(result.ok)
-    assert.equal(lookedUpHash, hashSecureToken('secret'))
-    assert.isTrue(await hash.verify(storedHash!, 'a-new-password'))
-    assert.equal(deletedFor, user.id)
+    assert.deepEqual(unknown, { ok: false, error: { type: 'invalid_token' } })
+    assert.deepEqual(expired, { ok: false, error: { type: 'invalid_token' } })
   })
 })

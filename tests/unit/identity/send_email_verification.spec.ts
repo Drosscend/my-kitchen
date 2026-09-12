@@ -1,3 +1,4 @@
+import app from '@adonisjs/core/services/app'
 import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
 import {
@@ -6,44 +7,36 @@ import {
 } from '#identity/actions/send_email_verification'
 import { EmailAddress } from '#identity/domain/email_address'
 import EmailVerificationMail from '#identity/mails/email_verification_mail'
+import { db } from '#shared/services/db'
 import { queuedMessage } from '#tests/helpers/mail'
-import { makeUser } from '#tests/helpers/users'
-import type { EmailVerificationTokenRepository } from '#identity/repositories/email_verification_token_repository'
-import type { TransactionManager } from '#shared/services/transaction_manager'
+import { resetState } from '#tests/helpers/state'
+import { createUser } from '#tests/helpers/users'
 
-// SAFETY: The actions only call `run` on their transaction dependency.
-const transactions = {
-  run<T>(callback: () => Promise<T>) {
-    return callback()
-  },
-} as TransactionManager
-
-interface IssuedToken {
-  email: EmailAddress
-  tokenHash: string
-  expiresAt: Date
+function storedTokens() {
+  return db
+    .selectFrom('email_verification_tokens')
+    .select(['user_id', 'email', 'expires_at'])
+    .execute()
 }
 
 test.group('SendEmailVerification', (group) => {
-  group.each.teardown(() => mail.restore())
+  group.each.setup(async () => {
+    await resetState()
+    return () => mail.restore()
+  })
 
   test('issues a 24 hour token for the account address', async ({ assert }) => {
     const mailer = mail.fake()
-    const user = makeUser()
-    let issued: IssuedToken | undefined
-    // SAFETY: The action only calls `replaceForUser`.
-    const tokens = {
-      replaceForUser(payload: IssuedToken) {
-        issued = payload
-        return Promise.resolve()
-      },
-    } as EmailVerificationTokenRepository
+    const user = await createUser('ada@example.com', false)
+    const sendEmailVerification = await app.container.make(SendEmailVerification)
 
     const before = Date.now()
-    await new SendEmailVerification(tokens, transactions).execute({ user })
+    await sendEmailVerification.execute({ user })
 
-    assert.equal(issued?.email.toString(), 'ada@example.com')
-    assert.isAtLeast(issued!.expiresAt.getTime(), before + EMAIL_VERIFICATION_TTL_MS)
+    const [token] = await storedTokens()
+    assert.equal(token.user_id, user.id)
+    assert.equal(token.email, 'ada@example.com')
+    assert.isAtLeast(token.expires_at.getTime(), before + EMAIL_VERIFICATION_TTL_MS)
     mailer.mails.assertQueuedCount(EmailVerificationMail, 1)
     const message = await queuedMessage(mailer)
     message.assertTo('ada@example.com')
@@ -52,25 +45,19 @@ test.group('SendEmailVerification', (group) => {
 
   test('confirms another address when one is given', async ({ assert }) => {
     const mailer = mail.fake()
-    const user = makeUser()
+    const user = await createUser('ada@example.com')
     const email = EmailAddress.create('new@example.com')
 
     if (!email.ok) {
       throw new Error('The test email address must be valid')
     }
 
-    let issued: IssuedToken | undefined
-    // SAFETY: The action only calls `replaceForUser`.
-    const tokens = {
-      replaceForUser(payload: IssuedToken) {
-        issued = payload
-        return Promise.resolve()
-      },
-    } as EmailVerificationTokenRepository
+    const sendEmailVerification = await app.container.make(SendEmailVerification)
 
-    await new SendEmailVerification(tokens, transactions).execute({ user, email: email.value })
+    await sendEmailVerification.execute({ user, email: email.value })
 
-    assert.equal(issued?.email.toString(), 'new@example.com')
+    const [token] = await storedTokens()
+    assert.equal(token.email, 'new@example.com')
     const message = await queuedMessage(mailer)
     message.assertTo('new@example.com')
     assert.isFalse(message.hasTo('ada@example.com'))

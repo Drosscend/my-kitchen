@@ -1,10 +1,11 @@
 import { BaseCommand, flags } from '@adonisjs/core/ace'
 import { RegisterUser, type RegisterUserError } from '#identity/actions/register_user'
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '#identity/domain/password'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
 
 const errorMessages = {
   invalid_email_address: 'The email address is invalid',
-  invalid_password: 'The password must contain between 8 and 72 characters',
+  invalid_password: `The password must contain between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters`,
   email_already_taken: 'A user already exists for this email address',
 } satisfies Record<RegisterUserError['type'], string>
 

@@ -1,11 +1,15 @@
 import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
 import { err, ok, type Result } from '#core/result'
-import { validatePassword, type InvalidPasswordError } from '#identity/domain/password'
+import {
+  validatePassword,
+  verifyPassword,
+  type InvalidCredentialsError,
+  type InvalidPasswordError,
+} from '#identity/domain/password'
 import { PasswordResetTokenRepository } from '#identity/repositories/password_reset_token_repository'
 import { UserRepository } from '#identity/repositories/user_repository'
 import { TransactionManager } from '#shared/services/transaction_manager'
-import type { InvalidCredentialsError } from '#identity/actions/verify_user_credentials'
 import type { User } from '#identity/domain/user'
 
 export interface ChangePasswordParams {
@@ -26,8 +30,10 @@ export class ChangePassword {
   ) {}
 
   async execute(params: ChangePasswordParams): Promise<ChangePasswordResult> {
-    if (!(await hash.verify(params.user.passwordHash, params.currentPassword))) {
-      return err({ type: 'invalid_credentials' })
+    const credentials = await verifyPassword(params.user.passwordHash, params.currentPassword)
+
+    if (!credentials.ok) {
+      return err(credentials.error)
     }
 
     const password = validatePassword(params.password)
@@ -41,10 +47,6 @@ export class ChangePassword {
 
     return this.transactions.run(async () => {
       const user = await this.users.updatePassword(userId, passwordHash)
-
-      if (!user) {
-        return err({ type: 'invalid_credentials' })
-      }
 
       /**
        * A reset link requested before the change must not undo it.

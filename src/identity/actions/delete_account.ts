@@ -1,8 +1,7 @@
 import { inject } from '@adonisjs/core'
-import hash from '@adonisjs/core/services/hash'
 import { err, ok, type Result } from '#core/result'
+import { verifyPassword, type InvalidCredentialsError } from '#identity/domain/password'
 import { UserRepository } from '#identity/repositories/user_repository'
-import type { InvalidCredentialsError } from '#identity/actions/verify_user_credentials'
 import type { User } from '#identity/domain/user'
 
 export interface DeleteAccountParams {
@@ -21,8 +20,10 @@ export class DeleteAccount {
   constructor(private readonly users: UserRepository) {}
 
   async execute(params: DeleteAccountParams): Promise<DeleteAccountResult> {
-    if (!(await hash.verify(params.user.passwordHash, params.password))) {
-      return err({ type: 'invalid_credentials' })
+    const credentials = await verifyPassword(params.user.passwordHash, params.password)
+
+    if (!credentials.ok) {
+      return err(credentials.error)
     }
 
     await this.users.deleteUser(params.user.getIdentifier())

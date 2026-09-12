@@ -22,19 +22,37 @@ test.group('MCP tokens', (group) => {
     assertRedirectedTo(created, '/account')
     const flashed = String(created.flashMessages().newMcpToken)
     assert.match(flashed, /^mk_[A-Za-z0-9_-]{40,}$/)
+    const [token] = await db
+      .selectFrom('mcp_tokens')
+      .select(['id', 'prefix', 'token_hash'])
+      .execute()
+    assert.isTrue(flashed.startsWith(token.prefix))
+    assert.notEqual(token.token_hash, flashed)
     shown.assertInertiaPropsContains({
-      mcpTokens: [{ name: 'Claude', prefix: flashed.slice(0, 11), lastUsedAt: null }],
+      mcpTokens: [{ name: 'Claude', prefix: token.prefix, lastUsedAt: null }],
     })
     again.assertInertiaPropsContains({ newMcpToken: null })
 
-    const [token] = await db.selectFrom('mcp_tokens').select(['id', 'token_hash']).execute()
-    assert.notEqual(token.token_hash, flashed)
     const revoked = await client
       .delete(`/account/mcp-tokens/${token.id}`)
       .loginAs(user)
       .withCsrfToken()
       .redirects(0)
     revoked.assertFlashMessage('success', 'Token révoqué')
+    assert.lengthOf(await db.selectFrom('mcp_tokens').select('id').execute(), 0)
+  })
+
+  test('refuses a blank token name', async ({ client, assert }) => {
+    const user = await createUser('ada@example.com')
+
+    const response = await client
+      .post('/account/mcp-tokens')
+      .loginAs(user)
+      .withCsrfToken()
+      .form({ name: '   ' })
+      .redirects(0)
+
+    response.assertFlashMessage('inputErrorsBag', { name: ['Ce champ est obligatoire'] })
     assert.lengthOf(await db.selectFrom('mcp_tokens').select('id').execute(), 0)
   })
 

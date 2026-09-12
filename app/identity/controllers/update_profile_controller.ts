@@ -1,12 +1,13 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
+import { nameField } from '#app/identity/validators'
 import { UpdateProfile } from '#identity/actions/update_profile'
 import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class UpdateProfileController {
   static readonly validator = vine.create({
-    name: vine.string().trim().maxLength(100).nullable(),
+    name: nameField.nullable(),
   })
 
   constructor(private readonly updateProfile: UpdateProfile) {}

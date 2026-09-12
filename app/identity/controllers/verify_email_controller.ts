@@ -1,11 +1,7 @@
 import { inject } from '@adonisjs/core'
+import { identityErrorMessages } from '#app/identity/error_messages'
 import { VerifyEmail } from '#identity/actions/verify_email'
 import type { HttpContext } from '@adonisjs/core/http'
-
-const errorMessages = {
-  invalid_token: 'Ce lien est invalide ou a expiré',
-  email_already_taken: 'Un compte existe déjà pour cette adresse',
-} as const
 
 @inject()
 export default class VerifyEmailController {
@@ -15,7 +11,7 @@ export default class VerifyEmailController {
     const result = await this.verifyEmail.execute({ token: params.token })
 
     if (!result.ok) {
-      session.flash('error', errorMessages[result.error.type])
+      session.flash('error', identityErrorMessages[result.error.type])
       return response.redirect().toRoute(auth.user ? 'verification.notice' : 'session.create')
     }
 

@@ -1,5 +1,5 @@
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
-import UserTransformer from '#app/transformers/user_transformer'
+import UserTransformer from '#app/identity/transformers/user_transformer'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 
@@ -37,9 +37,6 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     // SAFETY: Adonis may invoke this hook before session middleware hydrates the context.
     const { session } = ctx as Partial<HttpContext>
 
-    /**
-     * Fetching the first error from the flash messages
-     */
     // SAFETY: This application only flashes strings under the `error` and `success` keys.
     return {
       error: session?.flashMessages.get('error') as string | undefined,

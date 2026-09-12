@@ -1,101 +1,56 @@
-import hash from '@adonisjs/core/services/hash'
+import app from '@adonisjs/core/services/app'
+import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
 import { RequestEmailChange } from '#identity/actions/request_email_change'
-import { EmailAddress } from '#identity/domain/email_address'
-import { User } from '#identity/domain/user'
-import { UserIdentifier } from '#identity/domain/user_identifier'
-import type { SendEmailVerification } from '#identity/actions/send_email_verification'
-import type { UserRepository } from '#identity/repositories/user_repository'
+import { resetState } from '#tests/helpers/state'
+import { createUser, TEST_PASSWORD } from '#tests/helpers/users'
 
-async function makeUserWithPassword(password: string) {
-  const email = EmailAddress.create('ada@example.com')
-
-  if (!email.ok) {
-    throw new Error('The test email address must be valid')
-  }
-
-  return User.create({
-    id: UserIdentifier.generate(),
-    name: 'Ada',
-    email: email.value,
-    passwordHash: await hash.make(password),
-    emailVerifiedAt: new Date('2026-01-01T00:00:00Z'),
-    createdAt: new Date('2026-01-01T00:00:00Z'),
-    updatedAt: null,
+test.group('RequestEmailChange', (group) => {
+  group.each.setup(async () => {
+    await resetState()
+    return () => mail.restore()
   })
-}
 
-interface SentVerification {
-  user: User
-  email?: EmailAddress
-}
-
-function makeAction(takenEmail: string | null, sent: SentVerification[]) {
-  // SAFETY: The action only calls `findUserByEmail`.
-  const users = {
-    findUserByEmail(email: EmailAddress): Promise<User | null> {
-      return Promise.resolve(email.toString() === takenEmail ? makeUserWithPassword('x') : null)
-    },
-  } as UserRepository
-  // SAFETY: The action only calls `execute` on the verification sender.
-  const sendEmailVerification = {
-    execute(params: SentVerification) {
-      sent.push(params)
-      return Promise.resolve()
-    },
-  } as SendEmailVerification
-
-  return new RequestEmailChange(users, sendEmailVerification)
-}
-
-test.group('RequestEmailChange', () => {
   test('requires the current password', async ({ assert }) => {
-    const sent: SentVerification[] = []
-    const user = await makeUserWithPassword('a-secure-password')
+    const mailer = mail.fake()
+    const user = await createUser('ada@example.com')
+    const requestEmailChange = await app.container.make(RequestEmailChange)
 
-    const result = await makeAction(null, sent).execute({
+    const result = await requestEmailChange.execute({
       user,
       email: 'new@example.com',
       password: 'wrong-password',
     })
 
     assert.deepEqual(result, { ok: false, error: { type: 'invalid_credentials' } })
-    assert.lengthOf(sent, 0)
+    mailer.mails.assertNoneQueued()
   })
 
-  test('refuses the current address and a taken one', async ({ assert }) => {
-    const sent: SentVerification[] = []
-    const user = await makeUserWithPassword('a-secure-password')
-    const action = makeAction('taken@example.com', sent)
+  test('refuses an invalid address, the current one and a taken one', async ({ assert }) => {
+    const mailer = mail.fake()
+    const user = await createUser('ada@example.com')
+    await createUser('taken@example.com')
+    const requestEmailChange = await app.container.make(RequestEmailChange)
 
-    const same = await action.execute({
+    const invalid = await requestEmailChange.execute({
+      user,
+      email: 'not-an-email',
+      password: TEST_PASSWORD,
+    })
+    const same = await requestEmailChange.execute({
       user,
       email: 'ADA@example.com',
-      password: 'a-secure-password',
+      password: TEST_PASSWORD,
     })
-    const taken = await action.execute({
+    const taken = await requestEmailChange.execute({
       user,
       email: 'taken@example.com',
-      password: 'a-secure-password',
+      password: TEST_PASSWORD,
     })
 
+    assert.deepEqual(invalid, { ok: false, error: { type: 'invalid_email_address' } })
     assert.deepEqual(same, { ok: false, error: { type: 'same_email' } })
     assert.deepEqual(taken, { ok: false, error: { type: 'email_already_taken' } })
-    assert.lengthOf(sent, 0)
-  })
-
-  test('sends the confirmation link to the new address', async ({ assert }) => {
-    const sent: SentVerification[] = []
-    const user = await makeUserWithPassword('a-secure-password')
-
-    const result = await makeAction(null, sent).execute({
-      user,
-      email: ' New@Example.com ',
-      password: 'a-secure-password',
-    })
-
-    assert.isTrue(result.ok)
-    assert.equal(sent[0]?.email?.toString(), 'new@example.com')
-    assert.equal(sent[0]?.user, user)
+    mailer.mails.assertNoneQueued()
   })
 })

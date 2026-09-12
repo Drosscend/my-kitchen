@@ -18,7 +18,7 @@ export default class McpController {
   async execute({ request, response }: HttpContext) {
     const header = request.header('authorization') ?? ''
     const token = header.startsWith(BEARER) ? header.slice(BEARER.length).trim() : ''
-    const verified = token ? await this.verifyMcpToken.execute(token) : null
+    const verified = token ? await this.verifyMcpToken.execute({ token }) : null
 
     if (!verified?.ok) {
       response.header('WWW-Authenticate', 'Bearer error="invalid_token"')

@@ -1,5 +1,7 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
+import { identityErrorMessages } from '#app/identity/error_messages'
+import { nameField } from '#app/identity/validators'
 import { CreateMcpToken } from '#identity/actions/create_mcp_token'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -8,7 +10,7 @@ export const NEW_MCP_TOKEN_FLASH = 'newMcpToken'
 @inject()
 export default class CreateMcpTokenController {
   static readonly validator = vine.create({
-    name: vine.string().trim().minLength(1).maxLength(100),
+    name: nameField,
   })
 
   constructor(private readonly createMcpToken: CreateMcpToken) {}
@@ -21,13 +23,10 @@ export default class CreateMcpTokenController {
     })
 
     if (!result.ok) {
-      session.flash('error', 'Le nom du token est obligatoire')
+      session.flash('error', identityErrorMessages[result.error.type])
       return response.redirect().toRoute('account.show')
     }
 
-    /**
-     * The clear value is shown on the next page only, then gone.
-     */
     session.flash(NEW_MCP_TOKEN_FLASH, result.value)
     return response.redirect().toRoute('account.show')
   }

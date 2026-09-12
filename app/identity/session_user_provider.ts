@@ -1,5 +1,6 @@
 import { symbols } from '@adonisjs/auth'
 import { inject } from '@adonisjs/core'
+import { UserIdentifier } from '#identity/domain/user_identifier'
 import { UserRepository } from '#identity/repositories/user_repository'
 import type { User } from '#identity/domain/user'
 import type { SessionGuardUser, SessionUserProviderContract } from '@adonisjs/auth/types/session'
@@ -16,7 +17,7 @@ export class SessionKyselyUserProvider implements SessionUserProviderContract<Us
   }
 
   async findById(id: string) {
-    const user = await this.users.findUserById(id)
+    const user = await this.users.findUserById(UserIdentifier.fromString(id))
     return user ? this.createUserForGuard(user) : null
   }
 }

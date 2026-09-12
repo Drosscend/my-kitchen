@@ -1,5 +1,6 @@
 import { inject } from '@adonisjs/core'
 import mail from '@adonisjs/mail/services/main'
+import { appUrl } from '#config/app'
 import { EmailAddress } from '#identity/domain/email_address'
 import { generateSecureToken } from '#identity/domain/secure_token'
 import { TokenIdentifier } from '#identity/domain/token_identifier'
@@ -7,7 +8,6 @@ import PasswordResetMail from '#identity/mails/password_reset_mail'
 import { PasswordResetTokenRepository } from '#identity/repositories/password_reset_token_repository'
 import { UserRepository } from '#identity/repositories/user_repository'
 import { TransactionManager } from '#shared/services/transaction_manager'
-import env from '#start/env'
 
 export const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000
 
@@ -46,7 +46,7 @@ export class RequestPasswordReset {
       })
     )
 
-    const url = `${env.get('APP_URL')}/reset-password/${token.value}`
+    const url = `${appUrl}/reset-password/${token.value}`
     await mail.sendLater(new PasswordResetMail(user.email, user.name, url))
   }
 }

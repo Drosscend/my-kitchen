@@ -18,7 +18,7 @@ export class RevokeMcpToken {
   constructor(private readonly tokens: McpTokenRepository) {}
 
   async execute(params: RevokeMcpTokenParams): Promise<RevokeMcpTokenResult> {
-    const deleted = await this.tokens.deleteForUser(params.userId, params.id)
+    const deleted = await this.tokens.delete(params.userId, params.id)
     return deleted ? ok(undefined) : err({ type: 'mcp_token_not_found' })
   }
 }
