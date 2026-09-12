@@ -1,20 +1,7 @@
 import { inject } from '@adonisjs/core'
 import { TransactionManager } from '#shared/services/transaction_manager'
 import type { UserIdentifier } from '#identity/domain/user_identifier'
-
-export interface RecipeIngredientView {
-  ref: string
-  name: string
-  amount: number | null
-  unit: string | null
-}
-
-export interface RecipeStepView {
-  ref: string
-  title: string | null
-  content: string
-  timerSeconds: number | null
-}
+import type { RecipeIngredientProperties, RecipeStepProperties } from '#recipes/domain/recipe'
 
 /**
  * The recipe as a document: what the page renders, what a cooking
@@ -26,8 +13,8 @@ export interface RecipeView {
   description: string | null
   baseServings: number
   notes: string | null
-  ingredients: RecipeIngredientView[]
-  steps: RecipeStepView[]
+  ingredients: RecipeIngredientProperties[]
+  steps: RecipeStepProperties[]
 }
 
 @inject()
@@ -68,7 +55,12 @@ export class RecipeQuery {
       description: record.description,
       baseServings: record.base_servings,
       notes: record.notes,
-      ingredients,
+      ingredients: ingredients.map((ingredient) => ({
+        ref: ingredient.ref,
+        name: ingredient.name,
+        amount: ingredient.amount,
+        unit: ingredient.unit,
+      })),
       steps: steps.map((step) => ({
         ref: step.ref,
         title: step.title,

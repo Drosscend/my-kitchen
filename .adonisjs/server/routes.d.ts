@@ -15,7 +15,6 @@ export type ScannedRoutes = {
     'recipes.index': { paramsTuple?: []; params?: {} }
     'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'recipes.cook': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -35,6 +34,7 @@ export type ScannedRoutes = {
     'account.destroy': { paramsTuple?: []; params?: {} }
     'account.mcp_tokens.store': { paramsTuple?: []; params?: {} }
     'account.mcp_tokens.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'cooking.start': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'cooking.join': { paramsTuple?: []; params?: {} }
     'cooking.join.store': { paramsTuple?: []; params?: {} }
     'cooking.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
@@ -45,7 +45,6 @@ export type ScannedRoutes = {
     'mcp': { paramsTuple?: []; params?: {} }
     'inventory.store': { paramsTuple?: []; params?: {} }
     'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'recipes.cook': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'password.email': { paramsTuple?: []; params?: {} }
@@ -56,6 +55,7 @@ export type ScannedRoutes = {
     'account.email.update': { paramsTuple?: []; params?: {} }
     'account.password.update': { paramsTuple?: []; params?: {} }
     'account.mcp_tokens.store': { paramsTuple?: []; params?: {} }
+    'cooking.start': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'cooking.join.store': { paramsTuple?: []; params?: {} }
   }
   GET: {

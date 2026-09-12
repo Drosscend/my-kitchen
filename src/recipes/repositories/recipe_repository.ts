@@ -8,29 +8,45 @@ import {
 } from '#recipes/domain/recipe'
 import { RecipeIdentifier } from '#recipes/domain/recipe_identifier'
 import { TransactionManager } from '#shared/services/transaction_manager'
+import type { Recipes, RecipeSteps } from '#types/db'
+import type { Selectable } from 'kysely'
 
+const recipeColumns = [
+  'id',
+  'user_id',
+  'title',
+  'description',
+  'base_servings',
+  'notes',
+  'created_at',
+  'updated_at',
+] as const
+type RecipeRecord = Pick<Selectable<Recipes>, (typeof recipeColumns)[number]>
+
+/**
+ * A recipe spans three tables: the Action calling `insert` or `replace`
+ * owns the transaction that keeps them together.
+ */
 @inject()
 export class RecipeRepository {
   constructor(private readonly transactions: TransactionManager) {}
 
   async insert(recipe: Recipe) {
-    await this.transactions.run(async () => {
-      await this.transactions
-        .currentDatabase()
-        .insertInto('recipes')
-        .values({
-          id: recipe.id,
-          user_id: recipe.userId.toString(),
-          title: recipe.title,
-          description: recipe.description,
-          base_servings: recipe.baseServings,
-          notes: recipe.notes,
-          created_at: recipe.createdAt,
-          updated_at: recipe.updatedAt,
-        })
-        .execute()
-      await this.#insertContent(recipe)
-    })
+    await this.transactions
+      .currentDatabase()
+      .insertInto('recipes')
+      .values({
+        id: recipe.id,
+        user_id: recipe.userId.toString(),
+        title: recipe.title,
+        description: recipe.description,
+        base_servings: recipe.baseServings,
+        notes: recipe.notes,
+        created_at: recipe.createdAt,
+        updated_at: recipe.updatedAt,
+      })
+      .execute()
+    await this.#insertContent(recipe)
   }
 
   /**
@@ -38,41 +54,30 @@ export class RecipeRepository {
    * one document, never line by line.
    */
   async replace(recipe: Recipe) {
-    await this.transactions.run(async () => {
-      const database = this.transactions.currentDatabase()
+    const database = this.transactions.currentDatabase()
 
-      await database
-        .updateTable('recipes')
-        .set({
-          title: recipe.title,
-          description: recipe.description,
-          base_servings: recipe.baseServings,
-          notes: recipe.notes,
-          updated_at: recipe.updatedAt,
-        })
-        .where('id', '=', recipe.id)
-        .where('user_id', '=', recipe.userId.toString())
-        .execute()
-      await database.deleteFrom('recipe_ingredients').where('recipe_id', '=', recipe.id).execute()
-      await database.deleteFrom('recipe_steps').where('recipe_id', '=', recipe.id).execute()
-      await this.#insertContent(recipe)
-    })
+    await database
+      .updateTable('recipes')
+      .set({
+        title: recipe.title,
+        description: recipe.description,
+        base_servings: recipe.baseServings,
+        notes: recipe.notes,
+        updated_at: recipe.updatedAt,
+      })
+      .where('id', '=', recipe.id)
+      .where('user_id', '=', recipe.userId.toString())
+      .execute()
+    await database.deleteFrom('recipe_ingredients').where('recipe_id', '=', recipe.id).execute()
+    await database.deleteFrom('recipe_steps').where('recipe_id', '=', recipe.id).execute()
+    await this.#insertContent(recipe)
   }
 
   async findForUser(userId: UserIdentifier, id: string) {
     const database = this.transactions.currentDatabase()
     const record = await database
       .selectFrom('recipes')
-      .select([
-        'id',
-        'user_id',
-        'title',
-        'description',
-        'base_servings',
-        'notes',
-        'created_at',
-        'updated_at',
-      ])
+      .select(recipeColumns)
       .where('user_id', '=', userId.toString())
       .where('id', '=', id)
       .executeTakeFirst()
@@ -96,6 +101,23 @@ export class RecipeRepository {
         .execute(),
     ])
 
+    return this.#toDomain(record, ingredients, steps)
+  }
+
+  async delete(recipe: Recipe) {
+    await this.transactions
+      .currentDatabase()
+      .deleteFrom('recipes')
+      .where('id', '=', recipe.id)
+      .where('user_id', '=', recipe.userId.toString())
+      .execute()
+  }
+
+  #toDomain(
+    record: RecipeRecord,
+    ingredients: RecipeIngredientProperties[],
+    steps: Pick<Selectable<RecipeSteps>, 'ref' | 'title' | 'content' | 'timer_seconds'>[]
+  ) {
     return Recipe.create({
       id: RecipeIdentifier.fromString(record.id),
       userId: UserIdentifier.fromString(record.user_id),
@@ -118,15 +140,6 @@ export class RecipeRepository {
       createdAt: record.created_at,
       updatedAt: record.updated_at,
     })
-  }
-
-  async delete(recipe: Recipe) {
-    await this.transactions
-      .currentDatabase()
-      .deleteFrom('recipes')
-      .where('id', '=', recipe.id)
-      .where('user_id', '=', recipe.userId.toString())
-      .execute()
   }
 
   async #insertContent(recipe: Recipe) {

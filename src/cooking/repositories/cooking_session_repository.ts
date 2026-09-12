@@ -15,6 +15,13 @@ interface CreateSessionPayload {
   expiresAt: Date
 }
 
+interface UpdateSessionPayload {
+  code: string
+  state: CookingSessionState
+  updatedAt: Date
+  expiresAt: Date
+}
+
 @inject()
 export class CookingSessionRepository {
   constructor(private readonly transactions: TransactionManager) {}
@@ -48,7 +55,40 @@ export class CookingSessionRepository {
     }
   }
 
-  async findLive(code: string, now: Date): Promise<CookingSession | null> {
+  findLive(code: string, now: Date) {
+    return this.#findLive(code, now, false)
+  }
+
+  /**
+   * Locks the row until the caller's transaction ends, so two updates
+   * of the same session are applied one after the other.
+   */
+  findLiveForUpdate(code: string, now: Date) {
+    return this.#findLive(code, now, true)
+  }
+
+  async update(payload: UpdateSessionPayload) {
+    await this.transactions
+      .currentDatabase()
+      .updateTable('cooking_sessions')
+      .set({
+        state: sql`${payload.state}::jsonb`,
+        updated_at: payload.updatedAt,
+        expires_at: payload.expiresAt,
+      })
+      .where('code', '=', payload.code)
+      .execute()
+  }
+
+  async deleteExpired(now: Date) {
+    await this.transactions
+      .currentDatabase()
+      .deleteFrom('cooking_sessions')
+      .where('expires_at', '<=', now)
+      .execute()
+  }
+
+  async #findLive(code: string, now: Date, lock: boolean): Promise<CookingSession | null> {
     const record = await this.transactions
       .currentDatabase()
       .selectFrom('cooking_sessions')
@@ -62,6 +102,7 @@ export class CookingSessionRepository {
       ])
       .where('code', '=', code)
       .where('expires_at', '>', now)
+      .$if(lock, (query) => query.forUpdate())
       .executeTakeFirst()
 
     if (!record) {
@@ -75,26 +116,5 @@ export class CookingSessionRepository {
       state: record.state,
       updatedAt: record.updated_at,
     }
-  }
-
-  async update(code: string, state: CookingSessionState, updatedAt: Date, expiresAt: Date) {
-    await this.transactions
-      .currentDatabase()
-      .updateTable('cooking_sessions')
-      .set({
-        state: sql`${state}::jsonb`,
-        updated_at: updatedAt,
-        expires_at: expiresAt,
-      })
-      .where('code', '=', code)
-      .execute()
-  }
-
-  async deleteExpired(now: Date) {
-    await this.transactions
-      .currentDatabase()
-      .deleteFrom('cooking_sessions')
-      .where('expires_at', '<=', now)
-      .execute()
   }
 }

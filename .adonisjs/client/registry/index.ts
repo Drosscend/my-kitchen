@@ -72,12 +72,6 @@ const routes = {
     tokens: [{"old":"/recipes/:id","type":0,"val":"recipes","end":""},{"old":"/recipes/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['recipes.destroy']['types'],
   },
-  'recipes.cook': {
-    methods: ["POST"],
-    pattern: '/recipes/:id/cook',
-    tokens: [{"old":"/recipes/:id/cook","type":0,"val":"recipes","end":""},{"old":"/recipes/:id/cook","type":1,"val":"id","end":""},{"old":"/recipes/:id/cook","type":0,"val":"cook","end":""}],
-    types: placeholder as Registry['recipes.cook']['types'],
-  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',
@@ -191,6 +185,12 @@ const routes = {
     pattern: '/account/mcp-tokens/:id',
     tokens: [{"old":"/account/mcp-tokens/:id","type":0,"val":"account","end":""},{"old":"/account/mcp-tokens/:id","type":0,"val":"mcp-tokens","end":""},{"old":"/account/mcp-tokens/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['account.mcp_tokens.destroy']['types'],
+  },
+  'cooking.start': {
+    methods: ["POST"],
+    pattern: '/recipes/:id/cook',
+    tokens: [{"old":"/recipes/:id/cook","type":0,"val":"recipes","end":""},{"old":"/recipes/:id/cook","type":1,"val":"id","end":""},{"old":"/recipes/:id/cook","type":0,"val":"cook","end":""}],
+    types: placeholder as Registry['cooking.start']['types'],
   },
   'cooking.join': {
     methods: ["GET","HEAD"],

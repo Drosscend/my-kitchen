@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { formatInventoryMarkdown } from '#inventory/queries/inventory_markdown'
+import { formatInventoryMarkdown } from '#app/inventory/inventory_markdown'
 import type { IngredientView } from '#inventory/queries/inventory_query'
 
 function view(overrides: Partial<IngredientView>): IngredientView {

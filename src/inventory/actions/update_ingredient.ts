@@ -5,6 +5,7 @@ import {
   validateQuantity,
   type Ingredient,
   type IngredientChanges,
+  type IngredientNotFoundError,
   type InvalidIngredientError,
 } from '#inventory/domain/ingredient'
 import { IngredientRepository } from '#inventory/repositories/ingredient_repository'
@@ -16,9 +17,6 @@ export interface UpdateIngredientParams {
   changes: IngredientChanges
 }
 
-export interface IngredientNotFoundError {
-  type: 'ingredient_not_found'
-}
 export type UpdateIngredientError = IngredientNotFoundError | InvalidIngredientError
 export type UpdateIngredientResult = Result<Ingredient, UpdateIngredientError>
 
@@ -45,6 +43,8 @@ export class UpdateIngredient {
       if (!quantity.ok) {
         return err(quantity.error)
       }
+
+      changes.quantity = quantity.value
     }
 
     const ingredient = await this.ingredients.findForUser(params.userId, params.id)

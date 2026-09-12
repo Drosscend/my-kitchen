@@ -24,12 +24,12 @@ export class RecipeLibraryQuery {
         'recipes.description',
         eb
           .selectFrom('recipe_ingredients')
-          .select((inner) => inner.fn.countAll<number>().as('count'))
+          .select((inner) => inner.fn.countAll<string>().as('count'))
           .whereRef('recipe_ingredients.recipe_id', '=', 'recipes.id')
           .as('ingredient_count'),
         eb
           .selectFrom('recipe_steps')
-          .select((inner) => inner.fn.countAll<number>().as('count'))
+          .select((inner) => inner.fn.countAll<string>().as('count'))
           .whereRef('recipe_steps.recipe_id', '=', 'recipes.id')
           .as('step_count'),
       ])

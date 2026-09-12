@@ -2,6 +2,7 @@ import { randomInt } from 'node:crypto'
 import type { RecipeView } from '#recipes/queries/recipe_query'
 
 export const COOKING_SESSION_TTL_MS = 6 * 60 * 60 * 1000
+export const SESSION_CODE_PATTERN = /^\d{6}$/
 
 /**
  * A running timer only stores when it started, in server time: every
@@ -58,8 +59,4 @@ export function applyUpdate(
 
 export function generateSessionCode() {
   return randomInt(0, 1_000_000).toString().padStart(6, '0')
-}
-
-export function isSessionCode(value: string) {
-  return /^\d{6}$/.test(value)
 }

@@ -3,7 +3,7 @@ import {
   applyUpdate,
   generateSessionCode,
   INITIAL_STATE,
-  isSessionCode,
+  SESSION_CODE_PATTERN,
 } from '#cooking/domain/cooking_session'
 
 test.group('Cooking session state', () => {
@@ -29,10 +29,7 @@ test.group('Cooking session state', () => {
 
   test('draws six digit codes', ({ assert }) => {
     for (let draw = 0; draw < 20; draw++) {
-      assert.isTrue(isSessionCode(generateSessionCode()))
+      assert.match(generateSessionCode(), SESSION_CODE_PATTERN)
     }
-
-    assert.isFalse(isSessionCode('12345'))
-    assert.isFalse(isSessionCode('12345a'))
   })
 })

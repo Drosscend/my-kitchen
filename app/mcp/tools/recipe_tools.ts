@@ -2,19 +2,19 @@ import app from '@adonisjs/core/services/app'
 import { z } from 'zod'
 import { toolError, toolResult } from '#app/mcp/tool_result'
 import { invalidRecipeMessage, recipeErrorMessages } from '#app/recipes/error_messages'
+import { AddRecipe } from '#recipes/actions/add_recipe'
 import { DeleteRecipe } from '#recipes/actions/delete_recipe'
-import { ImportRecipes } from '#recipes/actions/import_recipes'
 import { UpdateRecipe } from '#recipes/actions/update_recipe'
 import { RecipeLibraryQuery } from '#recipes/queries/recipe_library_query'
 import { RecipeQuery } from '#recipes/queries/recipe_query'
 import type { UserIdentifier } from '#identity/domain/user_identifier'
 import type { Recipe, RecipeContentInput } from '#recipes/domain/recipe'
+import type { RecipeView } from '#recipes/queries/recipe_query'
 import type { McpServer } from '@modelcontextprotocol/server'
 
 /**
- * The same document the web import reads: `id` on ingredients and
- * steps is the ref a step mentions as "{id}", "{timer}" stands for the
- * step's own timer.
+ * The document assistants send: `id` is the ref a step mentions as
+ * "{id}", "{timer}" stands for the step's own timer.
  */
 const recipeDocument = z.object({
   title: z.string().min(1).max(200),
@@ -68,7 +68,7 @@ const recipeOutput = z.object({
 
 type RecipeDocument = z.infer<typeof recipeDocument>
 
-function toContent(document: RecipeDocument): RecipeContentInput {
+export function toRecipeContent(document: RecipeDocument): RecipeContentInput {
   return {
     title: document.title,
     description: document.description,
@@ -89,7 +89,7 @@ function toContent(document: RecipeDocument): RecipeContentInput {
   }
 }
 
-function toOutput(recipe: Recipe | RecipeDocumentView) {
+function toOutput(recipe: Recipe | RecipeView) {
   return {
     id: recipe.id,
     title: recipe.title,
@@ -111,21 +111,11 @@ function toOutput(recipe: Recipe | RecipeDocumentView) {
   }
 }
 
-interface RecipeDocumentView {
-  id: string
-  title: string
-  description: string | null
-  baseServings: number
-  notes: string | null
-  ingredients: { ref: string; name: string; amount: number | null; unit: string | null }[]
-  steps: { ref: string; title: string | null; content: string; timerSeconds: number | null }[]
-}
-
 export async function registerRecipeTools(server: McpServer, userId: UserIdentifier) {
-  const [library, recipeQuery, importRecipes, updateRecipe, deleteRecipe] = await Promise.all([
+  const [library, recipeQuery, addRecipe, updateRecipe, deleteRecipe] = await Promise.all([
     app.container.make(RecipeLibraryQuery),
     app.container.make(RecipeQuery),
-    app.container.make(ImportRecipes),
+    app.container.make(AddRecipe),
     app.container.make(UpdateRecipe),
     app.container.make(DeleteRecipe),
   ])
@@ -179,9 +169,9 @@ export async function registerRecipeTools(server: McpServer, userId: UserIdentif
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
     },
     async ({ recipe }) => {
-      const result = await importRecipes.execute({ userId, recipes: [toContent(recipe)] })
+      const result = await addRecipe.execute({ userId, content: toRecipeContent(recipe) })
       return result.ok
-        ? toolResult({ recipe: toOutput(result.value[0]) })
+        ? toolResult({ recipe: toOutput(result.value) })
         : toolError(invalidRecipeMessage(result.error))
     }
   )
@@ -201,7 +191,7 @@ export async function registerRecipeTools(server: McpServer, userId: UserIdentif
       },
     },
     async ({ id, recipe }) => {
-      const result = await updateRecipe.execute({ userId, id, content: toContent(recipe) })
+      const result = await updateRecipe.execute({ userId, id, content: toRecipeContent(recipe) })
 
       if (result.ok) {
         return toolResult({ recipe: toOutput(result.value) })
@@ -210,7 +200,7 @@ export async function registerRecipeTools(server: McpServer, userId: UserIdentif
       return toolError(
         result.error.type === 'recipe_not_found'
           ? recipeErrorMessages.recipe_not_found
-          : invalidRecipeMessage({ ...result.error, index: 0 })
+          : invalidRecipeMessage(result.error)
       )
     }
   )

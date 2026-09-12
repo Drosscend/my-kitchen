@@ -1,8 +1,8 @@
 import app from '@adonisjs/core/services/app'
-import { ImportRecipes } from '#recipes/actions/import_recipes'
+import { toRecipeContent } from '#app/mcp/tools/recipe_tools'
+import { AddRecipe } from '#recipes/actions/add_recipe'
 import { db } from '#shared/services/db'
 import type { User } from '#identity/domain/user'
-import type { RecipeContentInput } from '#recipes/domain/recipe'
 
 /**
  * The document shape the MCP tools take, as an assistant writes it.
@@ -24,35 +24,20 @@ export const BREAD = {
 
 type RecipeDocument = typeof BREAD
 
-function toContent(document: RecipeDocument): RecipeContentInput {
-  return {
-    title: document.title,
-    description: document.description,
-    baseServings: document.base_servings,
-    notes: document.notes,
-    ingredients: document.ingredients.map(({ id, ...ingredient }) => ({ ref: id, ...ingredient })),
-    steps: document.steps.map(({ id, timer_seconds: timerSeconds, ...step }) => ({
-      ref: id,
-      timerSeconds,
-      ...step,
-    })),
-  }
-}
-
-export async function importRecipe(user: User, document: RecipeDocument) {
-  const importRecipes = await app.container.make(ImportRecipes)
-  const result = await importRecipes.execute({
+export async function addRecipe(user: User, document: RecipeDocument) {
+  const action = await app.container.make(AddRecipe)
+  const result = await action.execute({
     userId: user.getIdentifier(),
-    recipes: [toContent(document)],
+    content: toRecipeContent(document),
   })
 
   if (!result.ok) {
-    throw new Error('Cannot import the test recipe')
+    throw new Error('Cannot add the test recipe')
   }
 
-  return result.value[0]
+  return result.value
 }
 
 export function storedRecipes(user: User) {
-  return db.selectFrom('recipes').select(['id', 'title']).where('user_id', '=', user.id).execute()
+  return db.selectFrom('recipes').select('id').where('user_id', '=', user.id).execute()
 }

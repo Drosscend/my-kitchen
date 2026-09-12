@@ -53,7 +53,28 @@ export function isIngredientState(value: string): value is IngredientState {
   return Object.hasOwn(INGREDIENT_STATES, value)
 }
 
-export interface StockLevel {
+interface CatalogRecord {
+  id: string
+  unit: string
+  category: string
+  state: string
+}
+
+/**
+ * Narrows the columns stored as text: a value outside the catalog is
+ * corrupt data, not an input error.
+ */
+export function parseCatalogValues(record: CatalogRecord) {
+  const { unit, category, state } = record
+
+  if (!isIngredientUnit(unit) || !isIngredientCategory(category) || !isIngredientState(state)) {
+    throw new Error(`Invalid catalog value persisted for ingredient ${record.id}`)
+  }
+
+  return { unit, category, state }
+}
+
+interface StockLevel {
   quantity: number
   unit: IngredientUnit
   category: IngredientCategory
@@ -65,9 +86,6 @@ export function isLowStock({ quantity, unit, category }: StockLevel) {
   )
 }
 
-/**
- * Freezing suspends perishability whatever the category.
- */
 export function isPerishable(state: IngredientState, category: IngredientCategory) {
   return state !== 'frozen' && INGREDIENT_CATEGORIES[category].perishable
 }

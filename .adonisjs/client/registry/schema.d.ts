@@ -139,18 +139,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/recipes/controllers/delete_recipe_controller').default['execute']>>>
     }
   }
-  'recipes.cook': {
-    methods: ["POST"]
-    pattern: '/recipes/:id/cook'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#app/recipes/controllers/start_cooking_session_controller').default)['validator']>>
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#app/recipes/controllers/start_cooking_session_controller').default)['validator']>>
-      response: ExtractResponse<Awaited<ReturnType<import('#app/recipes/controllers/start_cooking_session_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/recipes/controllers/start_cooking_session_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'
@@ -377,6 +365,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/revoke_mcp_token_controller').default['execute']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/revoke_mcp_token_controller').default['execute']>>>
+    }
+  }
+  'cooking.start': {
+    methods: ["POST"]
+    pattern: '/recipes/:id/cook'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/cooking/controllers/start_cooking_session_controller').default)['validator']>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#app/cooking/controllers/start_cooking_session_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/cooking/controllers/start_cooking_session_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/cooking/controllers/start_cooking_session_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'cooking.join': {

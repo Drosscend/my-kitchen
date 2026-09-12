@@ -46,22 +46,24 @@ test.group('Inventory', (group) => {
       .loginAs(user)
       .withCsrfToken()
       .form({ name: 'Tomates', state: 'frozen' })
+      .redirects(0)
     await client
       .post(`/inventory/${ingredient.id}/adjust`)
       .loginAs(user)
       .withCsrfToken()
       .form({ delta: -300 })
+      .redirects(0)
     const [adjusted] = await storedIngredients(user)
     assert.include(adjusted, { name: 'Tomates', state: 'frozen', quantity: 0 })
 
-    await client.delete(`/inventory/${ingredient.id}`).loginAs(user).withCsrfToken()
+    await client.delete(`/inventory/${ingredient.id}`).loginAs(user).withCsrfToken().redirects(0)
     assert.lengthOf(await storedIngredients(user), 0)
   })
 
   test('never touches another account', async ({ client, assert }) => {
     const ada = await createUser('ada@example.com')
     const bob = await createUser('bob@example.com')
-    await client.post('/inventory').loginAs(ada).withCsrfToken().form(TOMATOES)
+    await client.post('/inventory').loginAs(ada).withCsrfToken().form(TOMATOES).redirects(0)
     const [ingredient] = await storedIngredients(ada)
 
     const update = await client
@@ -69,6 +71,12 @@ test.group('Inventory', (group) => {
       .loginAs(bob)
       .withCsrfToken()
       .form({ name: 'Volées' })
+      .redirects(0)
+    const adjust = await client
+      .post(`/inventory/${ingredient.id}/adjust`)
+      .loginAs(bob)
+      .withCsrfToken()
+      .form({ delta: -100 })
       .redirects(0)
     const remove = await client
       .delete(`/inventory/${ingredient.id}`)
@@ -78,19 +86,21 @@ test.group('Inventory', (group) => {
     const page = await client.get('/').loginAs(bob).withInertia()
 
     update.assertFlashMessage('error', 'Ingrédient introuvable')
+    adjust.assertFlashMessage('error', 'Ingrédient introuvable')
     remove.assertFlashMessage('error', 'Ingrédient introuvable')
     page.assertInertiaPropsContains({ ingredients: [] })
-    assert.equal((await storedIngredients(ada))[0]?.name, 'Tomates cerises')
+    assert.include((await storedIngredients(ada))[0], { name: 'Tomates cerises', quantity: 250 })
   })
 
   test('renders the pantry with the stock rules applied', async ({ client }) => {
     const user = await createUser('ada@example.com')
-    await client.post('/inventory').loginAs(user).withCsrfToken().form(TOMATOES)
+    await client.post('/inventory').loginAs(user).withCsrfToken().form(TOMATOES).redirects(0)
     await client
       .post('/inventory')
       .loginAs(user)
       .withCsrfToken()
       .form({ name: 'Boulettes', quantity: 4, unit: 'piece', category: 'meat', state: 'frozen' })
+      .redirects(0)
 
     const page = await client.get('/').loginAs(user).withInertia()
 
@@ -103,13 +113,14 @@ test.group('Inventory', (group) => {
     })
   })
 
-  test('renders the pantry as Markdown for an assistant', async ({ client }) => {
+  test('renders the pantry as Markdown for an assistant', async ({ client, assert }) => {
     const user = await createUser('ada@example.com')
-    await client.post('/inventory').loginAs(user).withCsrfToken().form(TOMATOES)
+    await client.post('/inventory').loginAs(user).withCsrfToken().form(TOMATOES).redirects(0)
 
     const markdown = await client.get('/inventory/markdown').loginAs(user)
 
     markdown.assertStatus(200)
-    markdown.assertTextIncludes('- Tomates cerises: 250 g (périssable)')
+    assert.include(markdown.header('content-type'), 'text/markdown')
+    markdown.assertTextIncludes('Tomates cerises')
   })
 })

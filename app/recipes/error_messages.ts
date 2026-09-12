@@ -7,12 +7,10 @@ const reasons = {
   invalid_servings: 'le nombre de portions doit être un entier positif',
 } satisfies Record<InvalidRecipeError['reason'], string>
 
-export function invalidRecipeMessage(error: InvalidRecipeError & { index: number }) {
-  return `Recette ${error.index + 1} invalide : ${reasons[error.reason]}`
+export function invalidRecipeMessage(error: InvalidRecipeError) {
+  return `Recette invalide : ${reasons[error.reason]}`
 }
 
 export const recipeErrorMessages = {
   recipe_not_found: 'Recette introuvable',
-  code_exhausted: 'Impossible de créer une session, réessaie',
-  session_not_found: 'Session introuvable ou expirée',
 } as const

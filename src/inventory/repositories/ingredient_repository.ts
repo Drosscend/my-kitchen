@@ -1,10 +1,6 @@
 import { inject } from '@adonisjs/core'
 import { UserIdentifier } from '#identity/domain/user_identifier'
-import {
-  isIngredientCategory,
-  isIngredientState,
-  isIngredientUnit,
-} from '#inventory/domain/catalog'
+import { parseCatalogValues } from '#inventory/domain/catalog'
 import { Ingredient } from '#inventory/domain/ingredient'
 import { IngredientIdentifier } from '#inventory/domain/ingredient_identifier'
 import { TransactionManager } from '#shared/services/transaction_manager'
@@ -89,22 +85,12 @@ export class IngredientRepository {
   }
 
   #toDomain(record: IngredientRecord) {
-    if (
-      !isIngredientUnit(record.unit) ||
-      !isIngredientCategory(record.category) ||
-      !isIngredientState(record.state)
-    ) {
-      throw new Error(`Invalid catalog value persisted for ingredient ${record.id}`)
-    }
-
     return Ingredient.create({
       id: IngredientIdentifier.fromString(record.id),
       userId: UserIdentifier.fromString(record.user_id),
       name: record.name,
       quantity: record.quantity,
-      unit: record.unit,
-      category: record.category,
-      state: record.state,
+      ...parseCatalogValues(record),
       createdAt: record.created_at,
       updatedAt: record.updated_at,
     })

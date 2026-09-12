@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { BREAD, importRecipe, storedRecipes } from '#tests/helpers/recipes'
+import { addRecipe, BREAD, storedRecipes } from '#tests/helpers/recipes'
 import { resetState } from '#tests/helpers/state'
 import { createUser } from '#tests/helpers/users'
 
@@ -9,7 +9,7 @@ test.group('Recipes', (group) => {
   test('renders the library and the recipe page of the account only', async ({ client }) => {
     const ada = await createUser('ada@example.com')
     const bob = await createUser('bob@example.com')
-    await importRecipe(ada, BREAD)
+    await addRecipe(ada, BREAD)
     const [recipe] = await storedRecipes(ada)
 
     const library = await client.get('/recipes').loginAs(ada).withInertia()
@@ -34,7 +34,7 @@ test.group('Recipes', (group) => {
   test('deletes a recipe of the account', async ({ client, assert }) => {
     const ada = await createUser('ada@example.com')
     const bob = await createUser('bob@example.com')
-    await importRecipe(ada, BREAD)
+    await addRecipe(ada, BREAD)
     const [recipe] = await storedRecipes(ada)
 
     const foreign = await client

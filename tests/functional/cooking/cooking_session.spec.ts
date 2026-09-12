@@ -1,14 +1,14 @@
 import { test } from '@japa/runner'
 import { db } from '#shared/services/db'
 import { assertRedirectedTo } from '#tests/helpers/http'
-import { BREAD, importRecipe, storedRecipes } from '#tests/helpers/recipes'
+import { addRecipe, BREAD, storedRecipes } from '#tests/helpers/recipes'
 import { resetState } from '#tests/helpers/state'
 import { createUser } from '#tests/helpers/users'
 import type { User } from '#identity/domain/user'
 import type { ApiClient } from '@japa/api-client'
 
 async function startSession(client: ApiClient, user: User) {
-  await importRecipe(user, BREAD)
+  await addRecipe(user, BREAD)
   const [recipe] = await storedRecipes(user)
   const response = await client
     .post(`/recipes/${recipe.id}/cook`)
@@ -49,19 +49,33 @@ test.group('Cooking sessions', (group) => {
     state.assertBodyContains({ code, scale: 2, state: { closed: false } })
   })
 
-  test('stamps updates on the server and keeps the step in range', async ({ client, assert }) => {
+  test('only starts sessions on recipes of the account', async ({ client }) => {
+    const ada = await createUser('ada@example.com')
+    const bob = await createUser('bob@example.com')
+    await addRecipe(ada, BREAD)
+    const [recipe] = await storedRecipes(ada)
+
+    const foreign = await client
+      .post(`/recipes/${recipe.id}/cook`)
+      .loginAs(bob)
+      .withCsrfToken()
+      .form({ scale: 1 })
+      .redirects(0)
+
+    assertRedirectedTo(foreign, '/recipes')
+    foreign.assertFlashMessage('error', 'Recette introuvable')
+  })
+
+  test('stamps updates on the server and merges timers as a whole', async ({ client, assert }) => {
     const user = await createUser('ada@example.com')
     const { code } = await startSession(client, user)
     const before = await client.get(`/cook/${code}/state`)
 
     const forward = await client
       .patch(`/cook/${code}/state`)
-      .json({ currentStepIndex: 9, activeTimers: { rest: { total: 3600, startedAt: 1 } } })
+      .json({ currentStepIndex: 1, activeTimers: { rest: { total: 3600, startedAt: 1 } } })
     const timerKept = await client.patch(`/cook/${code}/state`).json({ currentStepIndex: 0 })
-    const invalid = await client
-      .patch(`/cook/${code}/state`)
-      .accept('json')
-      .json({ currentStepIndex: 'deux' })
+    const unknown = await client.patch('/cook/000000/state').json({ currentStepIndex: 0 })
 
     forward.assertStatus(200)
     forward.assertBodyContains({ state: { currentStepIndex: 1 } })
@@ -69,7 +83,8 @@ test.group('Cooking sessions', (group) => {
     timerKept.assertBodyContains({
       state: { currentStepIndex: 0, activeTimers: { rest: { total: 3600 } } },
     })
-    invalid.assertStatus(422)
+    unknown.assertStatus(404)
+    unknown.assertBodyContains({ error: 'Session introuvable ou expirée' })
   })
 
   test('joins by code and rejects unknown or expired ones', async ({ client }) => {

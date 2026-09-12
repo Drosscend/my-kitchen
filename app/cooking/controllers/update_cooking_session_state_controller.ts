@@ -1,6 +1,7 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
-import { sessionPayload } from '#app/cooking/session_payload'
+import { cookingErrorMessages } from '#app/cooking/error_messages'
+import CookingSessionTransformer from '#app/cooking/transformers/cooking_session_transformer'
 import { UpdateCookingSession } from '#cooking/actions/update_cooking_session'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -32,9 +33,9 @@ export default class UpdateCookingSessionStateController {
     const result = await this.updateCookingSession.execute({ code: params.code, update })
 
     if (!result.ok) {
-      return response.notFound({ error: 'Session introuvable' })
+      return response.notFound({ error: cookingErrorMessages.session_not_found })
     }
 
-    return response.json(sessionPayload(result.value))
+    return response.json(new CookingSessionTransformer(result.value).toObject())
   }
 }

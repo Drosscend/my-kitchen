@@ -8,7 +8,7 @@ import { CookingSessionRepository } from '#cooking/repositories/cooking_session_
 import { err, ok, type Result } from '#core/result'
 import { RecipeQuery } from '#recipes/queries/recipe_query'
 import type { UserIdentifier } from '#identity/domain/user_identifier'
-import type { RecipeNotFoundError } from '#recipes/actions/delete_recipe'
+import type { RecipeNotFoundError } from '#recipes/domain/recipe'
 
 export interface StartCookingSessionParams {
   userId: UserIdentifier

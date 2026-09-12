@@ -1,16 +1,14 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
-import { recipeErrorMessages } from '#app/recipes/error_messages'
+import { cookingErrorMessages } from '#app/cooking/error_messages'
+import { SESSION_CODE_PATTERN } from '#cooking/domain/cooking_session'
 import { CookingSessionQuery } from '#cooking/queries/cooking_session_query'
 import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class JoinCookingSessionController {
   static readonly validator = vine.create({
-    code: vine
-      .string()
-      .trim()
-      .regex(/^\d{6}$/),
+    code: vine.string().trim().regex(SESSION_CODE_PATTERN),
   })
 
   constructor(private readonly sessions: CookingSessionQuery) {}
@@ -23,7 +21,7 @@ export default class JoinCookingSessionController {
     const { code } = await request.validateUsing(JoinCookingSessionController.validator)
 
     if (!(await this.sessions.execute(code))) {
-      session.flash('error', recipeErrorMessages.session_not_found)
+      session.flash('error', cookingErrorMessages.session_not_found)
       return response.redirect().toRoute('cooking.join')
     }
 

@@ -4,7 +4,7 @@ import type { UserIdentifier } from '#identity/domain/user_identifier'
 import type { IngredientCategory, IngredientState, IngredientUnit } from '#inventory/domain/catalog'
 import type { IngredientIdentifier } from '#inventory/domain/ingredient_identifier'
 
-export interface IngredientProperties {
+interface IngredientProperties {
   id: IngredientIdentifier
   userId: UserIdentifier
   name: string
@@ -20,13 +20,17 @@ export type IngredientChanges = Partial<
   Pick<IngredientProperties, 'name' | 'quantity' | 'unit' | 'category' | 'state'>
 >
 
-export interface InvalidNameError {
+interface InvalidNameError {
   type: 'invalid_name'
 }
-export interface InvalidQuantityError {
+interface InvalidQuantityError {
   type: 'invalid_quantity'
 }
 export type InvalidIngredientError = InvalidNameError | InvalidQuantityError
+
+export interface IngredientNotFoundError {
+  type: 'ingredient_not_found'
+}
 
 export function validateName(value: string): Result<string, InvalidNameError> {
   const name = value.trim()

@@ -1,5 +1,6 @@
 import { inject } from '@adonisjs/core'
-import { sessionPayload } from '#app/cooking/session_payload'
+import { cookingErrorMessages } from '#app/cooking/error_messages'
+import CookingSessionTransformer from '#app/cooking/transformers/cooking_session_transformer'
 import { CookingSessionQuery } from '#cooking/queries/cooking_session_query'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -14,9 +15,9 @@ export default class CookingSessionStateController {
     const session = await this.sessions.execute(params.code)
 
     if (!session) {
-      return response.notFound({ error: 'Session introuvable' })
+      return response.notFound({ error: cookingErrorMessages.session_not_found })
     }
 
-    return response.json(sessionPayload(session))
+    return response.json(new CookingSessionTransformer(session).toObject())
   }
 }

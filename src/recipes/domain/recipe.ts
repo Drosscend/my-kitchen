@@ -21,7 +21,7 @@ export interface RecipeStepProperties {
   timerSeconds: number | null
 }
 
-export interface RecipeContent {
+interface RecipeContent {
   title: string
   description: string | null
   baseServings: number
@@ -30,7 +30,7 @@ export interface RecipeContent {
   steps: RecipeStepProperties[]
 }
 
-export interface RecipeProperties extends RecipeContent {
+interface RecipeProperties extends RecipeContent {
   id: RecipeIdentifier
   userId: UserIdentifier
   createdAt: Date
@@ -54,6 +54,10 @@ export interface RecipeContentInput {
 export interface InvalidRecipeError {
   type: 'invalid_recipe'
   reason: 'empty_title' | 'no_content' | 'duplicate_ref' | 'invalid_servings'
+}
+
+export interface RecipeNotFoundError {
+  type: 'recipe_not_found'
 }
 
 const DEFAULT_SERVINGS = 4

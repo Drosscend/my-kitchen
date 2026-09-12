@@ -8,6 +8,7 @@ export const controllers = {
     CookingSession: () => import('#app/cooking/controllers/cooking_session_controller'),
     CookingSessionState: () => import('#app/cooking/controllers/cooking_session_state_controller'),
     JoinCookingSession: () => import('#app/cooking/controllers/join_cooking_session_controller'),
+    StartCookingSession: () => import('#app/cooking/controllers/start_cooking_session_controller'),
     UpdateCookingSessionState: () => import('#app/cooking/controllers/update_cooking_session_state_controller'),
   },
   identity: {
@@ -41,7 +42,6 @@ export const controllers = {
     DeleteRecipe: () => import('#app/recipes/controllers/delete_recipe_controller'),
     Recipe: () => import('#app/recipes/controllers/recipe_controller'),
     RecipeLibrary: () => import('#app/recipes/controllers/recipe_library_controller'),
-    StartCookingSession: () => import('#app/recipes/controllers/start_cooking_session_controller'),
   },
   shared: {
     HealthChecks: () => import('#app/shared/controllers/health_checks_controller'),

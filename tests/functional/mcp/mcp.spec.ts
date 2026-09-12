@@ -1,11 +1,11 @@
 import app from '@adonisjs/core/services/app'
 import { test } from '@japa/runner'
 import { CreateMcpToken } from '#identity/actions/create_mcp_token'
-import { BREAD, importRecipe, storedRecipes } from '#tests/helpers/recipes'
+import { addRecipe, BREAD, storedRecipes } from '#tests/helpers/recipes'
 import { resetState } from '#tests/helpers/state'
 import { createUser } from '#tests/helpers/users'
 import type { User } from '#identity/domain/user'
-import type { ApiClient } from '@japa/api-client'
+import type { ApiClient, ApiResponse } from '@japa/api-client'
 
 async function issueToken(user: User) {
   const createMcpToken = await app.container.make(CreateMcpToken)
@@ -39,10 +39,6 @@ interface RpcResult {
   structuredContent?: object
 }
 
-interface RpcResponse {
-  text: () => string
-}
-
 /**
  * Speaks the 2025 flavor of the protocol, served statelessly: one
  * JSON-RPC request per POST, no session to open first.
@@ -61,7 +57,7 @@ function rpc(client: ApiClient, token: string | null, method: string, params: Rp
  * The stateless legacy path answers over SSE: the result is the JSON of
  * the single data line.
  */
-function rpcResult(response: RpcResponse): RpcResult {
+function rpcResult(response: ApiResponse): RpcResult {
   const data = response
     .text()
     .split('\n')
@@ -80,10 +76,22 @@ function rpcResult(response: RpcResponse): RpcResult {
   return message.result
 }
 
-function structured<TOutput extends object>(response: RpcResponse) {
+function structured<TOutput extends object>(response: ApiResponse) {
   // SAFETY: Each test reads the output its tool declares through outputSchema.
   return rpcResult(response).structuredContent as TOutput
 }
+
+function errorText(response: ApiResponse) {
+  const result = rpcResult(response)
+
+  if (!result.isError) {
+    throw new Error('The tool call did not fail')
+  }
+
+  return result.content?.[0]?.text ?? ''
+}
+
+const FLOUR = { name: 'Farine', quantity: 500, unit: 'g', category: 'starches' }
 
 test.group('MCP', (group) => {
   group.each.setup(() => resetState())
@@ -121,18 +129,23 @@ test.group('MCP', (group) => {
     const ada = await createUser('ada@example.com')
     const bob = await createUser('bob@example.com')
     const token = await issueToken(ada)
-    await client.post('/inventory').loginAs(bob).withCsrfToken().form({
-      name: 'Secret de Bob',
-      quantity: 1,
-      unit: 'piece',
-      category: 'other',
-      state: 'fresh',
-    })
+    await client
+      .post('/inventory')
+      .loginAs(bob)
+      .withCsrfToken()
+      .form({
+        name: 'Secret de Bob',
+        quantity: 1,
+        unit: 'piece',
+        category: 'other',
+        state: 'fresh',
+      })
+      .redirects(0)
 
     const tools = await rpc(client, token, 'tools/list', {})
     const added = await rpc(client, token, 'tools/call', {
       name: 'add_ingredient',
-      arguments: { name: 'Farine', quantity: 500, unit: 'g', category: 'starches' },
+      arguments: FLOUR,
     })
     const listed = await rpc(client, token, 'tools/call', {
       name: 'list_ingredients',
@@ -167,7 +180,7 @@ test.group('MCP', (group) => {
     const token = await issueToken(ada)
     const added = await rpc(client, token, 'tools/call', {
       name: 'add_ingredient',
-      arguments: { name: 'Farine', quantity: 500, unit: 'g', category: 'starches' },
+      arguments: FLOUR,
     })
     const id = structured<{ ingredient: { id: string } }>(added).ingredient.id
 
@@ -181,8 +194,34 @@ test.group('MCP', (group) => {
     })
 
     assert.containsSubset(structured(consumed), { ingredients: [{ id, quantity: 0 }] })
-    assert.isTrue(rpcResult(unknown).isError)
-    assert.include(rpcResult(unknown).content?.[0]?.text, 'Ingrédient introuvable')
+    assert.include(errorText(unknown), 'Ingrédient introuvable')
+  })
+
+  test('consumes nothing when one of the ingredients is unknown', async ({ client, assert }) => {
+    const ada = await createUser('ada@example.com')
+    const token = await issueToken(ada)
+    const added = await rpc(client, token, 'tools/call', {
+      name: 'add_ingredient',
+      arguments: FLOUR,
+    })
+    const id = structured<{ ingredient: { id: string } }>(added).ingredient.id
+
+    const consumed = await rpc(client, token, 'tools/call', {
+      name: 'consume_ingredients',
+      arguments: {
+        items: [
+          { id, quantity: 100 },
+          { id: 'nope', quantity: 1 },
+        ],
+      },
+    })
+    const listed = await rpc(client, token, 'tools/call', {
+      name: 'list_ingredients',
+      arguments: {},
+    })
+
+    assert.equal(errorText(consumed), 'Ingrédient introuvable : nope')
+    assert.containsSubset(structured(listed), { ingredients: [{ id, quantity: 500 }] })
   })
 
   test('adds, reads, replaces and deletes recipes as documents', async ({ client, assert }) => {
@@ -218,10 +257,36 @@ test.group('MCP', (group) => {
     assert.lengthOf(await storedRecipes(ada), 0)
   })
 
+  test('reports invalid documents and unknown recipes as tool errors', async ({
+    client,
+    assert,
+  }) => {
+    const ada = await createUser('ada@example.com')
+    const token = await issueToken(ada)
+
+    const duplicate = await rpc(client, token, 'tools/call', {
+      name: 'add_recipe',
+      arguments: {
+        recipe: { ...BREAD, ingredients: [BREAD.ingredients[0], BREAD.ingredients[0]] },
+      },
+    })
+    const unknown = await rpc(client, token, 'tools/call', {
+      name: 'update_recipe',
+      arguments: { id: 'nope', recipe: BREAD },
+    })
+
+    assert.equal(
+      errorText(duplicate),
+      'Recette invalide : deux ingrédients ou deux étapes portent le même id'
+    )
+    assert.equal(errorText(unknown), 'Recette introuvable')
+    assert.lengthOf(await storedRecipes(ada), 0)
+  })
+
   test('only sees recipes of the token owner', async ({ client, assert }) => {
     const ada = await createUser('ada@example.com')
     const bob = await createUser('bob@example.com')
-    await importRecipe(bob, BREAD)
+    await addRecipe(bob, BREAD)
     const token = await issueToken(ada)
 
     const listed = await rpc(client, token, 'tools/call', { name: 'list_recipes', arguments: {} })

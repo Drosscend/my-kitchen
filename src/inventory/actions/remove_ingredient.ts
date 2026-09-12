@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import { err, ok, type Result } from '#core/result'
 import { IngredientRepository } from '#inventory/repositories/ingredient_repository'
 import type { UserIdentifier } from '#identity/domain/user_identifier'
-import type { IngredientNotFoundError } from '#inventory/actions/update_ingredient'
+import type { IngredientNotFoundError } from '#inventory/domain/ingredient'
 
 export interface RemoveIngredientParams {
   userId: UserIdentifier

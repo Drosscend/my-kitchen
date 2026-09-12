@@ -16,7 +16,6 @@ export interface ApiDefinition {
     index: typeof routes['recipes.index']
     show: typeof routes['recipes.show']
     destroy: typeof routes['recipes.destroy']
-    cook: typeof routes['recipes.cook']
   }
   newAccount: {
     create: typeof routes['new_account.create']
@@ -56,6 +55,7 @@ export interface ApiDefinition {
     }
   }
   cooking: {
+    start: typeof routes['cooking.start']
     join: typeof routes['cooking.join'] & {
       store: typeof routes['cooking.join.store']
     }

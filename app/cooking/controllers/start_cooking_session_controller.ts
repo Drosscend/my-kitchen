@@ -1,6 +1,6 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
-import { recipeErrorMessages } from '#app/recipes/error_messages'
+import { cookingErrorMessages } from '#app/cooking/error_messages'
 import { StartCookingSession } from '#cooking/actions/start_cooking_session'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -21,7 +21,7 @@ export default class StartCookingSessionController {
     })
 
     if (!result.ok) {
-      session.flash('error', recipeErrorMessages[result.error.type])
+      session.flash('error', cookingErrorMessages[result.error.type])
       return response.redirect().toRoute('recipes.index')
     }
 

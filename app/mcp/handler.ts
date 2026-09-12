@@ -10,7 +10,7 @@ import { UserIdentifier } from '#identity/domain/user_identifier'
  * One stateless handler for the process. Every request builds a server
  * bound to the token's owner, carried as the auth `clientId`.
  */
-export const mcpHandler = createMcpHandler(
+const mcpHandler = createMcpHandler(
   async ({ authInfo }) => {
     if (!authInfo) {
       throw new Error('The MCP handler only serves authenticated requests')

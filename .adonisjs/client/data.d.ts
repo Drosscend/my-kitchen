@@ -9,10 +9,10 @@ import type { InferSharedProps, InferFlashData } from '@adonisjs/inertia/types'
 import type CookingCookingSessionTransformer from '#app/cooking/transformers/cooking_session_transformer'
 import type IdentityAccountDetailsTransformer from '#app/identity/transformers/account_details_transformer'
 import type IdentityMcpTokenTransformer from '#app/identity/transformers/mcp_token_transformer'
+import type IdentityUserTransformer from '#app/identity/transformers/user_transformer'
 import type InventoryIngredientTransformer from '#app/inventory/transformers/ingredient_transformer'
 import type RecipesRecipeSummaryTransformer from '#app/recipes/transformers/recipe_summary_transformer'
 import type RecipesRecipeTransformer from '#app/recipes/transformers/recipe_transformer'
-import type UserTransformer from '#app/transformers/user_transformer'
 import type InertiaMiddleware from '#app/middleware/inertia_middleware'
 
 export namespace Data {
@@ -31,6 +31,10 @@ export namespace Data {
     export namespace McpToken {
       export type Variants = InferVariants<IdentityMcpTokenTransformer>
     }
+    export type User = InferData<IdentityUserTransformer>
+    export namespace User {
+      export type Variants = InferVariants<IdentityUserTransformer>
+    }
   }
   export namespace Inventory {
     export type Ingredient = InferData<InventoryIngredientTransformer>
@@ -47,10 +51,6 @@ export namespace Data {
     export namespace Recipe {
       export type Variants = InferVariants<RecipesRecipeTransformer>
     }
-  }
-  export type User = InferData<UserTransformer>
-  export namespace User {
-    export type Variants = InferVariants<UserTransformer>
   }
   export type SharedProps = InferSharedProps<InertiaMiddleware>
   export type FlashMessages = InferFlashData<InertiaMiddleware>

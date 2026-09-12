@@ -40,7 +40,9 @@ const ingredientListOutput = z.object({
   ),
 })
 
-function toOutput(ingredient: Ingredient) {
+type IngredientOutput = Pick<Ingredient, 'id' | 'name' | 'quantity' | 'unit' | 'category' | 'state'>
+
+function toOutput(ingredient: IngredientOutput) {
   return {
     id: ingredient.id,
     name: ingredient.name,
@@ -83,21 +85,11 @@ export async function registerInventoryTools(server: McpServer, userId: UserIden
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async (input) => {
-      const search = input.search?.trim().toLowerCase()
-      const ingredients = (await inventory.execute(userId))
-        .filter((item) => !search || item.name.toLowerCase().includes(search))
-        .filter((item) => !input.category || item.category === input.category)
-        .filter((item) => !input.state || item.state === input.state)
-        .filter((item) => !input.lowStockOnly || item.lowStock)
+      const ingredients = await inventory.execute(userId, input)
 
       return toolResult({
         ingredients: ingredients.map((item) => ({
-          id: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          unit: item.unit,
-          category: item.category,
-          state: item.state,
+          ...toOutput(item),
           lowStock: item.lowStock,
           perishable: item.perishable,
           updatedAt: item.updatedAt.toISOString(),
