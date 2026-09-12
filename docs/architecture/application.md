@@ -10,9 +10,9 @@ app/<capability>  ──┐
 inertia/          ──┘
 ```
 
-- `app/**` owns HTTP and Inertia delivery: routes, controllers, request validators, middleware, policies, response mapping, and transformers.
+- `app/**` owns HTTP and Inertia delivery: routes, controllers, request validators, middleware, response mapping, and transformers.
 - `inertia/**` owns pages, layouts, browser state, and page-specific composition.
-- `src/**` owns Actions, Queries, domain objects, repositories, jobs, and application services.
+- `src/**` owns Actions, Queries, domain objects, repositories, and application services.
 - `src/**` never imports from `app/**` or `inertia/**`.
 - `app/shared` contains shared delivery concerns. `src/shared` contains application foundations needed by multiple capabilities.
 - `providers`, `config`, `start`, `commands`, and `database` retain their AdonisJS roles.

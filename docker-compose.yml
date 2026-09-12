@@ -1,5 +1,5 @@
-# Production stack, built and deployed on push to main. Local
-# development uses compose.yaml instead, which only runs Postgres and
+# Production stack read by Dokploy. Local development uses
+# compose.yaml instead, which only runs Postgres and
 # Mailpit, and `docker compose up -d` picks that one up first.
 #
 # Conventions this file follows:

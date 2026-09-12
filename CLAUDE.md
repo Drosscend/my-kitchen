@@ -8,7 +8,8 @@ Les règles du dépôt sont dans [AGENTS.md](AGENTS.md), l'architecture dans [do
 
 - Gestionnaire de paquets : npm, imposé par l'alignement avec kevin-dev.com.
 - Lint et format : oxlint + oxfmt, config et règles maison copiées de kevin-dev.com (`tools/oxlint/`).
-- Tests : Japa (`npm test`), unitaires sur les Actions et le domaine, fonctionnels sur les routes. Ils exigent le Postgres de `compose.yaml` et une base `my_kitchen_test`.
+- Tests : Japa (`npm test`), unitaires sur les Actions et le domaine, fonctionnels sur les routes avec le client API, sans suite navigateur. Ils exigent le Postgres de `compose.yaml` et une base `my_kitchen_test`.
+- Session : cookie de 30 jours sans jeton « se souvenir de moi », un seul foyer par compte.
 - Le dossier `inertia/components/ui/` est du code fourni par shadcn : jamais reformaté ni nettoyé.
 
 ## Commandes

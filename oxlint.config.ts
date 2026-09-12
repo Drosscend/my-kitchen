@@ -81,15 +81,5 @@ export default defineConfig({
         'anti-slop/no-unknown-parameters': 'off',
       },
     },
-    {
-      // Starter kit serializer: it validates the pagination metadata a
-      // transformer hands it, hence the raw parameter and the typeof check.
-      files: ['providers/api_provider.ts'],
-      rules: {
-        'anti-slop/no-reflect-get': 'off',
-        'anti-slop/no-runtime-typeof': 'off',
-        'anti-slop/no-unknown-parameters': 'off',
-      },
-    },
   ],
 })

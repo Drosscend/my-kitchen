@@ -1,13 +1,4 @@
-import vine, { SimpleMessagesProvider, VineDate } from '@vinejs/vine'
-import { DateTime } from 'luxon'
-
-declare module '@vinejs/vine/types' {
-  interface VineGlobalTransforms {
-    date: DateTime
-  }
-}
-
-VineDate.transform((value) => DateTime.fromJSDate(value))
+import vine, { SimpleMessagesProvider } from '@vinejs/vine'
 
 vine.messagesProvider = new SimpleMessagesProvider({
   'required': 'Ce champ est obligatoire',

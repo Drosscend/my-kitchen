@@ -47,8 +47,8 @@ const shieldConfig = defineConfig({
     enabled: true,
 
     /**
-     * Route patterns to exclude from CSRF checks.
-     * Useful for external webhooks or API endpoints.
+     * The cooking state is updated by phones without a session, the MCP
+     * endpoint by bearer clients: neither can carry a CSRF token.
      */
     exceptRoutes: ['/cook/:code/state', '/mcp'],
 
