@@ -55,28 +55,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/add_ingredient_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'inventory.import': {
-    methods: ["POST"]
-    pattern: '/inventory/import'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#app/inventory/controllers/import_inventory_controller').default)['validator']>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#app/inventory/controllers/import_inventory_controller').default)['validator']>>
-      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/import_inventory_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/import_inventory_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'inventory.export': {
+  'inventory.markdown': {
     methods: ["GET","HEAD"]
-    pattern: '/inventory/export/:format'
+    pattern: '/inventory/markdown'
     types: {
       body: {}
-      paramsTuple: [ParamValue]
-      params: { format: ParamValue }
+      paramsTuple: []
+      params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/export_inventory_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/export_inventory_controller').default['execute']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/inventory_markdown_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/inventory_markdown_controller').default['execute']>>>
     }
   }
   'inventory.update': {
@@ -125,18 +113,6 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#app/recipes/controllers/recipe_library_controller').default['render']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/recipes/controllers/recipe_library_controller').default['render']>>>
-    }
-  }
-  'recipes.import': {
-    methods: ["POST"]
-    pattern: '/recipes/import'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#app/recipes/controllers/import_recipes_controller').default)['validator']>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#app/recipes/controllers/import_recipes_controller').default)['validator']>>
-      response: ExtractResponse<Awaited<ReturnType<import('#app/recipes/controllers/import_recipes_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/recipes/controllers/import_recipes_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'recipes.show': {

@@ -1,7 +1,12 @@
+import app from '@adonisjs/core/services/app'
+import { ImportRecipes } from '#recipes/actions/import_recipes'
 import { db } from '#shared/services/db'
 import type { User } from '#identity/domain/user'
-import type { ApiClient } from '@japa/api-client'
+import type { RecipeContentInput } from '#recipes/domain/recipe'
 
+/**
+ * The document shape the MCP tools take, as an assistant writes it.
+ */
 export const BREAD = {
   title: 'Pain maison',
   description: 'Un pain simple',
@@ -17,21 +22,35 @@ export const BREAD = {
   notes: 'Le four doit être **très** chaud.',
 }
 
-export function importRecipeText(client: ApiClient, user: User, text: string) {
-  return client
-    .post('/recipes/import')
-    .loginAs(user)
-    .withCsrfToken()
-    .form({ json: text })
-    .redirects(0)
+type RecipeDocument = typeof BREAD
+
+function toContent(document: RecipeDocument): RecipeContentInput {
+  return {
+    title: document.title,
+    description: document.description,
+    baseServings: document.base_servings,
+    notes: document.notes,
+    ingredients: document.ingredients.map(({ id, ...ingredient }) => ({ ref: id, ...ingredient })),
+    steps: document.steps.map(({ id, timer_seconds: timerSeconds, ...step }) => ({
+      ref: id,
+      timerSeconds,
+      ...step,
+    })),
+  }
 }
 
-export function importRecipe(
-  client: ApiClient,
-  user: User,
-  document: Partial<typeof BREAD> | Partial<typeof BREAD>[]
-) {
-  return importRecipeText(client, user, JSON.stringify(document))
+export async function importRecipe(user: User, document: RecipeDocument) {
+  const importRecipes = await app.container.make(ImportRecipes)
+  const result = await importRecipes.execute({
+    userId: user.getIdentifier(),
+    recipes: [toContent(document)],
+  })
+
+  if (!result.ok) {
+    throw new Error('Cannot import the test recipe')
+  }
+
+  return result.value[0]
 }
 
 export function storedRecipes(user: User) {

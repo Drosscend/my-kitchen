@@ -36,18 +36,6 @@ export class IngredientRepository {
       .execute()
   }
 
-  async insertMany(ingredients: Ingredient[]) {
-    if (ingredients.length === 0) {
-      return
-    }
-
-    await this.transactions
-      .currentDatabase()
-      .insertInto('ingredients')
-      .values(ingredients.map((ingredient) => this.#toRow(ingredient)))
-      .execute()
-  }
-
   async findForUser(userId: UserIdentifier, id: string) {
     const record = await this.transactions
       .currentDatabase()
@@ -83,14 +71,6 @@ export class IngredientRepository {
       .deleteFrom('ingredients')
       .where('id', '=', ingredient.id)
       .where('user_id', '=', ingredient.userId.toString())
-      .execute()
-  }
-
-  async deleteAllForUser(userId: UserIdentifier) {
-    await this.transactions
-      .currentDatabase()
-      .deleteFrom('ingredients')
-      .where('user_id', '=', userId.toString())
       .execute()
   }
 

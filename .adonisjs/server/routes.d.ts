@@ -8,13 +8,11 @@ export type ScannedRoutes = {
     'health': { paramsTuple?: []; params?: {} }
     'inventory.index': { paramsTuple?: []; params?: {} }
     'inventory.store': { paramsTuple?: []; params?: {} }
-    'inventory.import': { paramsTuple?: []; params?: {} }
-    'inventory.export': { paramsTuple: [ParamValue]; params: {'format': ParamValue} }
+    'inventory.markdown': { paramsTuple?: []; params?: {} }
     'inventory.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.index': { paramsTuple?: []; params?: {} }
-    'recipes.import': { paramsTuple?: []; params?: {} }
     'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.cook': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -46,9 +44,7 @@ export type ScannedRoutes = {
   POST: {
     'mcp': { paramsTuple?: []; params?: {} }
     'inventory.store': { paramsTuple?: []; params?: {} }
-    'inventory.import': { paramsTuple?: []; params?: {} }
     'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'recipes.import': { paramsTuple?: []; params?: {} }
     'recipes.cook': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
@@ -66,7 +62,7 @@ export type ScannedRoutes = {
     'mcp': { paramsTuple?: []; params?: {} }
     'health': { paramsTuple?: []; params?: {} }
     'inventory.index': { paramsTuple?: []; params?: {} }
-    'inventory.export': { paramsTuple: [ParamValue]; params: {'format': ParamValue} }
+    'inventory.markdown': { paramsTuple?: []; params?: {} }
     'recipes.index': { paramsTuple?: []; params?: {} }
     'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
@@ -90,7 +86,7 @@ export type ScannedRoutes = {
   HEAD: {
     'health': { paramsTuple?: []; params?: {} }
     'inventory.index': { paramsTuple?: []; params?: {} }
-    'inventory.export': { paramsTuple: [ParamValue]; params: {'format': ParamValue} }
+    'inventory.markdown': { paramsTuple?: []; params?: {} }
     'recipes.index': { paramsTuple?: []; params?: {} }
     'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }

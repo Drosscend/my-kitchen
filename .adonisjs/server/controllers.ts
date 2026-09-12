@@ -29,9 +29,8 @@ export const controllers = {
   inventory: {
     AddIngredient: () => import('#app/inventory/controllers/add_ingredient_controller'),
     AdjustIngredientQuantity: () => import('#app/inventory/controllers/adjust_ingredient_quantity_controller'),
-    ExportInventory: () => import('#app/inventory/controllers/export_inventory_controller'),
-    ImportInventory: () => import('#app/inventory/controllers/import_inventory_controller'),
     Inventory: () => import('#app/inventory/controllers/inventory_controller'),
+    InventoryMarkdown: () => import('#app/inventory/controllers/inventory_markdown_controller'),
     RemoveIngredient: () => import('#app/inventory/controllers/remove_ingredient_controller'),
     UpdateIngredient: () => import('#app/inventory/controllers/update_ingredient_controller'),
   },
@@ -40,7 +39,6 @@ export const controllers = {
   },
   recipes: {
     DeleteRecipe: () => import('#app/recipes/controllers/delete_recipe_controller'),
-    ImportRecipes: () => import('#app/recipes/controllers/import_recipes_controller'),
     Recipe: () => import('#app/recipes/controllers/recipe_controller'),
     RecipeLibrary: () => import('#app/recipes/controllers/recipe_library_controller'),
     StartCookingSession: () => import('#app/recipes/controllers/start_cooking_session_controller'),

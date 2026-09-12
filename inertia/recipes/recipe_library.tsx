@@ -1,5 +1,5 @@
 import { Link, useRouter } from '@adonisjs/inertia/react'
-import { BookOpenIcon, PlusIcon, Trash2Icon } from 'lucide-react'
+import { BookOpenIcon, Trash2Icon } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +18,6 @@ import { type RecipeSummary } from '~/recipes/types'
 
 interface RecipeLibraryProps {
   recipes: RecipeSummary[]
-  onShowImport: () => void
 }
 
 function plural(count: number, singular: string) {
@@ -60,29 +59,21 @@ export function DeleteRecipeDialog({
   )
 }
 
-export function RecipeLibrary({ recipes, onShowImport }: RecipeLibraryProps) {
+export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
   if (recipes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border py-16 text-center">
         <BookOpenIcon className="size-10 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">Aucune recette dans la bibliothèque</p>
-        <Button variant="outline" onClick={onShowImport}>
-          <PlusIcon data-icon="inline-start" />
-          Importer des recettes
-        </Button>
+        <p className="text-sm text-muted-foreground">
+          Aucune recette. Ton assistant les ajoute depuis le serveur MCP.
+        </p>
       </div>
     )
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="kraft-title text-xl font-bold">Mes recettes</h2>
-        <Button variant="outline" size="sm" onClick={onShowImport}>
-          <PlusIcon data-icon="inline-start" />
-          Importer
-        </Button>
-      </div>
+      <h2 className="kraft-title text-xl font-bold">Mes recettes</h2>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {recipes.map((recipe) => (

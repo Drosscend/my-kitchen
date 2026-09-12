@@ -7,15 +7,13 @@ export interface ApiDefinition {
   inventory: {
     index: typeof routes['inventory.index']
     store: typeof routes['inventory.store']
-    import: typeof routes['inventory.import']
-    export: typeof routes['inventory.export']
+    markdown: typeof routes['inventory.markdown']
     update: typeof routes['inventory.update']
     adjust: typeof routes['inventory.adjust']
     destroy: typeof routes['inventory.destroy']
   }
   recipes: {
     index: typeof routes['recipes.index']
-    import: typeof routes['recipes.import']
     show: typeof routes['recipes.show']
     destroy: typeof routes['recipes.destroy']
     cook: typeof routes['recipes.cook']

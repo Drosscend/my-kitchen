@@ -103,49 +103,13 @@ test.group('Inventory', (group) => {
     })
   })
 
-  test('exports the pantry as JSON and Markdown, and imports the JSON back', async ({
-    client,
-    assert,
-  }) => {
+  test('renders the pantry as Markdown for an assistant', async ({ client }) => {
     const user = await createUser('ada@example.com')
     await client.post('/inventory').loginAs(user).withCsrfToken().form(TOMATOES)
 
-    const json = await client.get('/inventory/export/json').loginAs(user)
-    const markdown = await client.get('/inventory/export/markdown').loginAs(user)
+    const markdown = await client.get('/inventory/markdown').loginAs(user)
 
-    json.assertStatus(200)
-    json.assertHeader('content-disposition')
-    json.assertBody([TOMATOES])
     markdown.assertStatus(200)
     markdown.assertTextIncludes('- Tomates cerises: 250 g (périssable)')
-
-    const imported = await client
-      .post('/inventory/import')
-      .loginAs(user)
-      .withCsrfToken()
-      .file('file', Buffer.from(JSON.stringify([{ ...TOMATOES, name: 'Farine' }])), {
-        filename: 'garde-manger.json',
-      })
-      .redirects(0)
-
-    imported.assertFlashMessage('success', '1 ingrédients importés')
-    const stored = await storedIngredients(user)
-    assert.lengthOf(stored, 1)
-    assert.equal(stored[0].name, 'Farine')
-  })
-
-  test('refuses a file that is not a pantry export', async ({ client, assert }) => {
-    const user = await createUser('ada@example.com')
-    await client.post('/inventory').loginAs(user).withCsrfToken().form(TOMATOES)
-
-    const response = await client
-      .post('/inventory/import')
-      .loginAs(user)
-      .withCsrfToken()
-      .file('file', Buffer.from('{"not": "a list"}'), { filename: 'garde-manger.json' })
-      .redirects(0)
-
-    response.assertFlashMessage('error', 'Le fichier doit être un export JSON du garde-manger')
-    assert.lengthOf(await storedIngredients(user), 1)
   })
 })

@@ -8,7 +8,7 @@ import type { User } from '#identity/domain/user'
 import type { ApiClient } from '@japa/api-client'
 
 async function startSession(client: ApiClient, user: User) {
-  await importRecipe(client, user, BREAD)
+  await importRecipe(user, BREAD)
   const [recipe] = await storedRecipes(user)
   const response = await client
     .post(`/recipes/${recipe.id}/cook`)

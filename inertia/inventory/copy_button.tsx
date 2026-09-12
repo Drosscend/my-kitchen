@@ -13,7 +13,7 @@ export function CopyButton({ disabled }: { disabled: boolean }) {
 
   async function copy() {
     try {
-      const response = await fetch(client.urlFor('inventory.export', { format: 'markdown' }), {
+      const response = await fetch(client.urlFor('inventory.markdown'), {
         headers: { accept: 'text/markdown' },
       })
       await navigator.clipboard.writeText(await response.text())

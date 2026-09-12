@@ -12,5 +12,3 @@ export const ingredientFields = {
   category: vine.enum(INGREDIENT_CATEGORY_VALUES),
   state: vine.enum(INGREDIENT_STATE_VALUES),
 }
-
-export const ingredientSchema = vine.object(ingredientFields)

@@ -1,7 +1,4 @@
-import { Form } from '@adonisjs/inertia/react'
-import { DownloadIcon, SearchIcon, UploadIcon, XIcon } from 'lucide-react'
-import { useRef } from 'react'
-import { client } from '~/client'
+import { SearchIcon, XIcon } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Checkbox } from '~/components/ui/checkbox'
@@ -51,8 +48,6 @@ export function InventoryActions({
   onUpdateFilters,
   onResetFilters,
 }: InventoryActionsProps) {
-  const fileInput = useRef<HTMLInputElement>(null)
-
   return (
     <div className="space-y-4">
       <Section title="Résumé">
@@ -134,42 +129,6 @@ export function InventoryActions({
 
       <Section title="Actions">
         <CopyButton disabled={ingredients.length === 0} />
-
-        <Button
-          variant="outline"
-          nativeButton={false}
-          disabled={ingredients.length === 0}
-          className="w-full justify-start gap-2"
-          render={<a href={client.urlFor('inventory.export', { format: 'json' })} download />}
-        >
-          <DownloadIcon />
-          Exporter JSON
-        </Button>
-
-        <Form route="inventory.import">
-          {({ submit, processing }) => (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={processing}
-                onClick={() => fileInput.current?.click()}
-                className="w-full justify-start gap-2"
-              >
-                <UploadIcon />
-                Importer JSON (remplace tout)
-              </Button>
-              <input
-                ref={fileInput}
-                type="file"
-                name="file"
-                accept=".json"
-                className="hidden"
-                onChange={() => submit()}
-              />
-            </>
-          )}
-        </Form>
       </Section>
     </div>
   )

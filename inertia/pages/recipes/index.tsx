@@ -1,6 +1,4 @@
 import { Head } from '@inertiajs/react'
-import { useState } from 'react'
-import { RecipeImport } from '~/recipes/recipe_import'
 import { RecipeLibrary } from '~/recipes/recipe_library'
 import { type RecipeSummary } from '~/recipes/types'
 import { UnitConverter } from '~/recipes/unit_converter'
@@ -9,8 +7,6 @@ import { type InertiaProps } from '~/types'
 type PageProps = InertiaProps<{ recipes: RecipeSummary[] }>
 
 export default function Recipes({ recipes }: PageProps) {
-  const [showImport, setShowImport] = useState(recipes.length === 0)
-
   return (
     <>
       <Head title="Recettes" />
@@ -20,11 +16,7 @@ export default function Recipes({ recipes }: PageProps) {
             <UnitConverter />
           </div>
           <div className="order-2 space-y-6 lg:order-1">
-            {showImport && <RecipeImport />}
-            <RecipeLibrary
-              recipes={recipes}
-              onShowImport={() => setShowImport((value) => !value)}
-            />
+            <RecipeLibrary recipes={recipes} />
           </div>
           <div className="order-1 hidden lg:order-2 lg:block">
             <UnitConverter />

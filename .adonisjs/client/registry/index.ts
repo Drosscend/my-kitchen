@@ -30,17 +30,11 @@ const routes = {
     tokens: [{"old":"/inventory","type":0,"val":"inventory","end":""}],
     types: placeholder as Registry['inventory.store']['types'],
   },
-  'inventory.import': {
-    methods: ["POST"],
-    pattern: '/inventory/import',
-    tokens: [{"old":"/inventory/import","type":0,"val":"inventory","end":""},{"old":"/inventory/import","type":0,"val":"import","end":""}],
-    types: placeholder as Registry['inventory.import']['types'],
-  },
-  'inventory.export': {
+  'inventory.markdown': {
     methods: ["GET","HEAD"],
-    pattern: '/inventory/export/:format',
-    tokens: [{"old":"/inventory/export/:format","type":0,"val":"inventory","end":""},{"old":"/inventory/export/:format","type":0,"val":"export","end":""},{"old":"/inventory/export/:format","type":1,"val":"format","end":""}],
-    types: placeholder as Registry['inventory.export']['types'],
+    pattern: '/inventory/markdown',
+    tokens: [{"old":"/inventory/markdown","type":0,"val":"inventory","end":""},{"old":"/inventory/markdown","type":0,"val":"markdown","end":""}],
+    types: placeholder as Registry['inventory.markdown']['types'],
   },
   'inventory.update': {
     methods: ["PATCH"],
@@ -65,12 +59,6 @@ const routes = {
     pattern: '/recipes',
     tokens: [{"old":"/recipes","type":0,"val":"recipes","end":""}],
     types: placeholder as Registry['recipes.index']['types'],
-  },
-  'recipes.import': {
-    methods: ["POST"],
-    pattern: '/recipes/import',
-    tokens: [{"old":"/recipes/import","type":0,"val":"recipes","end":""},{"old":"/recipes/import","type":0,"val":"import","end":""}],
-    types: placeholder as Registry['recipes.import']['types'],
   },
   'recipes.show': {
     methods: ["GET","HEAD"],

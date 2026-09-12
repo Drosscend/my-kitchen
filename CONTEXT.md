@@ -39,7 +39,7 @@ A document owned by a user: title, description, base servings, notes, ingredient
 The short key of a recipe ingredient or step, chosen by whoever wrote the recipe. A step mentions an ingredient as `{ref}` and its own timer as `{timer}`; timers of a cooking session are tracked under the step ref.
 
 **Recipe document**:
-The JSON shape assistants produce and the import reads: snake_case keys, `id` as the ref.
+The JSON shape assistants send to the MCP tools: snake_case keys, `id` as the ref.
 
 ## Cooking
 

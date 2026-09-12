@@ -221,7 +221,7 @@ test.group('MCP', (group) => {
   test('only sees recipes of the token owner', async ({ client, assert }) => {
     const ada = await createUser('ada@example.com')
     const bob = await createUser('bob@example.com')
-    await importRecipe(client, bob, BREAD)
+    await importRecipe(bob, BREAD)
     const token = await issueToken(ada)
 
     const listed = await rpc(client, token, 'tools/call', { name: 'list_recipes', arguments: {} })

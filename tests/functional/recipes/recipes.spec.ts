@@ -1,57 +1,15 @@
 import { test } from '@japa/runner'
-import { assertRedirectedTo } from '#tests/helpers/http'
-import { BREAD, importRecipe, importRecipeText, storedRecipes } from '#tests/helpers/recipes'
+import { BREAD, importRecipe, storedRecipes } from '#tests/helpers/recipes'
 import { resetState } from '#tests/helpers/state'
 import { createUser } from '#tests/helpers/users'
 
 test.group('Recipes', (group) => {
   group.each.setup(() => resetState())
 
-  test('imports pasted JSON, one recipe or a list', async ({ client, assert }) => {
-    const user = await createUser('ada@example.com')
-
-    const single = await importRecipe(client, user, BREAD)
-    const list = await importRecipe(client, user, [BREAD, { ...BREAD, title: 'Brioche' }])
-
-    assertRedirectedTo(single, '/recipes')
-    single.assertFlashMessage('success', 'Recette importée')
-    list.assertFlashMessage('success', '2 recettes importées')
-    assert.lengthOf(await storedRecipes(user), 3)
-  })
-
-  test('refuses a broken document without writing anything', async ({ client, assert }) => {
-    const user = await createUser('ada@example.com')
-
-    const notJson = await importRecipeText(client, user, 'not json')
-    const noRef = await importRecipeText(
-      client,
-      user,
-      JSON.stringify({ title: 'Sans ref', ingredients: [{ name: 'Farine' }], steps: [] })
-    )
-    const duplicate = await importRecipe(client, user, [
-      BREAD,
-      { ...BREAD, steps: [BREAD.steps[0], BREAD.steps[0]] },
-    ])
-
-    notJson.assertFlashMessage(
-      'error',
-      'Aucune recette valide : il faut un title, des ingredients et des steps avec un id chacun'
-    )
-    noRef.assertFlashMessage(
-      'error',
-      'Aucune recette valide : il faut un title, des ingredients et des steps avec un id chacun'
-    )
-    duplicate.assertFlashMessage(
-      'error',
-      'Recette 2 invalide : deux ingrédients ou deux étapes portent le même id'
-    )
-    assert.lengthOf(await storedRecipes(user), 0)
-  })
-
   test('renders the library and the recipe page of the account only', async ({ client }) => {
     const ada = await createUser('ada@example.com')
     const bob = await createUser('bob@example.com')
-    await importRecipe(client, ada, BREAD)
+    await importRecipe(ada, BREAD)
     const [recipe] = await storedRecipes(ada)
 
     const library = await client.get('/recipes').loginAs(ada).withInertia()
@@ -76,7 +34,7 @@ test.group('Recipes', (group) => {
   test('deletes a recipe of the account', async ({ client, assert }) => {
     const ada = await createUser('ada@example.com')
     const bob = await createUser('bob@example.com')
-    await importRecipe(client, ada, BREAD)
+    await importRecipe(ada, BREAD)
     const [recipe] = await storedRecipes(ada)
 
     const foreign = await client
