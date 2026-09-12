@@ -63,14 +63,14 @@ export function CookingMode({
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-paper">
       <div className="flex items-center justify-between border-b border-border p-4">
-        <Button variant="ghost" size="sm" onClick={onExit}>
+        <Button variant="ghost" onClick={onExit}>
           <XIcon data-icon="inline-start" /> Quitter
         </Button>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-base text-muted-foreground">
           {onIngredients ? 'Ingrédients' : `Étape ${currentStepIndex + 1} / ${totalSteps}`}
         </span>
         <div className="flex w-16 justify-end">
-          <Button variant="ghost" size="icon-sm" onClick={onShare} aria-label="Partager la session">
+          <Button variant="ghost" size="icon-lg" onClick={onShare} aria-label="Partager la session">
             <QrCodeIcon />
           </Button>
         </div>
@@ -88,11 +88,11 @@ export function CookingMode({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="w-full max-w-lg text-center">
+        <div className="w-full max-w-3xl text-center">
           {onIngredients ? (
             <>
-              <h2 className="kraft-title mb-6 text-2xl font-bold">Ingrédients</h2>
-              <ul className="space-y-2 text-left text-lg">
+              <h2 className="kraft-title mb-8 text-3xl font-bold sm:text-4xl">Ingrédients</h2>
+              <ul className="mx-auto max-w-md space-y-3 text-left text-xl sm:text-2xl">
                 {recipe.ingredients.map((ingredient) => (
                   <li key={ingredient.ref}>{formatIngredient(ingredient, scale)}</li>
                 ))}
@@ -101,7 +101,9 @@ export function CookingMode({
           ) : currentStep ? (
             <>
               {currentStep.title && (
-                <h2 className="kraft-title mb-4 text-2xl font-bold">{currentStep.title}</h2>
+                <h2 className="kraft-title mb-6 text-3xl font-bold sm:text-4xl">
+                  {currentStep.title}
+                </h2>
               )}
               {currentStep.timerSeconds && (
                 <RecipeTimer
@@ -113,7 +115,7 @@ export function CookingMode({
                   onReset={onResetTimer}
                 />
               )}
-              <p className="mt-4 text-lg leading-relaxed text-foreground/80">
+              <p className="mt-6 text-xl leading-relaxed text-foreground/80 sm:text-2xl">
                 {resolveStep(currentStep, ingredients, scale)}
               </p>
             </>
@@ -140,11 +142,21 @@ export function CookingMode({
         </div>
       )}
 
-      <div className="flex items-center justify-between border-t border-border p-4">
-        <Button variant="outline" onClick={onPrevStep} disabled={onIngredients}>
+      <div className="flex items-center justify-between gap-4 border-t border-border p-4">
+        <Button
+          variant="outline"
+          size="lg"
+          className="h-12 flex-1 text-base sm:min-w-40 sm:flex-none"
+          onClick={onPrevStep}
+          disabled={onIngredients}
+        >
           <ArrowLeftIcon data-icon="inline-start" /> Préc.
         </Button>
-        <Button onClick={lastStep ? onFinish : onNextStep}>
+        <Button
+          size="lg"
+          className="h-12 flex-1 text-base sm:min-w-40 sm:flex-none"
+          onClick={lastStep ? onFinish : onNextStep}
+        >
           {lastStep ? (
             <>
               Terminer <CheckIcon data-icon="inline-end" />

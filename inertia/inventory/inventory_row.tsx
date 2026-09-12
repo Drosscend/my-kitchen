@@ -123,7 +123,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
 
   return (
     <tr className="group border-b border-border/50 transition-colors hover:bg-paper-light/50">
-      <td className="px-4 py-3 first:pl-5 last:pr-5">
+      <td className="px-4 py-3 first:pl-5 last:pr-5 max-md:sticky max-md:left-0 max-md:z-10 max-md:bg-card">
         <div className="flex items-center gap-2">
           <CategoryIcon className="size-4 shrink-0 text-secondary" />
           {editing === 'name' ? (

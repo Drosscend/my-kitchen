@@ -41,7 +41,7 @@ function SortableHeader({
       <button
         type="button"
         onClick={() => onSort(field)}
-        className="flex items-center gap-1 transition-colors hover:text-primary"
+        className="flex items-center gap-1 uppercase transition-colors hover:text-primary"
       >
         {children}
         {active && <Icon className="size-3" />}
@@ -64,7 +64,12 @@ export function InventoryTable({ ingredients, total, catalog, sort, onSort }: In
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border">
-            <SortableHeader field="name" sort={sort} onSort={onSort} className="pl-5">
+            <SortableHeader
+              field="name"
+              sort={sort}
+              onSort={onSort}
+              className="pl-5 max-md:sticky max-md:left-0 max-md:z-10 max-md:bg-card"
+            >
               Nom
             </SortableHeader>
             <SortableHeader field="quantity" sort={sort} onSort={onSort}>

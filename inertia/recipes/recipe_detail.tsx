@@ -28,7 +28,7 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
   return (
     <>
       <header className="mb-10 max-w-3xl">
-        <h1 className="kraft-title text-4xl font-bold text-primary">{recipe.title}</h1>
+        <h1 className="kraft-title text-3xl font-bold text-primary sm:text-4xl">{recipe.title}</h1>
         {recipe.description && (
           <p className="mt-3 text-lg leading-relaxed text-muted-foreground">{recipe.description}</p>
         )}

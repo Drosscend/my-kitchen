@@ -227,7 +227,7 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
                 <CopyButton
                   text={() => `Bearer ${newMcpToken}`}
                   label="Copier le token"
-                  className="h-auto w-full justify-between gap-3 bg-paper-light px-3 py-2 text-left font-mono text-sm break-all whitespace-normal"
+                  className="h-auto w-full justify-start gap-3 bg-paper-light px-3 py-2 text-left font-mono text-sm break-all whitespace-normal"
                 >
                   Bearer {newMcpToken}
                 </CopyButton>
