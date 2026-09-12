@@ -24,6 +24,16 @@ export interface ApiDefinition {
   }
   account: {
     show: typeof routes['account.show']
+    profile: {
+      update: typeof routes['account.profile.update']
+    }
+    email: {
+      update: typeof routes['account.email.update']
+    }
+    password: {
+      update: typeof routes['account.password.update']
+    }
+    destroy: typeof routes['account.destroy']
   }
   home: typeof routes['home']
 }

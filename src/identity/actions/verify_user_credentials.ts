@@ -10,10 +10,10 @@ export interface VerifyUserCredentialsParams {
   password: string
 }
 
-export interface VerifyUserCredentialsError {
+export interface InvalidCredentialsError {
   type: 'invalid_credentials'
 }
-export type VerifyUserCredentialsResult = Result<User, VerifyUserCredentialsError>
+export type VerifyUserCredentialsResult = Result<User, InvalidCredentialsError>
 
 @inject()
 export class VerifyUserCredentials {

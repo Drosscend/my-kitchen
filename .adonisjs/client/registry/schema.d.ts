@@ -163,6 +163,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/account_controller').default['render']>>>
     }
   }
+  'account.profile.update': {
+    methods: ["POST"]
+    pattern: '/account/profile'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/identity/controllers/update_profile_controller').default)['validator']>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#app/identity/controllers/update_profile_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/update_profile_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/update_profile_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'account.email.update': {
+    methods: ["POST"]
+    pattern: '/account/email'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/identity/controllers/request_email_change_controller').default)['validator']>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#app/identity/controllers/request_email_change_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/request_email_change_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/request_email_change_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'account.password.update': {
+    methods: ["POST"]
+    pattern: '/account/password'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/identity/controllers/change_password_controller').default)['validator']>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#app/identity/controllers/change_password_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/change_password_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/change_password_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'account.destroy': {
+    methods: ["DELETE"]
+    pattern: '/account'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/identity/controllers/delete_account_controller').default)['validator']>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#app/identity/controllers/delete_account_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/delete_account_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/delete_account_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'home': {
     methods: ["GET","HEAD"]
     pattern: '/'

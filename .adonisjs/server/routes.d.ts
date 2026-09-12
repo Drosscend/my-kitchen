@@ -17,6 +17,10 @@ export type ScannedRoutes = {
     'verification.resend': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'account.show': { paramsTuple?: []; params?: {} }
+    'account.profile.update': { paramsTuple?: []; params?: {} }
+    'account.email.update': { paramsTuple?: []; params?: {} }
+    'account.password.update': { paramsTuple?: []; params?: {} }
+    'account.destroy': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
   }
   GET: {
@@ -46,6 +50,12 @@ export type ScannedRoutes = {
     'password.update': { paramsTuple?: []; params?: {} }
     'verification.resend': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
+    'account.profile.update': { paramsTuple?: []; params?: {} }
+    'account.email.update': { paramsTuple?: []; params?: {} }
+    'account.password.update': { paramsTuple?: []; params?: {} }
+  }
+  DELETE: {
+    'account.destroy': { paramsTuple?: []; params?: {} }
   }
 }
 declare module '@adonisjs/core/types/http' {

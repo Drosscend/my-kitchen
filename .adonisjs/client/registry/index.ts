@@ -84,6 +84,30 @@ const routes = {
     tokens: [{"old":"/account","type":0,"val":"account","end":""}],
     types: placeholder as Registry['account.show']['types'],
   },
+  'account.profile.update': {
+    methods: ["POST"],
+    pattern: '/account/profile',
+    tokens: [{"old":"/account/profile","type":0,"val":"account","end":""},{"old":"/account/profile","type":0,"val":"profile","end":""}],
+    types: placeholder as Registry['account.profile.update']['types'],
+  },
+  'account.email.update': {
+    methods: ["POST"],
+    pattern: '/account/email',
+    tokens: [{"old":"/account/email","type":0,"val":"account","end":""},{"old":"/account/email","type":0,"val":"email","end":""}],
+    types: placeholder as Registry['account.email.update']['types'],
+  },
+  'account.password.update': {
+    methods: ["POST"],
+    pattern: '/account/password',
+    tokens: [{"old":"/account/password","type":0,"val":"account","end":""},{"old":"/account/password","type":0,"val":"password","end":""}],
+    types: placeholder as Registry['account.password.update']['types'],
+  },
+  'account.destroy': {
+    methods: ["DELETE"],
+    pattern: '/account',
+    tokens: [{"old":"/account","type":0,"val":"account","end":""}],
+    types: placeholder as Registry['account.destroy']['types'],
+  },
   'home': {
     methods: ["GET","HEAD"],
     pattern: '/',

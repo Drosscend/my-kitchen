@@ -6,12 +6,16 @@
 export const controllers = {
   identity: {
     Account: () => import('#app/identity/controllers/account_controller'),
+    ChangePassword: () => import('#app/identity/controllers/change_password_controller'),
+    DeleteAccount: () => import('#app/identity/controllers/delete_account_controller'),
     EmailVerification: () => import('#app/identity/controllers/email_verification_controller'),
     ForgotPassword: () => import('#app/identity/controllers/forgot_password_controller'),
     Login: () => import('#app/identity/controllers/login_controller'),
     Logout: () => import('#app/identity/controllers/logout_controller'),
     RegisterUser: () => import('#app/identity/controllers/register_user_controller'),
+    RequestEmailChange: () => import('#app/identity/controllers/request_email_change_controller'),
     ResetPassword: () => import('#app/identity/controllers/reset_password_controller'),
+    UpdateProfile: () => import('#app/identity/controllers/update_profile_controller'),
     VerifyEmail: () => import('#app/identity/controllers/verify_email_controller'),
   },
 }

@@ -6,6 +6,12 @@ const LoginController = () => import('#app/identity/controllers/login_controller
 const RegisterUserController = () => import('#app/identity/controllers/register_user_controller')
 const LogoutController = () => import('#app/identity/controllers/logout_controller')
 const AccountController = () => import('#app/identity/controllers/account_controller')
+const UpdateProfileController = () => import('#app/identity/controllers/update_profile_controller')
+const RequestEmailChangeController = () =>
+  import('#app/identity/controllers/request_email_change_controller')
+const ChangePasswordController = () =>
+  import('#app/identity/controllers/change_password_controller')
+const DeleteAccountController = () => import('#app/identity/controllers/delete_account_controller')
 const EmailVerificationController = () =>
   import('#app/identity/controllers/email_verification_controller')
 const VerifyEmailController = () => import('#app/identity/controllers/verify_email_controller')
@@ -51,5 +57,16 @@ router
 router
   .group(() => {
     router.get('account', [AccountController, 'render']).as('account.show')
+    router
+      .post('account/profile', [UpdateProfileController, 'execute'])
+      .as('account.profile.update')
+    router
+      .post('account/email', [RequestEmailChangeController, 'execute'])
+      .as('account.email.update')
+      .use(mailThrottle)
+    router
+      .post('account/password', [ChangePasswordController, 'execute'])
+      .as('account.password.update')
+    router.delete('account', [DeleteAccountController, 'execute']).as('account.destroy')
   })
   .use([middleware.auth(), middleware.verified()])

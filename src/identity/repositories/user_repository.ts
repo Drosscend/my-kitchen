@@ -117,6 +117,18 @@ export class UserRepository {
     }
   }
 
+  async updateName(id: UserIdentifier, name: string | null) {
+    const record = await this.transactions
+      .currentDatabase()
+      .updateTable('users')
+      .set({ name, updated_at: new Date() })
+      .where('id', '=', id.toString())
+      .returning(userColumns)
+      .executeTakeFirst()
+
+    return record ? this.#toDomain(record) : null
+  }
+
   async updatePassword(id: UserIdentifier, passwordHash: string) {
     const record = await this.transactions
       .currentDatabase()
@@ -127,6 +139,14 @@ export class UserRepository {
       .executeTakeFirst()
 
     return record ? this.#toDomain(record) : null
+  }
+
+  async deleteUser(id: UserIdentifier) {
+    await this.transactions
+      .currentDatabase()
+      .deleteFrom('users')
+      .where('id', '=', id.toString())
+      .execute()
   }
 
   #toDomain(record: UserRecord) {

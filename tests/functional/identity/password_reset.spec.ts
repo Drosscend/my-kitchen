@@ -1,13 +1,13 @@
 import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
-import { resetDatabase } from '#tests/helpers/database'
 import { assertRedirectedTo } from '#tests/helpers/http'
 import { queuedLink } from '#tests/helpers/mail'
+import { resetState } from '#tests/helpers/state'
 import { createUser, TEST_PASSWORD } from '#tests/helpers/users'
 
 test.group('Password reset', (group) => {
   group.each.setup(async () => {
-    await resetDatabase()
+    await resetState()
     return () => mail.restore()
   })
 
