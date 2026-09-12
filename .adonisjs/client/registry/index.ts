@@ -12,6 +12,12 @@ const routes = {
     tokens: [{"old":"/mcp","type":0,"val":"mcp","end":""}],
     types: placeholder as Registry['mcp']['types'],
   },
+  'up': {
+    methods: ["GET","HEAD"],
+    pattern: '/up',
+    tokens: [{"old":"/up","type":0,"val":"up","end":""}],
+    types: placeholder as Registry['up']['types'],
+  },
   'health': {
     methods: ["GET","HEAD"],
     pattern: '/health',

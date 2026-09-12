@@ -5,6 +5,7 @@ type ParamValue = string | number | bigint | boolean
 export type ScannedRoutes = {
   ALL: {
     'mcp': { paramsTuple?: []; params?: {} }
+    'up': { paramsTuple?: []; params?: {} }
     'health': { paramsTuple?: []; params?: {} }
     'inventory.index': { paramsTuple?: []; params?: {} }
     'inventory.store': { paramsTuple?: []; params?: {} }
@@ -60,6 +61,7 @@ export type ScannedRoutes = {
   }
   GET: {
     'mcp': { paramsTuple?: []; params?: {} }
+    'up': { paramsTuple?: []; params?: {} }
     'health': { paramsTuple?: []; params?: {} }
     'inventory.index': { paramsTuple?: []; params?: {} }
     'inventory.markdown': { paramsTuple?: []; params?: {} }
@@ -84,6 +86,7 @@ export type ScannedRoutes = {
     'account.mcp_tokens.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
+    'up': { paramsTuple?: []; params?: {} }
     'health': { paramsTuple?: []; params?: {} }
     'inventory.index': { paramsTuple?: []; params?: {} }
     'inventory.markdown': { paramsTuple?: []; params?: {} }

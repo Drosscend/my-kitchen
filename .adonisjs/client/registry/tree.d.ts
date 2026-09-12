@@ -3,6 +3,7 @@ import type { routes } from './index.ts'
 
 export interface ApiDefinition {
   mcp: typeof routes['mcp']
+  up: typeof routes['up']
   health: typeof routes['health']
   inventory: {
     index: typeof routes['inventory.index']

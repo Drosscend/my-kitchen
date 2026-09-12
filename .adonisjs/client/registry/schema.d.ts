@@ -19,6 +19,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
     }
   }
+  'up': {
+    methods: ["GET","HEAD"]
+    pattern: '/up'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
+    }
+  }
   'health': {
     methods: ["GET","HEAD"]
     pattern: '/health'

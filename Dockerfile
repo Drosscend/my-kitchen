@@ -29,7 +29,7 @@ USER node
 EXPOSE 3333
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s \
-  CMD wget -qO- http://127.0.0.1:3333/health || exit 1
+  CMD wget -qO- http://127.0.0.1:3333/up || exit 1
 
 # Migrations run on container start, before the HTTP server
 CMD ["sh", "-c", "node ace migrate && node bin/server.js"]

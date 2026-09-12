@@ -45,5 +45,6 @@ export const controllers = {
   },
   shared: {
     HealthChecks: () => import('#app/shared/controllers/health_checks_controller'),
+    Liveness: () => import('#app/shared/controllers/liveness_controller'),
   },
 }

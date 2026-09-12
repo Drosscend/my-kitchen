@@ -21,6 +21,8 @@ class DatabaseCheck extends BaseCheck {
   }
 }
 
+export const liveness = new HealthChecks().register([new DatabaseCheck()])
+
 export const healthChecks = new HealthChecks().register([
   new DiskSpaceCheck(),
   new MemoryHeapCheck().warnWhenExceeds('400 mb').failWhenExceeds('500 mb'),
