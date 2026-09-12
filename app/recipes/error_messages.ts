@@ -1,0 +1,18 @@
+import type { InvalidRecipeError } from '#recipes/domain/recipe'
+
+const reasons = {
+  empty_title: 'il lui manque un titre',
+  no_content: 'elle n’a ni ingrédient ni étape',
+  duplicate_ref: 'deux ingrédients ou deux étapes portent le même id',
+  invalid_servings: 'le nombre de portions doit être un entier positif',
+} satisfies Record<InvalidRecipeError['reason'], string>
+
+export function invalidRecipeMessage(error: InvalidRecipeError & { index: number }) {
+  return `Recette ${error.index + 1} invalide : ${reasons[error.reason]}`
+}
+
+export const recipeErrorMessages = {
+  recipe_not_found: 'Recette introuvable',
+  code_exhausted: 'Impossible de créer une session, réessaie',
+  session_not_found: 'Session introuvable ou expirée',
+} as const

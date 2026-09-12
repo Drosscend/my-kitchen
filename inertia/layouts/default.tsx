@@ -1,6 +1,6 @@
 import { Form, Link } from '@adonisjs/inertia/react'
 import { usePage } from '@inertiajs/react'
-import { ClipboardListIcon, LogOutIcon, UserRoundIcon } from 'lucide-react'
+import { ClipboardListIcon, CookingPotIcon, LogOutIcon, UserRoundIcon } from 'lucide-react'
 import { type ReactElement, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
@@ -42,6 +42,15 @@ export default function Layout({ children }: { children: ReactElement }) {
                 >
                   <ClipboardListIcon data-icon="inline-start" />
                   Inventaire
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  nativeButton={false}
+                  render={<Link route="recipes.index" />}
+                >
+                  <CookingPotIcon data-icon="inline-start" />
+                  Recettes
                 </Button>
                 <Button
                   variant="ghost"

@@ -54,6 +54,36 @@ const routes = {
     tokens: [{"old":"/inventory/:id","type":0,"val":"inventory","end":""},{"old":"/inventory/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['inventory.destroy']['types'],
   },
+  'recipes.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/recipes',
+    tokens: [{"old":"/recipes","type":0,"val":"recipes","end":""}],
+    types: placeholder as Registry['recipes.index']['types'],
+  },
+  'recipes.import': {
+    methods: ["POST"],
+    pattern: '/recipes/import',
+    tokens: [{"old":"/recipes/import","type":0,"val":"recipes","end":""},{"old":"/recipes/import","type":0,"val":"import","end":""}],
+    types: placeholder as Registry['recipes.import']['types'],
+  },
+  'recipes.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/recipes/:id',
+    tokens: [{"old":"/recipes/:id","type":0,"val":"recipes","end":""},{"old":"/recipes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['recipes.show']['types'],
+  },
+  'recipes.destroy': {
+    methods: ["DELETE"],
+    pattern: '/recipes/:id',
+    tokens: [{"old":"/recipes/:id","type":0,"val":"recipes","end":""},{"old":"/recipes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['recipes.destroy']['types'],
+  },
+  'recipes.cook': {
+    methods: ["POST"],
+    pattern: '/recipes/:id/cook',
+    tokens: [{"old":"/recipes/:id/cook","type":0,"val":"recipes","end":""},{"old":"/recipes/:id/cook","type":1,"val":"id","end":""},{"old":"/recipes/:id/cook","type":0,"val":"cook","end":""}],
+    types: placeholder as Registry['recipes.cook']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',
@@ -155,6 +185,36 @@ const routes = {
     pattern: '/account',
     tokens: [{"old":"/account","type":0,"val":"account","end":""}],
     types: placeholder as Registry['account.destroy']['types'],
+  },
+  'cooking.join': {
+    methods: ["GET","HEAD"],
+    pattern: '/cook/join',
+    tokens: [{"old":"/cook/join","type":0,"val":"cook","end":""},{"old":"/cook/join","type":0,"val":"join","end":""}],
+    types: placeholder as Registry['cooking.join']['types'],
+  },
+  'cooking.join.store': {
+    methods: ["POST"],
+    pattern: '/cook/join',
+    tokens: [{"old":"/cook/join","type":0,"val":"cook","end":""},{"old":"/cook/join","type":0,"val":"join","end":""}],
+    types: placeholder as Registry['cooking.join.store']['types'],
+  },
+  'cooking.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/cook/:code',
+    tokens: [{"old":"/cook/:code","type":0,"val":"cook","end":""},{"old":"/cook/:code","type":1,"val":"code","end":""}],
+    types: placeholder as Registry['cooking.show']['types'],
+  },
+  'cooking.state': {
+    methods: ["GET","HEAD"],
+    pattern: '/cook/:code/state',
+    tokens: [{"old":"/cook/:code/state","type":0,"val":"cook","end":""},{"old":"/cook/:code/state","type":1,"val":"code","end":""},{"old":"/cook/:code/state","type":0,"val":"state","end":""}],
+    types: placeholder as Registry['cooking.state']['types'],
+  },
+  'cooking.state.update': {
+    methods: ["PATCH"],
+    pattern: '/cook/:code/state',
+    tokens: [{"old":"/cook/:code/state","type":0,"val":"cook","end":""},{"old":"/cook/:code/state","type":1,"val":"code","end":""},{"old":"/cook/:code/state","type":0,"val":"state","end":""}],
+    types: placeholder as Registry['cooking.state.update']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

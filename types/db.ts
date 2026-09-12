@@ -9,7 +9,29 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
 
+export type Json = JsonValue;
+
+export type JsonArray = JsonValue[];
+
+export type JsonObject = {
+  [x: string]: JsonValue | undefined;
+};
+
+export type JsonPrimitive = boolean | number | string | null;
+
+export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+
+export interface CookingSessions {
+  code: string;
+  expires_at: Timestamp;
+  recipe: Json;
+  scale: number;
+  state: Json;
+  updated_at: Generated<Timestamp>;
+  user_id: string;
+}
 
 export interface EmailVerificationTokens {
   created_at: Generated<Timestamp>;
@@ -40,6 +62,37 @@ export interface PasswordResetTokens {
   user_id: string;
 }
 
+export interface RecipeIngredients {
+  amount: number | null;
+  id: string;
+  name: string;
+  position: number;
+  recipe_id: string;
+  ref: string;
+  unit: string | null;
+}
+
+export interface Recipes {
+  base_servings: number;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  id: string;
+  notes: string | null;
+  title: string;
+  updated_at: Generated<Timestamp>;
+  user_id: string;
+}
+
+export interface RecipeSteps {
+  content: string;
+  id: string;
+  position: number;
+  recipe_id: string;
+  ref: string;
+  timer_seconds: number | null;
+  title: string | null;
+}
+
 export interface Users {
   created_at: Generated<Timestamp>;
   email: string;
@@ -51,8 +104,12 @@ export interface Users {
 }
 
 export interface DB {
+  cooking_sessions: CookingSessions;
   email_verification_tokens: EmailVerificationTokens;
   ingredients: Ingredients;
   password_reset_tokens: PasswordResetTokens;
+  recipe_ingredients: RecipeIngredients;
+  recipe_steps: RecipeSteps;
+  recipes: Recipes;
   users: Users;
 }

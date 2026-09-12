@@ -1,3 +1,5 @@
 import '#app/identity/routes'
 import '#app/inventory/routes'
+import '#app/recipes/routes'
+import '#app/cooking/routes'
 import '#app/shared/routes'

@@ -6,12 +6,21 @@
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type { InferSharedProps, InferFlashData } from '@adonisjs/inertia/types'
+import type CookingCookingSessionTransformer from '#app/cooking/transformers/cooking_session_transformer'
 import type IdentityAccountDetailsTransformer from '#app/identity/transformers/account_details_transformer'
 import type InventoryIngredientTransformer from '#app/inventory/transformers/ingredient_transformer'
+import type RecipesRecipeSummaryTransformer from '#app/recipes/transformers/recipe_summary_transformer'
+import type RecipesRecipeTransformer from '#app/recipes/transformers/recipe_transformer'
 import type UserTransformer from '#app/transformers/user_transformer'
 import type InertiaMiddleware from '#app/middleware/inertia_middleware'
 
 export namespace Data {
+  export namespace Cooking {
+    export type CookingSession = InferData<CookingCookingSessionTransformer>
+    export namespace CookingSession {
+      export type Variants = InferVariants<CookingCookingSessionTransformer>
+    }
+  }
   export namespace Identity {
     export type AccountDetails = InferData<IdentityAccountDetailsTransformer>
     export namespace AccountDetails {
@@ -22,6 +31,16 @@ export namespace Data {
     export type Ingredient = InferData<InventoryIngredientTransformer>
     export namespace Ingredient {
       export type Variants = InferVariants<InventoryIngredientTransformer>
+    }
+  }
+  export namespace Recipes {
+    export type RecipeSummary = InferData<RecipesRecipeSummaryTransformer>
+    export namespace RecipeSummary {
+      export type Variants = InferVariants<RecipesRecipeSummaryTransformer>
+    }
+    export type Recipe = InferData<RecipesRecipeTransformer>
+    export namespace Recipe {
+      export type Variants = InferVariants<RecipesRecipeTransformer>
     }
   }
   export type User = InferData<UserTransformer>

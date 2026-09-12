@@ -4,6 +4,12 @@
  */
 
 export const controllers = {
+  cooking: {
+    CookingSession: () => import('#app/cooking/controllers/cooking_session_controller'),
+    CookingSessionState: () => import('#app/cooking/controllers/cooking_session_state_controller'),
+    JoinCookingSession: () => import('#app/cooking/controllers/join_cooking_session_controller'),
+    UpdateCookingSessionState: () => import('#app/cooking/controllers/update_cooking_session_state_controller'),
+  },
   identity: {
     Account: () => import('#app/identity/controllers/account_controller'),
     ChangePassword: () => import('#app/identity/controllers/change_password_controller'),
@@ -26,6 +32,13 @@ export const controllers = {
     Inventory: () => import('#app/inventory/controllers/inventory_controller'),
     RemoveIngredient: () => import('#app/inventory/controllers/remove_ingredient_controller'),
     UpdateIngredient: () => import('#app/inventory/controllers/update_ingredient_controller'),
+  },
+  recipes: {
+    DeleteRecipe: () => import('#app/recipes/controllers/delete_recipe_controller'),
+    ImportRecipes: () => import('#app/recipes/controllers/import_recipes_controller'),
+    Recipe: () => import('#app/recipes/controllers/recipe_controller'),
+    RecipeLibrary: () => import('#app/recipes/controllers/recipe_library_controller'),
+    StartCookingSession: () => import('#app/recipes/controllers/start_cooking_session_controller'),
   },
   shared: {
     HealthChecks: () => import('#app/shared/controllers/health_checks_controller'),

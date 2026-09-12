@@ -15,3 +15,10 @@ export const signupThrottle = limiter.define('signup', ({ request }) => {
 export const mailThrottle = limiter.define('mail', ({ request }) => {
   return limiter.allowRequests(3).every('1 hour').usingKey(`mail_${request.ip()}`)
 })
+
+/**
+ * A six digit code is guessable: joining gets its own budget per address.
+ */
+export const joinThrottle = limiter.define('join', ({ request }) => {
+  return limiter.allowRequests(20).every('1 minute').usingKey(`join_${request.ip()}`)
+})

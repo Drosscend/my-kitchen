@@ -12,6 +12,13 @@ export interface ApiDefinition {
     adjust: typeof routes['inventory.adjust']
     destroy: typeof routes['inventory.destroy']
   }
+  recipes: {
+    index: typeof routes['recipes.index']
+    import: typeof routes['recipes.import']
+    show: typeof routes['recipes.show']
+    destroy: typeof routes['recipes.destroy']
+    cook: typeof routes['recipes.cook']
+  }
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']
@@ -44,5 +51,14 @@ export interface ApiDefinition {
       update: typeof routes['account.password.update']
     }
     destroy: typeof routes['account.destroy']
+  }
+  cooking: {
+    join: typeof routes['cooking.join'] & {
+      store: typeof routes['cooking.join.store']
+    }
+    show: typeof routes['cooking.show']
+    state: typeof routes['cooking.state'] & {
+      update: typeof routes['cooking.state.update']
+    }
   }
 }
