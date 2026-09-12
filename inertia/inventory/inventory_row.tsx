@@ -1,17 +1,7 @@
 import { useRouter } from '@adonisjs/inertia/react'
 import { MinusIcon, PlusIcon, SnowflakeIcon, Trash2Icon } from 'lucide-react'
-import { useState, type KeyboardEvent } from 'react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '~/components/ui/alert-dialog'
+import { useState, type KeyboardEvent, type ReactNode } from 'react'
+import { ConfirmDeleteDialog } from '~/components/confirm_delete_dialog'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -21,7 +11,12 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '~/components/ui/input-group'
-import { CATEGORY_ICONS, type Catalog, type Ingredient } from '~/inventory/catalog'
+import {
+  CATEGORY_ICONS,
+  type Catalog,
+  type CatalogOption,
+  type Ingredient,
+} from '~/inventory/catalog'
 import { CatalogSelect } from '~/inventory/catalog_select'
 
 const VISIT_OPTIONS = { preserveScroll: true, preserveState: true } as const
@@ -32,8 +27,6 @@ interface InventoryRowProps {
 }
 
 type EditableField = 'name' | 'quantity' | 'unit' | 'category' | 'state' | null
-
-const INLINE_TRIGGER = 'h-5 min-w-14 border-none bg-transparent px-1 text-xs text-muted-foreground'
 
 export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
   const router = useRouter()
@@ -94,14 +87,16 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
 
   function selectCell(
     field: 'unit' | 'category' | 'state',
-    options: Catalog[keyof Catalog],
-    label: React.ReactNode
+    options: CatalogOption[],
+    editLabel: string,
+    label: ReactNode
   ) {
     if (editing !== field) {
       return (
         <button
           type="button"
           onClick={() => startEditing(field)}
+          aria-label={editLabel}
           className="flex cursor-pointer items-center gap-1 text-xs underline-offset-2 hover:underline"
         >
           {label}
@@ -115,7 +110,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
         value={ingredient[field]}
         open
         onOpenChange={(open) => !open && setEditing(null)}
-        triggerClassName={INLINE_TRIGGER}
+        triggerClassName="h-5 min-w-14 border-none bg-transparent px-1 text-xs text-muted-foreground"
         onValueChange={(value) => {
           if (value !== ingredient[field]) {
             update({ [field]: value })
@@ -135,6 +130,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
             <Input
               ref={(input) => input?.focus()}
               value={draftName}
+              aria-label="Nom"
               onChange={(event) => setDraftName(event.target.value)}
               onBlur={commitName}
               onKeyDown={(event) => onKeyDown(event, commitName)}
@@ -144,6 +140,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
             <button
               type="button"
               onClick={() => startEditing('name')}
+              aria-label={`Modifier le nom : ${ingredient.name}`}
               className="cursor-text text-left font-medium underline-offset-2 hover:underline"
             >
               {ingredient.name}
@@ -159,7 +156,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
               onClick={() => adjust(-1)}
               disabled={ingredient.quantity <= 0}
             >
-              <MinusIcon className="size-3" />
+              <MinusIcon />
             </InputGroupButton>
           </InputGroupAddon>
           <InputGroupInput
@@ -176,7 +173,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton aria-label="Ajouter une unité" onClick={() => adjust(1)}>
-              <PlusIcon className="size-3" />
+              <PlusIcon />
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>
@@ -185,6 +182,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
         {selectCell(
           'unit',
           catalog.units,
+          `Modifier l'unité : ${ingredient.unitLabel}`,
           <span className="text-muted-foreground">{ingredient.unitLabel}</span>
         )}
       </td>
@@ -192,6 +190,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
         {selectCell(
           'category',
           catalog.categories,
+          `Modifier la catégorie : ${ingredient.categoryLabel}`,
           <Badge variant="secondary" className="text-xs hover:bg-secondary/80">
             {ingredient.categoryLabel}
           </Badge>
@@ -201,6 +200,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
         {selectCell(
           'state',
           catalog.states,
+          `Modifier l'état : ${ingredient.stateLabel}`,
           <>
             {ingredient.state === 'frozen' && <SnowflakeIcon className="size-3 text-accent" />}
             <span className="text-muted-foreground">{ingredient.stateLabel}</span>
@@ -222,42 +222,26 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
         </div>
       </td>
       <td className="px-4 py-3 first:pl-5 last:pr-5">
-        <AlertDialog>
-          <AlertDialogTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                aria-label={`Supprimer ${ingredient.name}`}
-                className="text-destructive opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100"
-              />
-            }
-          >
-            <Trash2Icon className="size-3" />
-          </AlertDialogTrigger>
-          <AlertDialogContent size="sm">
-            <AlertDialogHeader>
-              <AlertDialogTitle>Supprimer cet ingrédient ?</AlertDialogTitle>
-              <AlertDialogDescription>
-                {ingredient.name} disparaît définitivement du garde-manger.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Annuler</AlertDialogCancel>
-              <AlertDialogAction
-                variant="destructive"
-                onClick={() =>
-                  router.visit(
-                    { route: 'inventory.destroy', routeParams: { id: ingredient.id } },
-                    VISIT_OPTIONS
-                  )
-                }
-              >
-                Supprimer
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <ConfirmDeleteDialog
+          title="Supprimer cet ingrédient ?"
+          description={`${ingredient.name} disparaît définitivement du garde-manger.`}
+          onConfirm={() =>
+            router.visit(
+              { route: 'inventory.destroy', routeParams: { id: ingredient.id } },
+              VISIT_OPTIONS
+            )
+          }
+          trigger={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Supprimer ${ingredient.name}`}
+              className="transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+            >
+              <Trash2Icon className="text-muted-foreground" />
+            </Button>
+          }
+        />
       </td>
     </tr>
   )

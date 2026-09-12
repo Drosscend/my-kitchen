@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/react'
 import { CookingPotIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 export default function JoinCookingSession() {
   const [code, setCode] = useState('')
@@ -19,7 +20,7 @@ export default function JoinCookingSession() {
         <Form route="cooking.join.store" className="flex flex-col items-center gap-4">
           {({ processing }) => (
             <>
-              <input
+              <Input
                 type="text"
                 name="code"
                 inputMode="numeric"
@@ -29,9 +30,9 @@ export default function JoinCookingSession() {
                 onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))}
                 placeholder="000000"
                 aria-label="Code de la session"
-                className="w-48 rounded-lg border border-border bg-background p-3 text-center font-mono text-3xl font-bold tracking-[0.3em] outline-none focus:border-accent focus:ring-2 focus:ring-accent/30"
+                className="h-auto w-48 rounded-lg p-3 text-center font-mono text-3xl font-bold tracking-[0.3em] md:text-3xl"
               />
-              <Button type="submit" disabled={code.length !== 6 || processing}>
+              <Button type="submit" size="lg" disabled={code.length !== 6 || processing}>
                 Rejoindre
               </Button>
             </>

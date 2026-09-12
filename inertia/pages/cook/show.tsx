@@ -2,6 +2,7 @@ import { useRouter } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useState } from 'react'
+import { client } from '~/client'
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,7 @@ export default function CookingSession({ session: initial, user }: PageProps) {
   const router = useRouter()
   const session = useCookingSession(initial)
   const [showQr, setShowQr] = useState(false)
-  const shareUrl = `${window.location.origin}/cook/${initial.code}`
+  const shareUrl = `${window.location.origin}${client.urlFor('cooking.show', { code: initial.code })}`
 
   function exit() {
     router.visit({ route: user ? 'recipes.index' : 'cooking.join' })

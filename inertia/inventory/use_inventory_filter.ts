@@ -16,7 +16,7 @@ export interface InventorySort {
   direction: 'asc' | 'desc'
 }
 
-export const DEFAULT_FILTERS: InventoryFilters = {
+const DEFAULT_FILTERS: InventoryFilters = {
   search: '',
   category: 'all',
   state: 'all',

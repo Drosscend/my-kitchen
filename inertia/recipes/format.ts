@@ -59,7 +59,11 @@ export function formatTimer(seconds: number) {
 }
 
 export function formatIngredient(ingredient: RecipeIngredient, scale: number) {
-  return [formatAmount((ingredient.amount ?? 0) * scale), ingredient.unit ?? '', ingredient.name]
+  return [
+    ingredient.amount === null ? '' : formatAmount(ingredient.amount * scale),
+    ingredient.unit ?? '',
+    ingredient.name,
+  ]
     .filter(Boolean)
     .join(' ')
 }
@@ -72,9 +76,9 @@ export function ingredientsByRef(ingredients: RecipeIngredient[]) {
  * Steps mention ingredients as "{ref}" and their own timer as "{timer}".
  * The text is split around the mentions so each can be rendered.
  */
-export type StepPart =
+type StepPart =
   | { kind: 'text'; text: string }
-  | { kind: 'timer' }
+  | { kind: 'timer'; seconds: number }
   | { kind: 'ingredient'; ingredient: RecipeIngredient }
 
 export function splitStep(
@@ -82,9 +86,9 @@ export function splitStep(
   ingredients: Map<string, RecipeIngredient>,
   options: { appendTimer: boolean }
 ): StepPart[] {
-  const hasTimer = Boolean(step.timerSeconds)
+  const timerSeconds = step.timerSeconds || null
   const text =
-    options.appendTimer && hasTimer && !step.content.includes('{timer}')
+    options.appendTimer && timerSeconds && !step.content.includes('{timer}')
       ? `${step.content} {timer}`
       : step.content
   const parts: StepPart[] = []
@@ -98,8 +102,8 @@ export function splitStep(
     const ref = match[1]
     const ingredient = ingredients.get(ref)
 
-    if (ref === 'timer' && hasTimer) {
-      parts.push({ kind: 'timer' })
+    if (ref === 'timer' && timerSeconds) {
+      parts.push({ kind: 'timer', seconds: timerSeconds })
     } else if (ingredient) {
       parts.push({ kind: 'ingredient', ingredient })
     } else {
@@ -127,7 +131,7 @@ export function resolveStep(
         case 'text':
           return part.text
         case 'timer':
-          return formatDuration(step.timerSeconds ?? 0)
+          return formatDuration(part.seconds)
         case 'ingredient':
           return formatIngredient(part.ingredient, scale)
       }

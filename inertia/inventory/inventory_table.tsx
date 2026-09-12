@@ -1,7 +1,10 @@
+import { cn } from 'cn'
 import { ArrowDownIcon, ArrowUpIcon, PackageIcon } from 'lucide-react'
+import { EmptyState } from '~/components/empty_state'
 import { type Catalog, type Ingredient } from '~/inventory/catalog'
 import { InventoryRow } from '~/inventory/inventory_row'
 import { type InventorySort, type SortField } from '~/inventory/use_inventory_filter'
+import { plural } from '~/plural'
 
 interface InventoryTableProps {
   ingredients: Ingredient[]
@@ -27,17 +30,21 @@ function SortableHeader({
   className?: string
   children: string
 }) {
+  const active = sort.field === field
   const Icon = sort.direction === 'asc' ? ArrowUpIcon : ArrowDownIcon
 
   return (
-    <th className={`${HEADER} ${className ?? ''}`}>
+    <th
+      className={cn(HEADER, className)}
+      aria-sort={active ? (sort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
+    >
       <button
         type="button"
         onClick={() => onSort(field)}
         className="flex items-center gap-1 transition-colors hover:text-primary"
       >
         {children}
-        {sort.field === field && <Icon className="size-3" />}
+        {active && <Icon className="size-3" />}
       </button>
     </th>
   )
@@ -46,12 +53,9 @@ function SortableHeader({
 export function InventoryTable({ ingredients, total, catalog, sort, onSort }: InventoryTableProps) {
   if (ingredients.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 px-6 py-20 text-muted-foreground">
-        <PackageIcon className="size-12 opacity-50" />
-        <p className="text-sm">
-          {total === 0 ? 'Aucun ingrédient' : 'Aucun ingrédient ne correspond aux filtres'}
-        </p>
-      </div>
+      <EmptyState icon={PackageIcon}>
+        {total === 0 ? 'Aucun ingrédient' : 'Aucun ingrédient ne correspond aux filtres'}
+      </EmptyState>
     )
   }
 
@@ -83,8 +87,8 @@ export function InventoryTable({ ingredients, total, catalog, sort, onSort }: In
       </table>
       <p className="border-t border-border/60 px-5 py-3 text-xs text-muted-foreground">
         {ingredients.length === total
-          ? `${total} ingrédients`
-          : `${ingredients.length} ingrédients sur ${total}`}
+          ? plural(total, 'ingrédient')
+          : `${plural(ingredients.length, 'ingrédient')} sur ${total}`}
       </p>
     </div>
   )

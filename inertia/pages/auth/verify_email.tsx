@@ -1,11 +1,10 @@
 import { Form } from '@adonisjs/inertia/react'
-import { Head, usePage } from '@inertiajs/react'
+import { Head } from '@inertiajs/react'
 import { AuthShell } from '~/components/auth_shell'
 import { Button } from '~/components/ui/button'
+import { type InertiaProps } from '~/types'
 
-export default function VerifyEmail() {
-  const { props } = usePage()
-
+export default function VerifyEmail({ user }: InertiaProps) {
   return (
     <>
       <Head title="Confirme ton adresse" />
@@ -20,8 +19,8 @@ export default function VerifyEmail() {
         }
       >
         <p className="text-sm">
-          Un e-mail contenant un lien de confirmation a été envoyé à{' '}
-          <strong>{props.user?.email}</strong>. Ouvre-le pour activer ton compte.
+          Un e-mail contenant un lien de confirmation a été envoyé à <strong>{user?.email}</strong>.
+          Ouvre-le pour activer ton compte.
         </p>
         <Form route="verification.resend" className="mt-6">
           {({ processing }) => (

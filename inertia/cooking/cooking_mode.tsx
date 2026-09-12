@@ -56,7 +56,7 @@ export function CookingMode({
   })
   const runningTimers = recipe.steps
     .map((step, index) => ({ step, index, timer: activeTimers[step.ref] }))
-    .filter(({ timer }) => timer?.running && timer.remaining > 0)
+    .filter(({ timer }) => timer?.running)
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-paper">
@@ -74,7 +74,7 @@ export function CookingMode({
         </div>
       </div>
 
-      <div className="h-1 bg-muted">
+      <div className="h-1 bg-muted" aria-hidden>
         <div
           className="h-full bg-accent transition-all duration-300"
           style={{ width: `${((currentStepIndex + 1) / totalSteps) * 100}%` }}
@@ -109,7 +109,6 @@ export function CookingMode({
                   onStart={onStartTimer}
                   onStop={onStopTimer}
                   onReset={onResetTimer}
-                  size="large"
                 />
               )}
               <p className="mt-4 text-lg leading-relaxed text-foreground/80">

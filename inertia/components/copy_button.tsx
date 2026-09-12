@@ -6,23 +6,22 @@ import { Button } from '~/components/ui/button'
 interface CopyButtonProps extends Omit<ComponentProps<typeof Button>, 'onClick' | 'children'> {
   text: () => string | Promise<string>
   label: string
-  copiedLabel?: string
+  iconOnly?: boolean
   children?: ReactNode
 }
 
-/**
- * Puts a text in the clipboard and confirms it on the button itself for
- * two seconds. Pass children to show something else than the label.
- */
+const COPIED_LABEL = 'Copié !'
+
 export function CopyButton({
   text,
   label,
-  copiedLabel = 'Copié !',
+  iconOnly = false,
   children,
   variant = 'outline',
   ...props
 }: CopyButtonProps) {
   const [copied, setCopied] = useState(false)
+  const iconSlot = iconOnly ? undefined : 'inline-start'
 
   async function copy() {
     try {
@@ -35,13 +34,13 @@ export function CopyButton({
   }
 
   return (
-    <Button variant={variant} onClick={copy} aria-label={copied ? copiedLabel : label} {...props}>
+    <Button variant={variant} onClick={copy} aria-label={copied ? COPIED_LABEL : label} {...props}>
       {copied ? (
-        <CheckIcon data-icon="inline-start" className="text-accent" />
+        <CheckIcon data-icon={iconSlot} className="text-accent" />
       ) : (
-        <CopyIcon data-icon="inline-start" />
+        <CopyIcon data-icon={iconSlot} />
       )}
-      {children ?? (copied ? copiedLabel : label)}
+      {!iconOnly && (children ?? (copied ? COPIED_LABEL : label))}
     </Button>
   )
 }

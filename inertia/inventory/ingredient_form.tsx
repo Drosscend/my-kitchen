@@ -28,6 +28,7 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
               value={name}
               onChange={(event) => setName(event.target.value)}
               required
+              aria-invalid={Boolean(errors.name)}
             />
             {errors.name && <FieldError>{errors.name}</FieldError>}
           </Field>
@@ -43,13 +44,15 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
                 step="any"
                 defaultValue={100}
                 required
+                aria-invalid={Boolean(errors.quantity)}
               />
               {errors.quantity && <FieldError>{errors.quantity}</FieldError>}
             </Field>
 
             <Field>
-              <FieldLabel>Unité</FieldLabel>
+              <FieldLabel htmlFor="new-unit">Unité</FieldLabel>
               <CatalogSelect
+                id="new-unit"
                 name="unit"
                 options={catalog.units}
                 value={unit}
@@ -59,8 +62,9 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
           </div>
 
           <Field>
-            <FieldLabel>Catégorie</FieldLabel>
+            <FieldLabel htmlFor="new-category">Catégorie</FieldLabel>
             <CatalogSelect
+              id="new-category"
               name="category"
               options={catalog.categories}
               value={category}
@@ -69,8 +73,9 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
           </Field>
 
           <Field>
-            <FieldLabel>État</FieldLabel>
+            <FieldLabel htmlFor="new-state">État</FieldLabel>
             <CatalogSelect
+              id="new-state"
               name="state"
               options={catalog.states}
               value={state}
@@ -79,7 +84,7 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
           </Field>
 
           <Button type="submit" className="w-full" disabled={processing}>
-            <PlusIcon />
+            <PlusIcon data-icon="inline-start" />
             Ajouter
           </Button>
         </>

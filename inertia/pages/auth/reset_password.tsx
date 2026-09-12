@@ -48,6 +48,7 @@ export default function ResetPassword({ token }: PageProps) {
                   name="passwordConfirmation"
                   autoComplete="new-password"
                   required
+                  aria-invalid={Boolean(errors.password)}
                 />
               </Field>
 

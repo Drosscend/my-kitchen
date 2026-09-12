@@ -1,7 +1,6 @@
+import { cn } from 'cn'
 import { CheckIcon } from 'lucide-react'
-import { type ActiveTimers } from '~/cooking/types'
 import { formatDuration, formatIngredient, splitStep } from '~/recipes/format'
-import { RecipeTimer } from '~/recipes/recipe_timer'
 import { type RecipeIngredient, type RecipeStep } from '~/recipes/types'
 
 interface RecipeStepProps {
@@ -11,12 +10,6 @@ interface RecipeStepProps {
   onToggle: (ref: string) => void
   ingredients: Map<string, RecipeIngredient>
   scale: number
-  timers?: {
-    active: ActiveTimers
-    onStart: (id: string, duration: number) => void
-    onStop: (id: string) => void
-    onReset: (id: string) => void
-  }
 }
 
 export function RecipeStepDisplay({
@@ -26,26 +19,30 @@ export function RecipeStepDisplay({
   onToggle,
   ingredients,
   scale,
-  timers,
 }: RecipeStepProps) {
   const parts = splitStep(step, ingredients, { appendTimer: true })
 
   return (
-    <div className={`flex items-start gap-3 ${completed ? 'opacity-60' : ''}`}>
+    <div className={cn('flex items-start gap-3', completed && 'opacity-60')}>
       <button
         type="button"
         onClick={() => onToggle(step.ref)}
+        aria-pressed={completed}
         aria-label={completed ? 'Marquer comme non faite' : 'Marquer comme faite'}
-        className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-sm font-medium transition-all ${
+        className={cn(
+          'flex size-7 shrink-0 items-center justify-center rounded-full border text-sm font-medium transition-all',
           completed
             ? 'border-accent bg-accent text-accent-foreground'
             : 'border-border text-muted-foreground hover:border-accent'
-        }`}
+        )}
       >
         {completed ? <CheckIcon className="size-4" /> : index + 1}
       </button>
       <div
-        className={`text-base leading-relaxed ${completed ? 'line-through decoration-muted-foreground' : ''}`}
+        className={cn(
+          'text-base leading-relaxed',
+          completed && 'line-through decoration-muted-foreground'
+        )}
       >
         {step.title && <span className="font-semibold">{step.title} : </span>}
         {parts.map((part, partIndex) => {
@@ -57,25 +54,13 @@ export function RecipeStepDisplay({
 
           if (part.kind === 'ingredient') {
             return (
-              <span key={key} className={completed ? 'text-muted-foreground' : ''}>
+              <span key={key} className={cn(completed && 'text-muted-foreground')}>
                 {formatIngredient(part.ingredient, scale)}
               </span>
             )
           }
 
-          return timers ? (
-            <RecipeTimer
-              key={key}
-              id={step.ref}
-              duration={step.timerSeconds ?? 0}
-              timer={timers.active[step.ref]}
-              onStart={timers.onStart}
-              onStop={timers.onStop}
-              onReset={timers.onReset}
-            />
-          ) : (
-            <span key={key}>{formatDuration(step.timerSeconds ?? 0)}</span>
-          )
+          return <span key={key}>{formatDuration(part.seconds)}</span>
         })}
       </div>
     </div>

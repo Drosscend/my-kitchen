@@ -31,10 +31,6 @@ function formatResult(value: number) {
   return Math.abs(value) >= 1 ? value.toFixed(2) : value.toFixed(3)
 }
 
-function isConversionUnit(value: string): value is ConversionUnit {
-  return Object.hasOwn(CONVERSION_UNITS, value)
-}
-
 function UnitSelect({
   value,
   onChange,
@@ -45,16 +41,7 @@ function UnitSelect({
   label: string
 }) {
   return (
-    <Select
-      value={value}
-      onValueChange={(next) => {
-        const unit = String(next)
-
-        if (isConversionUnit(unit)) {
-          onChange(unit)
-        }
-      }}
-    >
+    <Select value={value} onValueChange={(next) => next !== null && onChange(next)}>
       <SelectTrigger className="flex-1" aria-label={label}>
         <SelectValue>{CONVERSION_UNITS[value].label}</SelectValue>
       </SelectTrigger>
@@ -83,7 +70,7 @@ export function UnitConverter() {
           amount,
           from,
           to,
-          crossing ? INGREDIENT_DENSITIES[ingredientIndex]?.density : undefined
+          crossing ? INGREDIENT_DENSITIES[ingredientIndex].density : undefined
         )
 
   return (
@@ -119,7 +106,7 @@ export function UnitConverter() {
           onValueChange={(next) => next !== null && setIngredientIndex(Number(next))}
         >
           <SelectTrigger className="w-full" aria-label="Ingrédient">
-            <SelectValue>{INGREDIENT_DENSITIES[ingredientIndex]?.name}</SelectValue>
+            <SelectValue>{INGREDIENT_DENSITIES[ingredientIndex].name}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {INGREDIENT_DENSITIES.map((ingredient, index) => (

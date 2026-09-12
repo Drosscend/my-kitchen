@@ -6,12 +6,13 @@ async function fetchMarkdown() {
     headers: { accept: 'text/markdown' },
   })
 
+  if (!response.ok) {
+    throw new Error(`Inventory export failed with status ${response.status}`)
+  }
+
   return response.text()
 }
 
-/**
- * The pantry as Markdown, ready to paste in a chat with an assistant.
- */
 export function CopyPantryButton({ disabled }: { disabled: boolean }) {
   return (
     <CopyButton text={fetchMarkdown} label="Copier pour une IA" size="lg" disabled={disabled} />

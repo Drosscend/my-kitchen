@@ -1,6 +1,6 @@
 import { Link } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
-import { ArrowLeftIcon, Trash2Icon } from 'lucide-react'
+import { ArrowLeftIcon } from 'lucide-react'
 import { Page } from '~/components/page'
 import { Button } from '~/components/ui/button'
 import { RecipeDetail } from '~/recipes/recipe_detail'
@@ -11,14 +11,6 @@ import { type InertiaProps } from '~/types'
 type PageProps = InertiaProps<{ recipe: Recipe }>
 
 export default function ShowRecipe({ recipe }: PageProps) {
-  const summary = {
-    id: recipe.id,
-    title: recipe.title,
-    description: recipe.description,
-    ingredientCount: recipe.ingredients.length,
-    stepCount: recipe.steps.length,
-  }
-
   return (
     <>
       <Head title={recipe.title} />
@@ -28,14 +20,7 @@ export default function ShowRecipe({ recipe }: PageProps) {
             <ArrowLeftIcon data-icon="inline-start" />
             Toutes les recettes
           </Button>
-          <DeleteRecipeDialog
-            recipe={summary}
-            trigger={
-              <Button variant="ghost" size="icon" aria-label="Supprimer la recette">
-                <Trash2Icon className="text-muted-foreground" />
-              </Button>
-            }
-          />
+          <DeleteRecipeDialog id={recipe.id} title={recipe.title} />
         </div>
         <RecipeDetail recipe={recipe} />
       </Page>

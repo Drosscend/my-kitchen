@@ -10,9 +10,6 @@ interface CookingNavigationOptions {
 
 const SWIPE_THRESHOLD = 50
 
-/**
- * Arrow keys and horizontal swipes move between steps, Escape leaves.
- */
 export function useCookingNavigation({
   onPrev,
   onNext,
@@ -24,10 +21,16 @@ export function useCookingNavigation({
   const onKeyDown = useEffectEvent((event: KeyboardEvent) => {
     if (event.key === 'ArrowLeft') {
       event.preventDefault()
-      onPrev()
+
+      if (canGoPrev) {
+        onPrev()
+      }
     } else if (event.key === 'ArrowRight') {
       event.preventDefault()
-      onNext()
+
+      if (canGoNext) {
+        onNext()
+      }
     } else if (event.key === 'Escape') {
       event.preventDefault()
       onExit()

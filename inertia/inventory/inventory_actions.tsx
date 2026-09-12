@@ -58,8 +58,9 @@ export function InventoryActions({
 
         <div className="grid grid-cols-2 gap-3">
           <Field>
-            <FieldLabel>Catégorie</FieldLabel>
+            <FieldLabel htmlFor="filter-category">Catégorie</FieldLabel>
             <CatalogSelect
+              id="filter-category"
               options={catalog.categories}
               value={filters.category}
               allLabel="Toutes"
@@ -68,8 +69,9 @@ export function InventoryActions({
           </Field>
 
           <Field>
-            <FieldLabel>État</FieldLabel>
+            <FieldLabel htmlFor="filter-state">État</FieldLabel>
             <CatalogSelect
+              id="filter-state"
               options={catalog.states}
               value={filters.state}
               allLabel="Tous"
@@ -82,7 +84,7 @@ export function InventoryActions({
           <Checkbox
             id="filter-low-stock"
             checked={filters.lowStockOnly}
-            onCheckedChange={(checked) => onUpdateFilters({ lowStockOnly: checked === true })}
+            onCheckedChange={(checked) => onUpdateFilters({ lowStockOnly: checked })}
           />
           <FieldLabel htmlFor="filter-low-stock" className="cursor-pointer">
             Stock bas uniquement
@@ -93,7 +95,7 @@ export function InventoryActions({
           <Checkbox
             id="filter-perishable"
             checked={filters.perishableOnly}
-            onCheckedChange={(checked) => onUpdateFilters({ perishableOnly: checked === true })}
+            onCheckedChange={(checked) => onUpdateFilters({ perishableOnly: checked })}
           />
           <FieldLabel htmlFor="filter-perishable" className="cursor-pointer">
             Périssables uniquement

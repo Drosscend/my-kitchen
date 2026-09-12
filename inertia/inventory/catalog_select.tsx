@@ -11,22 +11,19 @@ interface CatalogSelectProps {
   options: CatalogOption[]
   value: string
   onValueChange: (value: string) => void
+  id?: string
   name?: string
   allLabel?: string
-  className?: string
   triggerClassName?: string
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }
 
-/**
- * A select over one catalog list, with an optional "all" entry for the
- * filters.
- */
 export function CatalogSelect({
   options,
   value,
   onValueChange,
+  id,
   name,
   allLabel,
   triggerClassName,
@@ -40,11 +37,11 @@ export function CatalogSelect({
     <Select
       name={name}
       value={value}
-      onValueChange={(next) => next !== null && onValueChange(String(next))}
+      onValueChange={(next) => next !== null && onValueChange(next)}
       open={open}
       onOpenChange={onOpenChange}
     >
-      <SelectTrigger className={triggerClassName ?? 'w-full'}>
+      <SelectTrigger id={id} className={triggerClassName ?? 'w-full'}>
         <SelectValue>{label}</SelectValue>
       </SelectTrigger>
       <SelectContent align="start">

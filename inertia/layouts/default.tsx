@@ -41,7 +41,7 @@ export default function Layout({ children }: { children: ReactElement }) {
     if (flash.success) {
       toast.success(flash.success)
     }
-  })
+  }, [flash])
 
   return (
     <div className="flex min-h-dvh flex-col">

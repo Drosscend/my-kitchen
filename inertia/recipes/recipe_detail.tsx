@@ -54,7 +54,7 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
             )}
             <div className="flex flex-wrap gap-2 pt-2">
               {recipe.steps.length > 0 && (
-                <Form route="recipes.cook" routeParams={{ id: recipe.id }}>
+                <Form route="cooking.start" routeParams={{ id: recipe.id }}>
                   {({ processing }) => (
                     <>
                       <input type="hidden" name="scale" value={scale} />

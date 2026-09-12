@@ -4,8 +4,8 @@ import { TuyauProvider } from '@adonisjs/inertia/react'
 import { createInertiaApp, type ResolvedComponent } from '@inertiajs/react'
 import { type ReactElement } from 'react'
 import { createRoot } from 'react-dom/client'
+import { client } from '~/client'
 import Layout from '~/layouts/default'
-import { client } from './client'
 
 const appName = 'Mon Garde-Manger'
 

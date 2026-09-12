@@ -25,7 +25,13 @@ export default function Signup() {
             <FieldGroup>
               <Field data-invalid={Boolean(errors.name)}>
                 <FieldLabel htmlFor="name">Prénom</FieldLabel>
-                <Input id="name" type="text" name="name" autoComplete="given-name" />
+                <Input
+                  id="name"
+                  type="text"
+                  name="name"
+                  autoComplete="given-name"
+                  aria-invalid={Boolean(errors.name)}
+                />
                 {errors.name && <FieldError>{errors.name}</FieldError>}
               </Field>
 
@@ -63,6 +69,7 @@ export default function Signup() {
                   name="passwordConfirmation"
                   autoComplete="new-password"
                   required
+                  aria-invalid={Boolean(errors.password)}
                 />
               </Field>
 

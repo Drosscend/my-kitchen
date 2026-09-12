@@ -54,10 +54,6 @@ export function useCookingSession(initial: CookingSessionPayload) {
     latest.current = session
   }, [session])
 
-  useEffect(() => {
-    clockOffset.current = initial.serverNow - Date.now()
-  }, [initial.serverNow])
-
   const stateUrl = client.urlFor('cooking.state', { code: initial.code })
 
   function serverNow() {
@@ -68,10 +64,12 @@ export function useCookingSession(initial: CookingSessionPayload) {
     clockOffset.current = payload.serverNow - Date.now()
     setSession(payload)
     lastUpdate.current = payload.state.updatedAt
-    setActiveTimers(computeTimers(payload.state.activeTimers, Date.now() + clockOffset.current))
+    setActiveTimers(computeTimers(payload.state.activeTimers, serverNow()))
   })
 
   useEffect(() => {
+    clockOffset.current = initial.serverNow - Date.now()
+
     const interval = setInterval(async () => {
       if (polling.current || pending.current > 0) {
         return
@@ -99,7 +97,7 @@ export function useCookingSession(initial: CookingSessionPayload) {
     }, POLL_INTERVAL_MS)
 
     return () => clearInterval(interval)
-  }, [stateUrl])
+  }, [stateUrl, initial.serverNow])
 
   const syncedTimers = session.state.activeTimers
 

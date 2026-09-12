@@ -4,19 +4,9 @@ import { cn } from 'cn'
 import { KeyRoundIcon, Trash2Icon } from 'lucide-react'
 import { type ReactNode } from 'react'
 import { type Data } from '@generated/data'
+import { ConfirmDeleteDialog } from '~/components/confirm_delete_dialog'
 import { CopyButton } from '~/components/copy_button'
 import { Page, PageHeader } from '~/components/page'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '~/components/ui/alert-dialog'
 import { Button } from '~/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
@@ -61,34 +51,19 @@ function RevokeTokenDialog({ token }: { token: Data.Identity.McpToken }) {
   const router = useRouter()
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger
-        render={
-          <Button variant="ghost" size="icon-sm" aria-label={`Révoquer ${token.name}`}>
-            <Trash2Icon className="text-destructive" />
-          </Button>
-        }
-      />
-      <AlertDialogContent size="sm">
-        <AlertDialogHeader>
-          <AlertDialogTitle>Révoquer ce token ?</AlertDialogTitle>
-          <AlertDialogDescription>
-            « {token.name} » ne pourra plus appeler le serveur MCP.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Annuler</AlertDialogCancel>
-          <AlertDialogAction
-            variant="destructive"
-            onClick={() =>
-              router.visit({ route: 'account.mcp_tokens.destroy', routeParams: { id: token.id } })
-            }
-          >
-            Révoquer
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmDeleteDialog
+      title="Révoquer ce token ?"
+      description={`« ${token.name} » ne pourra plus appeler le serveur MCP.`}
+      confirmLabel="Révoquer"
+      onConfirm={() =>
+        router.visit({ route: 'account.mcp_tokens.destroy', routeParams: { id: token.id } })
+      }
+      trigger={
+        <Button variant="ghost" size="icon-sm" aria-label={`Révoquer ${token.name}`}>
+          <Trash2Icon className="text-muted-foreground" />
+        </Button>
+      }
+    />
   )
 }
 
@@ -105,7 +80,12 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
               <FieldGroup className="max-w-md">
                 <Field data-invalid={Boolean(errors.name)}>
                   <FieldLabel htmlFor="name">Prénom</FieldLabel>
-                  <Input id="name" name="name" defaultValue={account.name ?? ''} />
+                  <Input
+                    id="name"
+                    name="name"
+                    defaultValue={account.name ?? ''}
+                    aria-invalid={Boolean(errors.name)}
+                  />
                   {errors.name && <FieldError>{errors.name}</FieldError>}
                 </Field>
                 <Button type="submit" disabled={processing} className="w-fit">
@@ -125,7 +105,14 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
               <FieldGroup className="max-w-md">
                 <Field data-invalid={Boolean(errors.email)}>
                   <FieldLabel htmlFor="new-email">Nouvelle adresse e-mail</FieldLabel>
-                  <Input id="new-email" type="email" name="email" autoComplete="email" required />
+                  <Input
+                    id="new-email"
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    required
+                    aria-invalid={Boolean(errors.email)}
+                  />
                   {errors.email && <FieldError>{errors.email}</FieldError>}
                 </Field>
                 <Field data-invalid={Boolean(errors.password)}>
@@ -136,6 +123,7 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
                     name="password"
                     autoComplete="current-password"
                     required
+                    aria-invalid={Boolean(errors.password)}
                   />
                   {errors.password && <FieldError>{errors.password}</FieldError>}
                 </Field>
@@ -159,6 +147,7 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
                     name="currentPassword"
                     autoComplete="current-password"
                     required
+                    aria-invalid={Boolean(errors.currentPassword)}
                   />
                   {errors.currentPassword && <FieldError>{errors.currentPassword}</FieldError>}
                 </Field>
@@ -172,6 +161,7 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
                     name="password"
                     autoComplete="new-password"
                     required
+                    aria-invalid={Boolean(errors.password)}
                   />
                   {errors.password && <FieldError>{errors.password}</FieldError>}
                 </Field>
@@ -185,6 +175,7 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
                     name="passwordConfirmation"
                     autoComplete="new-password"
                     required
+                    aria-invalid={Boolean(errors.password)}
                   />
                 </Field>
                 <Button type="submit" disabled={processing} className="w-fit">
@@ -203,9 +194,7 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
                 <code className="min-w-0 flex-1 truncate rounded-md bg-paper-light px-3 py-2 font-mono text-sm">
                   {mcpUrl}
                 </code>
-                <CopyButton text={() => mcpUrl} label="Copier l'adresse" size="icon">
-                  <span className="sr-only">Copier l'adresse</span>
-                </CopyButton>
+                <CopyButton text={() => mcpUrl} label="Copier l'adresse" size="icon" iconOnly />
               </div>
             </div>
 
@@ -219,6 +208,7 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
                       name="name"
                       placeholder="Nom, par exemple Claude"
                       required
+                      aria-invalid={Boolean(errors.name)}
                     />
                     <Button type="submit" disabled={processing} className="shrink-0">
                       Créer
@@ -289,6 +279,7 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
                     name="password"
                     autoComplete="current-password"
                     required
+                    aria-invalid={Boolean(errors.password)}
                   />
                   {errors.password && <FieldError>{errors.password}</FieldError>}
                 </Field>

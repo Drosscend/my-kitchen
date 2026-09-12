@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react'
 import { Page, PageHeader } from '~/components/page'
 import { Badge } from '~/components/ui/badge'
+import { plural } from '~/plural'
 import { RecipeLibrary } from '~/recipes/recipe_library'
 import { type RecipeSummary } from '~/recipes/types'
 import { UnitConverter } from '~/recipes/unit_converter'
@@ -18,7 +19,7 @@ export default function Recipes({ recipes }: PageProps) {
           actions={
             recipes.length > 0 && (
               <Badge variant="outline" className="px-3 py-1 text-sm">
-                {recipes.length} {recipes.length > 1 ? 'recettes' : 'recette'}
+                {plural(recipes.length, 'recette')}
               </Badge>
             )
           }
