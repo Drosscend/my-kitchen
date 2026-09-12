@@ -27,6 +27,14 @@ const env = await Env.create(new URL('../', import.meta.url), {
 
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory'] as const),
+
+  // Mail (SMTP relay in production, Mailpit locally)
+  SMTP_HOST: Env.schema.string(),
+  SMTP_PORT: Env.schema.number(),
+  SMTP_USERNAME: Env.schema.string.optional(),
+  SMTP_PASSWORD: Env.schema.string.optional(),
+  MAIL_FROM_ADDRESS: Env.schema.string(),
+  MAIL_FROM_NAME: Env.schema.string(),
 })
 
 try {

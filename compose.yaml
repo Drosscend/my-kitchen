@@ -1,5 +1,5 @@
 # Local development services only. In production the database ships in
-# docker-compose.yml (`db` service).
+# docker-compose.yml (`db` service) and mail goes through the SMTP relay.
 services:
   postgres:
     image: postgres:17-alpine
@@ -11,6 +11,12 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - '1025:1025'
+      - '8025:8025'
 
 volumes:
   postgres_data:
