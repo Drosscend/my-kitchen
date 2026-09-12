@@ -44,6 +44,10 @@ export default function CookingSession({ session: initial, user }: PageProps) {
           onNextStep={session.nextStep}
           onGoToStep={session.goToStep}
           onExit={exit}
+          onFinish={() => {
+            session.close()
+            exit()
+          }}
           onStartTimer={session.startTimer}
           onStopTimer={session.stopTimer}
           onResetTimer={session.resetTimer}

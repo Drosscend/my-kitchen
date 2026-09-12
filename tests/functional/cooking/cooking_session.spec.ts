@@ -109,4 +109,23 @@ test.group('Cooking sessions', (group) => {
     unknown.assertFlashMessage('error', 'Session introuvable ou expirée')
     expired.assertStatus(404)
   })
+
+  test('closes a session for every device and never reopens it', async ({ client }) => {
+    const user = await createUser('ada@example.com')
+    const { code } = await startSession(client, user)
+
+    const closed = await client
+      .patch(`/cook/${code}/state`)
+      .header('accept', 'application/json')
+      .json({ closed: true })
+    const reopened = await client
+      .patch(`/cook/${code}/state`)
+      .header('accept', 'application/json')
+      .json({ closed: false, currentStepIndex: 0 })
+    const state = await client.get(`/cook/${code}/state`).header('accept', 'application/json')
+
+    closed.assertStatus(200)
+    reopened.assertStatus(200)
+    state.assertBodyContains({ state: { closed: true } })
+  })
 })

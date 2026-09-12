@@ -22,6 +22,7 @@ interface CookingModeProps {
   onNextStep: () => void
   onGoToStep: (index: number) => void
   onExit: () => void
+  onFinish: () => void
   onStartTimer: (id: string, duration: number) => void
   onStopTimer: (id: string) => void
   onResetTimer: (id: string) => void
@@ -37,6 +38,7 @@ export function CookingMode({
   onNextStep,
   onGoToStep,
   onExit,
+  onFinish,
   onStartTimer,
   onStopTimer,
   onResetTimer,
@@ -142,7 +144,7 @@ export function CookingMode({
         <Button variant="outline" onClick={onPrevStep} disabled={onIngredients}>
           <ArrowLeftIcon data-icon="inline-start" /> Préc.
         </Button>
-        <Button onClick={lastStep ? onExit : onNextStep}>
+        <Button onClick={lastStep ? onFinish : onNextStep}>
           {lastStep ? (
             <>
               Terminer <CheckIcon data-icon="inline-end" />
