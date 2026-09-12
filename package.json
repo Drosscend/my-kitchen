@@ -26,6 +26,7 @@
     "#app/*": "./app/*.js",
     "#core/*": "./src/core/*.js",
     "#identity/*": "./src/identity/*.js",
+    "#inventory/*": "./src/inventory/*.js",
     "#shared/*": "./src/shared/*.js",
     "#generated/*": "./.adonisjs/server/*.js",
     "#providers/*": "./providers/*.js",

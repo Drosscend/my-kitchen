@@ -20,6 +20,18 @@ export interface EmailVerificationTokens {
   user_id: string;
 }
 
+export interface Ingredients {
+  category: string;
+  created_at: Generated<Timestamp>;
+  id: string;
+  name: string;
+  quantity: number;
+  state: string;
+  unit: string;
+  updated_at: Generated<Timestamp>;
+  user_id: string;
+}
+
 export interface PasswordResetTokens {
   created_at: Generated<Timestamp>;
   expires_at: Timestamp;
@@ -40,6 +52,7 @@ export interface Users {
 
 export interface DB {
   email_verification_tokens: EmailVerificationTokens;
+  ingredients: Ingredients;
   password_reset_tokens: PasswordResetTokens;
   users: Users;
 }
