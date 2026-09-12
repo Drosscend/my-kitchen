@@ -1,0 +1,16 @@
+# Local development services only. In production the database ships in
+# docker-compose.yml (`db` service).
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: my_kitchen
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: my_kitchen
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

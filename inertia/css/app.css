@@ -1,0 +1,108 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@fontsource/kalam/400.css';
+@import '@fontsource/kalam/700.css';
+
+@source '../';
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-paper: var(--paper);
+  --color-paper-light: var(--paper-light);
+  --font-handwriting: 'Kalam', cursive;
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* Palette Kraft Rustique */
+:root {
+  color-scheme: light;
+  --background: oklch(0.96 0.02 75);
+  --paper: oklch(0.91 0.03 75);
+  --paper-light: oklch(0.95 0.02 75);
+  --foreground: oklch(0.25 0.05 50);
+
+  --card: oklch(0.91 0.03 75);
+  --card-foreground: oklch(0.25 0.05 50);
+  --popover: oklch(0.95 0.02 75);
+  --popover-foreground: oklch(0.25 0.05 50);
+
+  --primary: oklch(0.55 0.15 35);
+  --primary-foreground: oklch(0.98 0.01 75);
+
+  --secondary: oklch(0.55 0.12 75);
+  --secondary-foreground: oklch(0.98 0.01 75);
+
+  --accent: oklch(0.45 0.08 140);
+  --accent-foreground: oklch(0.98 0.01 75);
+
+  --muted: oklch(0.75 0.03 60);
+  --muted-foreground: oklch(0.55 0.04 60);
+
+  --destructive: oklch(0.55 0.18 25);
+
+  --border: oklch(0.7 0.05 60);
+  --input: oklch(0.7 0.05 60);
+  --ring: oklch(0.55 0.15 35);
+
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+.kraft-title {
+  font-family: var(--font-handwriting);
+  letter-spacing: -0.02em;
+}
+
+.kraft-card {
+  @apply bg-paper;
+  box-shadow:
+    0 1px 3px oklch(0.25 0.05 50 / 0.1),
+    0 4px 6px oklch(0.25 0.05 50 / 0.05);
+}
+
+.kraft-border-dashed {
+  border-style: dashed;
+  border-color: oklch(0.55 0.04 60 / 0.5);
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

@@ -1,50 +1,31 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Dependencies and AdonisJS build
+node_modules
+build
+tmp/*
+!tmp/.gitkeep
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Secrets
+.env
+.env.local
+.env.production.local
+.env.development.local
 
-# testing
-/coverage
+# Frontend assets compiled code
+public/assets
 
-# next.js
-/.next/
-/out/
+# Build tools specific
+npm-debug.log
+yarn-error.log
 
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# Ai stuff
+# Editors specific
+.fleet
+.idea
+.vscode
 .claude
 .mcp.json
 
-data
+# Platform specific
+.DS_Store
 
-.vercel
-.env*.local
+# Local data exports
+data
