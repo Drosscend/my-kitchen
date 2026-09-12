@@ -1,7 +1,7 @@
 import { cn } from 'cn'
 import { type ReactNode } from 'react'
 
-export const CONTAINER = 'mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12'
+export const CONTAINER = 'w-full px-5 sm:px-8 lg:px-12 2xl:px-16'
 
 interface PageProps {
   children: ReactNode
@@ -15,7 +15,7 @@ export function Page({ children, width = 'wide', className }: PageProps) {
       className={cn(
         CONTAINER,
         'flex-1 py-8 lg:py-12',
-        width === 'narrow' && 'max-w-5xl',
+        width === 'narrow' && 'mx-auto max-w-5xl',
         className
       )}
     >

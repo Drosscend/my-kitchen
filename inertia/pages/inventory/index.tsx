@@ -26,7 +26,7 @@ export default function Inventory({ ingredients, catalog }: PageProps) {
 
         <StatsSummary ingredients={ingredients} />
 
-        <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-10">
+        <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_380px] xl:gap-10">
           <Card className="kraft-card order-2 min-w-0 py-0 xl:order-1">
             <InventoryTable
               ingredients={filtered}

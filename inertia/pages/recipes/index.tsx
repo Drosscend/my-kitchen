@@ -24,7 +24,7 @@ export default function Recipes({ recipes }: PageProps) {
           }
         />
 
-        <div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-10">
+        <div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_380px] xl:gap-10">
           <div className="min-w-0">
             <RecipeLibrary recipes={recipes} />
           </div>
