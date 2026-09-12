@@ -12,6 +12,7 @@ interface CreateUserPayload {
   name: string | null
   email: EmailAddress
   passwordHash: string
+  emailVerifiedAt: Date | null
 }
 
 test.group('RegisterUser', () => {
@@ -33,6 +34,7 @@ test.group('RegisterUser', () => {
       name: 'Ada Lovelace',
       email: 'not-an-email',
       password: 'a-secure-password',
+      emailVerified: false,
     })
 
     assert.deepEqual(result, { ok: false, error: { type: 'invalid_email_address' } })
@@ -59,6 +61,7 @@ test.group('RegisterUser', () => {
       name: 'Ada Lovelace',
       email: 'ada@example.com',
       password: 'short',
+      emailVerified: false,
     })
 
     assert.deepEqual(result, { ok: false, error: { type: 'invalid_password' } })
@@ -94,6 +97,7 @@ test.group('RegisterUser', () => {
       name: '  Ada Lovelace  ',
       email: '  ADA@EXAMPLE.COM  ',
       password: 'a-secure-password',
+      emailVerified: false,
     })
 
     assert.isTrue(result.ok)

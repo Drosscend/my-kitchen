@@ -22,6 +22,7 @@ test.group('Create user command', (group) => {
       name: 'Ada Lovelace',
       email: email.value,
       passwordHash: 'hashed',
+      emailVerifiedAt: null,
       createdAt: new Date('2026-01-01T00:00:00Z'),
       updatedAt: null,
     })
@@ -46,6 +47,7 @@ test.group('Create user command', (group) => {
       name: '  Ada Lovelace  ',
       email: '  ADA@example.com  ',
       password: 'a-secure-password',
+      emailVerified: true,
     })
   })
 
@@ -62,6 +64,7 @@ test.group('Create user command', (group) => {
       name: 'Ada Lovelace',
       email: email.value,
       passwordHash: 'hashed',
+      emailVerifiedAt: null,
       createdAt: new Date('2026-01-01T00:00:00Z'),
       updatedAt: null,
     })
@@ -84,6 +87,7 @@ test.group('Create user command', (group) => {
       name: 'Ada Lovelace',
       email: 'ada@example.com',
       password: 'a-secure-password',
+      emailVerified: true,
     })
   })
 })

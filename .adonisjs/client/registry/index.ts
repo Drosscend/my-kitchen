@@ -30,17 +30,59 @@ const routes = {
     tokens: [{"old":"/login","type":0,"val":"login","end":""}],
     types: placeholder as Registry['session.store']['types'],
   },
-  'account.show': {
+  'password.forgot': {
     methods: ["GET","HEAD"],
-    pattern: '/account',
-    tokens: [{"old":"/account","type":0,"val":"account","end":""}],
-    types: placeholder as Registry['account.show']['types'],
+    pattern: '/forgot-password',
+    tokens: [{"old":"/forgot-password","type":0,"val":"forgot-password","end":""}],
+    types: placeholder as Registry['password.forgot']['types'],
+  },
+  'password.email': {
+    methods: ["POST"],
+    pattern: '/forgot-password',
+    tokens: [{"old":"/forgot-password","type":0,"val":"forgot-password","end":""}],
+    types: placeholder as Registry['password.email']['types'],
+  },
+  'password.reset': {
+    methods: ["GET","HEAD"],
+    pattern: '/reset-password/:token',
+    tokens: [{"old":"/reset-password/:token","type":0,"val":"reset-password","end":""},{"old":"/reset-password/:token","type":1,"val":"token","end":""}],
+    types: placeholder as Registry['password.reset']['types'],
+  },
+  'password.update': {
+    methods: ["POST"],
+    pattern: '/reset-password',
+    tokens: [{"old":"/reset-password","type":0,"val":"reset-password","end":""}],
+    types: placeholder as Registry['password.update']['types'],
+  },
+  'verification.verify': {
+    methods: ["GET","HEAD"],
+    pattern: '/verify-email/:token',
+    tokens: [{"old":"/verify-email/:token","type":0,"val":"verify-email","end":""},{"old":"/verify-email/:token","type":1,"val":"token","end":""}],
+    types: placeholder as Registry['verification.verify']['types'],
+  },
+  'verification.notice': {
+    methods: ["GET","HEAD"],
+    pattern: '/verify-email',
+    tokens: [{"old":"/verify-email","type":0,"val":"verify-email","end":""}],
+    types: placeholder as Registry['verification.notice']['types'],
+  },
+  'verification.resend': {
+    methods: ["POST"],
+    pattern: '/verify-email/resend',
+    tokens: [{"old":"/verify-email/resend","type":0,"val":"verify-email","end":""},{"old":"/verify-email/resend","type":0,"val":"resend","end":""}],
+    types: placeholder as Registry['verification.resend']['types'],
   },
   'session.destroy': {
     methods: ["POST"],
     pattern: '/logout',
     tokens: [{"old":"/logout","type":0,"val":"logout","end":""}],
     types: placeholder as Registry['session.destroy']['types'],
+  },
+  'account.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/account',
+    tokens: [{"old":"/account","type":0,"val":"account","end":""}],
+    types: placeholder as Registry['account.show']['types'],
   },
   'home': {
     methods: ["GET","HEAD"],

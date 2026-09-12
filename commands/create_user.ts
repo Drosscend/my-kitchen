@@ -10,7 +10,7 @@ const errorMessages = {
 
 export default class CreateUser extends BaseCommand {
   static commandName = 'create:user'
-  static description = 'Create a user with an email and password'
+  static description = 'Create a user with an email and password, e-mail already confirmed'
   static options: CommandOptions = { startApp: true }
 
   @flags.string({ description: 'User name' })
@@ -32,6 +32,7 @@ export default class CreateUser extends BaseCommand {
       name,
       email,
       password,
+      emailVerified: true,
     })
 
     if (!result.ok) {

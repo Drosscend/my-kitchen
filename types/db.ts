@@ -11,9 +11,27 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export interface EmailVerificationTokens {
+  created_at: Generated<Timestamp>;
+  email: string;
+  expires_at: Timestamp;
+  id: string;
+  token_hash: string;
+  user_id: string;
+}
+
+export interface PasswordResetTokens {
+  created_at: Generated<Timestamp>;
+  expires_at: Timestamp;
+  id: string;
+  token_hash: string;
+  user_id: string;
+}
+
 export interface Users {
   created_at: Generated<Timestamp>;
   email: string;
+  email_verified_at: Timestamp | null;
   id: string;
   name: string | null;
   password: string;
@@ -21,5 +39,7 @@ export interface Users {
 }
 
 export interface DB {
+  email_verification_tokens: EmailVerificationTokens;
+  password_reset_tokens: PasswordResetTokens;
   users: Users;
 }

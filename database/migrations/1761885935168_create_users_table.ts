@@ -7,6 +7,7 @@ export async function up(db: Kysely<unknown>) {
     .addColumn('name', 'text')
     .addColumn('email', 'text', (column) => column.notNull())
     .addColumn('password', 'text', (column) => column.notNull())
+    .addColumn('email_verified_at', 'timestamptz')
     .addColumn('created_at', 'timestamptz', (column) => column.notNull().defaultTo(sql`now()`))
     .addColumn('updated_at', 'timestamptz')
     .execute()

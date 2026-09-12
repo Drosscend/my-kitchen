@@ -7,6 +7,7 @@ export interface UserProperties {
   name: string | null
   email: EmailAddress
   passwordHash: string
+  emailVerifiedAt: Date | null
   createdAt: Date
   updatedAt: Date | null
 }
@@ -30,6 +31,14 @@ export class User extends Entity<UserProperties> {
 
   get passwordHash() {
     return this.props.passwordHash
+  }
+
+  get emailVerifiedAt() {
+    return this.props.emailVerifiedAt
+  }
+
+  get isEmailVerified() {
+    return this.props.emailVerifiedAt !== null
   }
 
   get createdAt() {

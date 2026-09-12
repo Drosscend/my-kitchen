@@ -6,8 +6,12 @@
 export const controllers = {
   identity: {
     Account: () => import('#app/identity/controllers/account_controller'),
+    EmailVerification: () => import('#app/identity/controllers/email_verification_controller'),
+    ForgotPassword: () => import('#app/identity/controllers/forgot_password_controller'),
     Login: () => import('#app/identity/controllers/login_controller'),
     Logout: () => import('#app/identity/controllers/logout_controller'),
     RegisterUser: () => import('#app/identity/controllers/register_user_controller'),
+    ResetPassword: () => import('#app/identity/controllers/reset_password_controller'),
+    VerifyEmail: () => import('#app/identity/controllers/verify_email_controller'),
   },
 }

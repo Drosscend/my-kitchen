@@ -8,6 +8,7 @@ import { apiClient } from '@japa/api-client'
 import { assert } from '@japa/assert'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import env from '#start/env'
+import { migrateTestDatabase } from '#tests/helpers/database'
 import type { Config } from '@japa/runner/types'
 
 export const plugins: Config['plugins'] = [
@@ -34,7 +35,7 @@ function assertTestDatabase() {
 }
 
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [assertTestDatabase],
+  setup: [assertTestDatabase, migrateTestDatabase],
   teardown: [],
 }
 

@@ -1,4 +1,5 @@
-import { ExceptionHandler } from '@adonisjs/core/http'
+import { errors as authErrors } from '@adonisjs/auth'
+import { ExceptionHandler, type HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
 
@@ -24,4 +25,16 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     '404': (_, { inertia }) => inertia.render('errors/not_found', {}),
     '500..599': (_, { inertia }) => inertia.render('errors/server_error', {}),
   } satisfies Record<StatusPageRange, StatusPageRenderer>
+
+  async handle(error: unknown, ctx: HttpContext) {
+    /**
+     * The auth package flashes its English message before redirecting.
+     */
+    if (error instanceof authErrors.E_UNAUTHORIZED_ACCESS && ctx.session) {
+      ctx.session.flash('error', 'Connecte-toi pour continuer')
+      return ctx.response.redirect().withIntendedUrl().toRoute('session.create')
+    }
+
+    return super.handle(error, ctx)
+  }
 }

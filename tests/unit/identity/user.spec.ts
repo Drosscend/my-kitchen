@@ -15,6 +15,7 @@ function makeUser(id: string, email = 'ada@example.com') {
     name: 'Ada Lovelace',
     email: emailAddress.value,
     passwordHash: 'hashed',
+    emailVerifiedAt: null,
     createdAt: new Date('2026-01-01T00:00:00Z'),
     updatedAt: null,
   })

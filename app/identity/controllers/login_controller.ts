@@ -21,7 +21,7 @@ export default class LoginController {
     const result = await this.verifyUserCredentials.execute(params)
 
     if (!result.ok) {
-      session.flash('error', 'Invalid credentials')
+      session.flash('error', 'Identifiants incorrects')
       return response.redirect().back()
     }
 

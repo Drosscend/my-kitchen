@@ -52,6 +52,13 @@ export default function Login() {
               <Button type="submit" size="lg" disabled={processing} className="w-full">
                 Se connecter
               </Button>
+
+              <Link
+                route="password.forgot"
+                className="text-center text-xs text-muted-foreground hover:text-primary hover:underline"
+              >
+                Mot de passe oublié ?
+              </Link>
             </FieldGroup>
           )}
         </Form>

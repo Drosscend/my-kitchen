@@ -49,4 +49,5 @@ router.use([
 export const middleware = router.named({
   guest: () => import('#app/middleware/guest_middleware'),
   auth: () => import('#app/middleware/auth_middleware'),
+  verified: () => import('#app/middleware/verified_email_middleware'),
 })
