@@ -1,6 +1,14 @@
 # Mon Garde-Manger
 
-Kitchen inventory, recipe library and shared cooking mode, one account per user. AdonisJS 7 with Inertia 3 and React 19, PostgreSQL through Kysely, deployed on a Dokploy VPS.
+Kitchen inventory, recipe library, shared cooking mode and an MCP server for assistants, one account per user. AdonisJS 7 with Inertia 3 and React 19, PostgreSQL through Kysely, deployed on a Dokploy VPS.
+
+## Features
+
+- Pantry with categories, units, fresh or frozen state, low stock alerts, JSON export and import, Markdown copy for assistants.
+- Recipe library imported from the JSON documents assistants produce, with servings scaling and a unit converter.
+- Cooking mode step by step with synced timers, shared with any phone through a QR code or a six digit code.
+- Accounts with confirmed e-mail addresses and password reset by mail.
+- MCP endpoint at `/mcp` exposing the pantry and the recipes as tools, authenticated by personal tokens created on the account page.
 
 ## Requirements
 
@@ -46,6 +54,15 @@ Create a user with an already confirmed address from the command line:
 ```bash
 node ace create:user --name='Ada' --email='ada@example.com' --password='a-secure-password'
 ```
+
+## MCP
+
+Create a token on the account page, then register the server in the client:
+
+- claude.ai and Claude Desktop: add a custom connector with the server URL and, under the advanced request headers, `Authorization` set to `Bearer <token>`;
+- Claude Code: `claude mcp add --transport http garde-manger https://<domain>/mcp --header "Authorization: Bearer <token>"`.
+
+Tools: `list_ingredients`, `add_ingredient`, `update_ingredient`, `consume_ingredients`, `remove_ingredient`, `list_recipes`, `get_recipe`, `add_recipe`, `update_recipe`, `delete_recipe`. Recipes use the same JSON document as the web import: `title`, `description`, `base_servings`, `ingredients` with `id`, `name`, `amount`, `unit`, `steps` with `id`, `title`, `content` mentioning ingredients as `{id}` and the step timer as `{timer}`, `timer_seconds`, and `notes`.
 
 ## Deployment
 
