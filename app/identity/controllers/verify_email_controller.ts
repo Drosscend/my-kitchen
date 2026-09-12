@@ -20,6 +20,6 @@ export default class VerifyEmailController {
     }
 
     session.flash('success', 'Adresse e-mail confirmée')
-    return response.redirect().toRoute(auth.user ? 'home' : 'session.create')
+    return response.redirect().toRoute(auth.user ? 'inventory.index' : 'session.create')
   }
 }

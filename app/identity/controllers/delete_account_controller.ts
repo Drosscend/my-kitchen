@@ -22,6 +22,6 @@ export default class DeleteAccountController {
 
     await auth.use('web').logout()
     session.flash('success', 'Compte supprimé')
-    return response.redirect().toRoute('home')
+    return response.redirect().toRoute('session.create')
   }
 }

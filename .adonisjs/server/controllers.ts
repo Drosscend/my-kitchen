@@ -18,6 +18,15 @@ export const controllers = {
     UpdateProfile: () => import('#app/identity/controllers/update_profile_controller'),
     VerifyEmail: () => import('#app/identity/controllers/verify_email_controller'),
   },
+  inventory: {
+    AddIngredient: () => import('#app/inventory/controllers/add_ingredient_controller'),
+    AdjustIngredientQuantity: () => import('#app/inventory/controllers/adjust_ingredient_quantity_controller'),
+    ExportInventory: () => import('#app/inventory/controllers/export_inventory_controller'),
+    ImportInventory: () => import('#app/inventory/controllers/import_inventory_controller'),
+    Inventory: () => import('#app/inventory/controllers/inventory_controller'),
+    RemoveIngredient: () => import('#app/inventory/controllers/remove_ingredient_controller'),
+    UpdateIngredient: () => import('#app/inventory/controllers/update_ingredient_controller'),
+  },
   shared: {
     HealthChecks: () => import('#app/shared/controllers/health_checks_controller'),
   },

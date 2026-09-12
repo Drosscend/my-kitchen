@@ -127,7 +127,7 @@ test.group('Account', (group) => {
       .redirects(0)
 
     refused.assertFlashMessage('error', 'Mot de passe incorrect')
-    assertRedirectedTo(deleted, '/')
+    assertRedirectedTo(deleted, '/login')
     deleted.assertFlashMessage('success', 'Compte supprimé')
     assert.isUndefined(await storedUser('ada@example.com'))
   })

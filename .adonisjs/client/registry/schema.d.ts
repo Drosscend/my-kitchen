@@ -19,6 +19,90 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
     }
   }
+  'inventory.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/inventory_controller').default['render']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/inventory_controller').default['render']>>>
+    }
+  }
+  'inventory.store': {
+    methods: ["POST"]
+    pattern: '/inventory'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/inventory/controllers/add_ingredient_controller').default)['validator']>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#app/inventory/controllers/add_ingredient_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/add_ingredient_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/add_ingredient_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'inventory.import': {
+    methods: ["POST"]
+    pattern: '/inventory/import'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/inventory/controllers/import_inventory_controller').default)['validator']>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#app/inventory/controllers/import_inventory_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/import_inventory_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/import_inventory_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'inventory.export': {
+    methods: ["GET","HEAD"]
+    pattern: '/inventory/export/:format'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { format: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/export_inventory_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/export_inventory_controller').default['execute']>>>
+    }
+  }
+  'inventory.update': {
+    methods: ["PATCH"]
+    pattern: '/inventory/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/inventory/controllers/update_ingredient_controller').default)['validator']>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#app/inventory/controllers/update_ingredient_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/update_ingredient_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/update_ingredient_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'inventory.adjust': {
+    methods: ["POST"]
+    pattern: '/inventory/:id/adjust'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/inventory/controllers/adjust_ingredient_quantity_controller').default)['validator']>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#app/inventory/controllers/adjust_ingredient_quantity_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/adjust_ingredient_quantity_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/adjust_ingredient_quantity_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'inventory.destroy': {
+    methods: ["DELETE"]
+    pattern: '/inventory/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/remove_ingredient_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/remove_ingredient_controller').default['execute']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'
@@ -221,18 +305,6 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#app/identity/controllers/delete_account_controller').default)['validator']>>
       response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/delete_account_controller').default['execute']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/delete_account_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'home': {
-    methods: ["GET","HEAD"]
-    pattern: '/'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
     }
   }
 }

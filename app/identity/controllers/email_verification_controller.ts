@@ -8,7 +8,7 @@ export default class EmailVerificationController {
 
   render({ auth, inertia, response }: HttpContext) {
     if (auth.getUserOrFail().isEmailVerified) {
-      return response.redirect().toRoute('home')
+      return response.redirect().toRoute('inventory.index')
     }
 
     return inertia.render('auth/verify_email', {})

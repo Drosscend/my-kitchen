@@ -1,6 +1,6 @@
 import { Form, Link } from '@adonisjs/inertia/react'
 import { usePage } from '@inertiajs/react'
-import { LogOutIcon, UserRoundIcon } from 'lucide-react'
+import { ClipboardListIcon, LogOutIcon, UserRoundIcon } from 'lucide-react'
 import { type ReactElement, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
@@ -27,13 +27,22 @@ export default function Layout({ children }: { children: ReactElement }) {
     <div className="flex min-h-dvh flex-col">
       <header className="border-b border-border/60 bg-paper/80 backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link route="home" className="kraft-title text-2xl font-bold text-primary">
+          <Link route="inventory.index" className="kraft-title text-2xl font-bold text-primary">
             Mon Garde-Manger
           </Link>
 
-          <nav className="flex items-center gap-1" aria-label="Compte">
+          <nav className="flex items-center gap-1" aria-label="Navigation">
             {props.user ? (
               <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  nativeButton={false}
+                  render={<Link route="inventory.index" />}
+                >
+                  <ClipboardListIcon data-icon="inline-start" />
+                  Inventaire
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"

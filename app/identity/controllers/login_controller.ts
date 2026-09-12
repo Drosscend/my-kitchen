@@ -26,6 +26,6 @@ export default class LoginController {
     }
 
     await auth.use('web').login(result.value)
-    return response.redirect().toRoute('home')
+    return response.redirect().toRoute('inventory.index')
   }
 }

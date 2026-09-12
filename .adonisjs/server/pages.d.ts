@@ -20,6 +20,6 @@ declare module '@adonisjs/inertia/types' {
     'auth/verify_email': ExtractProps<(typeof import('../../inertia/pages/auth/verify_email.tsx'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.tsx'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.tsx'))['default']>
-    'home': ExtractProps<(typeof import('../../inertia/pages/home.tsx'))['default']>
+    'inventory/index': ExtractProps<(typeof import('../../inertia/pages/inventory/index.tsx'))['default']>
   }
 }

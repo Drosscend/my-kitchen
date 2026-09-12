@@ -12,6 +12,48 @@ const routes = {
     tokens: [{"old":"/health","type":0,"val":"health","end":""}],
     types: placeholder as Registry['health']['types'],
   },
+  'inventory.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/',
+    tokens: [{"old":"/","type":0,"val":"/","end":""}],
+    types: placeholder as Registry['inventory.index']['types'],
+  },
+  'inventory.store': {
+    methods: ["POST"],
+    pattern: '/inventory',
+    tokens: [{"old":"/inventory","type":0,"val":"inventory","end":""}],
+    types: placeholder as Registry['inventory.store']['types'],
+  },
+  'inventory.import': {
+    methods: ["POST"],
+    pattern: '/inventory/import',
+    tokens: [{"old":"/inventory/import","type":0,"val":"inventory","end":""},{"old":"/inventory/import","type":0,"val":"import","end":""}],
+    types: placeholder as Registry['inventory.import']['types'],
+  },
+  'inventory.export': {
+    methods: ["GET","HEAD"],
+    pattern: '/inventory/export/:format',
+    tokens: [{"old":"/inventory/export/:format","type":0,"val":"inventory","end":""},{"old":"/inventory/export/:format","type":0,"val":"export","end":""},{"old":"/inventory/export/:format","type":1,"val":"format","end":""}],
+    types: placeholder as Registry['inventory.export']['types'],
+  },
+  'inventory.update': {
+    methods: ["PATCH"],
+    pattern: '/inventory/:id',
+    tokens: [{"old":"/inventory/:id","type":0,"val":"inventory","end":""},{"old":"/inventory/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['inventory.update']['types'],
+  },
+  'inventory.adjust': {
+    methods: ["POST"],
+    pattern: '/inventory/:id/adjust',
+    tokens: [{"old":"/inventory/:id/adjust","type":0,"val":"inventory","end":""},{"old":"/inventory/:id/adjust","type":1,"val":"id","end":""},{"old":"/inventory/:id/adjust","type":0,"val":"adjust","end":""}],
+    types: placeholder as Registry['inventory.adjust']['types'],
+  },
+  'inventory.destroy': {
+    methods: ["DELETE"],
+    pattern: '/inventory/:id',
+    tokens: [{"old":"/inventory/:id","type":0,"val":"inventory","end":""},{"old":"/inventory/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['inventory.destroy']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',
@@ -113,12 +155,6 @@ const routes = {
     pattern: '/account',
     tokens: [{"old":"/account","type":0,"val":"account","end":""}],
     types: placeholder as Registry['account.destroy']['types'],
-  },
-  'home': {
-    methods: ["GET","HEAD"],
-    pattern: '/',
-    tokens: [{"old":"/","type":0,"val":"/","end":""}],
-    types: placeholder as Registry['home']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 
