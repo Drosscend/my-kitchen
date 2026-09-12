@@ -54,6 +54,16 @@ export interface Ingredients {
   user_id: string;
 }
 
+export interface McpTokens {
+  created_at: Generated<Timestamp>;
+  id: string;
+  last_used_at: Timestamp | null;
+  name: string;
+  prefix: string;
+  token_hash: string;
+  user_id: string;
+}
+
 export interface PasswordResetTokens {
   created_at: Generated<Timestamp>;
   expires_at: Timestamp;
@@ -107,6 +117,7 @@ export interface DB {
   cooking_sessions: CookingSessions;
   email_verification_tokens: EmailVerificationTokens;
   ingredients: Ingredients;
+  mcp_tokens: McpTokens;
   password_reset_tokens: PasswordResetTokens;
   recipe_ingredients: RecipeIngredients;
   recipe_steps: RecipeSteps;

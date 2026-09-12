@@ -6,6 +6,12 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
+  'mcp': {
+    methods: ["POST","GET","DELETE"],
+    pattern: '/mcp',
+    tokens: [{"old":"/mcp","type":0,"val":"mcp","end":""}],
+    types: placeholder as Registry['mcp']['types'],
+  },
   'health': {
     methods: ["GET","HEAD"],
     pattern: '/health',
@@ -185,6 +191,18 @@ const routes = {
     pattern: '/account',
     tokens: [{"old":"/account","type":0,"val":"account","end":""}],
     types: placeholder as Registry['account.destroy']['types'],
+  },
+  'account.mcp_tokens.store': {
+    methods: ["POST"],
+    pattern: '/account/mcp-tokens',
+    tokens: [{"old":"/account/mcp-tokens","type":0,"val":"account","end":""},{"old":"/account/mcp-tokens","type":0,"val":"mcp-tokens","end":""}],
+    types: placeholder as Registry['account.mcp_tokens.store']['types'],
+  },
+  'account.mcp_tokens.destroy': {
+    methods: ["DELETE"],
+    pattern: '/account/mcp-tokens/:id',
+    tokens: [{"old":"/account/mcp-tokens/:id","type":0,"val":"account","end":""},{"old":"/account/mcp-tokens/:id","type":0,"val":"mcp-tokens","end":""},{"old":"/account/mcp-tokens/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['account.mcp_tokens.destroy']['types'],
   },
   'cooking.join': {
     methods: ["GET","HEAD"],

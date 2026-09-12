@@ -8,6 +8,7 @@ import type { InferData, InferVariants } from '@adonisjs/core/types/transformers
 import type { InferSharedProps, InferFlashData } from '@adonisjs/inertia/types'
 import type CookingCookingSessionTransformer from '#app/cooking/transformers/cooking_session_transformer'
 import type IdentityAccountDetailsTransformer from '#app/identity/transformers/account_details_transformer'
+import type IdentityMcpTokenTransformer from '#app/identity/transformers/mcp_token_transformer'
 import type InventoryIngredientTransformer from '#app/inventory/transformers/ingredient_transformer'
 import type RecipesRecipeSummaryTransformer from '#app/recipes/transformers/recipe_summary_transformer'
 import type RecipesRecipeTransformer from '#app/recipes/transformers/recipe_transformer'
@@ -25,6 +26,10 @@ export namespace Data {
     export type AccountDetails = InferData<IdentityAccountDetailsTransformer>
     export namespace AccountDetails {
       export type Variants = InferVariants<IdentityAccountDetailsTransformer>
+    }
+    export type McpToken = InferData<IdentityMcpTokenTransformer>
+    export namespace McpToken {
+      export type Variants = InferVariants<IdentityMcpTokenTransformer>
     }
   }
   export namespace Inventory {

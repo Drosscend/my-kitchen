@@ -2,6 +2,7 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
+  mcp: typeof routes['mcp']
   health: typeof routes['health']
   inventory: {
     index: typeof routes['inventory.index']
@@ -51,6 +52,10 @@ export interface ApiDefinition {
       update: typeof routes['account.password.update']
     }
     destroy: typeof routes['account.destroy']
+    mcpTokens: {
+      store: typeof routes['account.mcp_tokens.store']
+      destroy: typeof routes['account.mcp_tokens.destroy']
+    }
   }
   cooking: {
     join: typeof routes['cooking.join'] & {

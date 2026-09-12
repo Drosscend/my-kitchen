@@ -13,6 +13,7 @@ export const controllers = {
   identity: {
     Account: () => import('#app/identity/controllers/account_controller'),
     ChangePassword: () => import('#app/identity/controllers/change_password_controller'),
+    CreateMcpToken: () => import('#app/identity/controllers/create_mcp_token_controller'),
     DeleteAccount: () => import('#app/identity/controllers/delete_account_controller'),
     EmailVerification: () => import('#app/identity/controllers/email_verification_controller'),
     ForgotPassword: () => import('#app/identity/controllers/forgot_password_controller'),
@@ -21,6 +22,7 @@ export const controllers = {
     RegisterUser: () => import('#app/identity/controllers/register_user_controller'),
     RequestEmailChange: () => import('#app/identity/controllers/request_email_change_controller'),
     ResetPassword: () => import('#app/identity/controllers/reset_password_controller'),
+    RevokeMcpToken: () => import('#app/identity/controllers/revoke_mcp_token_controller'),
     UpdateProfile: () => import('#app/identity/controllers/update_profile_controller'),
     VerifyEmail: () => import('#app/identity/controllers/verify_email_controller'),
   },
@@ -32,6 +34,9 @@ export const controllers = {
     Inventory: () => import('#app/inventory/controllers/inventory_controller'),
     RemoveIngredient: () => import('#app/inventory/controllers/remove_ingredient_controller'),
     UpdateIngredient: () => import('#app/inventory/controllers/update_ingredient_controller'),
+  },
+  mcp: {
+    Mcp: () => import('#app/mcp/controllers/mcp_controller'),
   },
   recipes: {
     DeleteRecipe: () => import('#app/recipes/controllers/delete_recipe_controller'),

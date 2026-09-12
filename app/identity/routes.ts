@@ -12,6 +12,10 @@ const RequestEmailChangeController = () =>
 const ChangePasswordController = () =>
   import('#app/identity/controllers/change_password_controller')
 const DeleteAccountController = () => import('#app/identity/controllers/delete_account_controller')
+const CreateMcpTokenController = () =>
+  import('#app/identity/controllers/create_mcp_token_controller')
+const RevokeMcpTokenController = () =>
+  import('#app/identity/controllers/revoke_mcp_token_controller')
 const EmailVerificationController = () =>
   import('#app/identity/controllers/email_verification_controller')
 const VerifyEmailController = () => import('#app/identity/controllers/verify_email_controller')
@@ -68,5 +72,11 @@ router
       .post('account/password', [ChangePasswordController, 'execute'])
       .as('account.password.update')
     router.delete('account', [DeleteAccountController, 'execute']).as('account.destroy')
+    router
+      .post('account/mcp-tokens', [CreateMcpTokenController, 'execute'])
+      .as('account.mcp_tokens.store')
+    router
+      .delete('account/mcp-tokens/:id', [RevokeMcpTokenController, 'execute'])
+      .as('account.mcp_tokens.destroy')
   })
   .use([middleware.auth(), middleware.verified()])

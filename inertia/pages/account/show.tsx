@@ -1,5 +1,6 @@
-import { Form } from '@adonisjs/inertia/react'
+import { Form, useRouter } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
+import { KeyRoundIcon, Trash2Icon } from 'lucide-react'
 import { type ReactNode } from 'react'
 import { type Data } from '@generated/data'
 import { Button } from '~/components/ui/button'
@@ -7,7 +8,16 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '~/components/ui/field
 import { Input } from '~/components/ui/input'
 import { type InertiaProps } from '~/types'
 
-type PageProps = InertiaProps<{ account: Data.Identity.AccountDetails }>
+type PageProps = InertiaProps<{
+  account: Data.Identity.AccountDetails
+  mcpTokens: Data.Identity.McpToken[]
+  mcpUrl: string
+  newMcpToken: string | null
+}>
+
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString('fr-FR', { dateStyle: 'medium' })
+}
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -18,7 +28,9 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   )
 }
 
-export default function ShowAccount({ account }: PageProps) {
+export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }: PageProps) {
+  const router = useRouter()
+
   return (
     <>
       <Head title="Mon compte" />
@@ -115,6 +127,78 @@ export default function ShowAccount({ account }: PageProps) {
                 </Field>
                 <Button type="submit" disabled={processing} className="w-fit">
                   Modifier le mot de passe
+                </Button>
+              </FieldGroup>
+            )}
+          </Form>
+        </Section>
+
+        <Section title="Accès MCP">
+          <p className="mb-4 text-sm">
+            Adresse du serveur :{' '}
+            <code className="rounded bg-paper-light px-1.5 py-0.5">{mcpUrl}</code>
+          </p>
+          {newMcpToken && (
+            <div className="mb-4 rounded-lg border border-accent/40 bg-accent/10 p-4 text-sm">
+              <p className="mb-2 font-medium">
+                Nouveau token, copie-le maintenant, il ne sera plus affiché :
+              </p>
+              <code className="block break-all rounded bg-paper-light px-2 py-1 font-mono text-xs">
+                {newMcpToken}
+              </code>
+              <p className="mt-2 text-xs text-muted-foreground">
+                À envoyer dans l’en-tête Authorization: Bearer {newMcpToken.slice(0, 11)}…
+              </p>
+            </div>
+          )}
+          {mcpTokens.length > 0 && (
+            <ul className="mb-4 divide-y divide-border/60 text-sm">
+              {mcpTokens.map((token) => (
+                <li key={token.id} className="flex items-center justify-between gap-3 py-2">
+                  <div>
+                    <p className="font-medium">
+                      <KeyRoundIcon className="mr-1 inline size-3.5 text-muted-foreground" />
+                      {token.name}{' '}
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {token.prefix}…
+                      </span>
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Créé le {formatDate(token.createdAt)}
+                      {token.lastUsedAt
+                        ? `, utilisé le ${formatDate(token.lastUsedAt)}`
+                        : ', jamais utilisé'}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={`Révoquer ${token.name}`}
+                    onClick={() =>
+                      router.visit({
+                        route: 'account.mcp_tokens.destroy',
+                        routeParams: { id: token.id },
+                      })
+                    }
+                  >
+                    <Trash2Icon className="text-destructive" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <Form key={newMcpToken ?? 'empty'} route="account.mcp_tokens.store" errorBag="mcp">
+            {({ errors, processing }) => (
+              <FieldGroup>
+                <Field data-invalid={Boolean(errors.name)}>
+                  <FieldLabel htmlFor="mcp-token-name">
+                    Nom du token (par exemple « Claude »)
+                  </FieldLabel>
+                  <Input id="mcp-token-name" name="name" required />
+                  {errors.name && <FieldError>{errors.name}</FieldError>}
+                </Field>
+                <Button type="submit" disabled={processing} className="w-fit">
+                  Créer un token
                 </Button>
               </FieldGroup>
             )}
