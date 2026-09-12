@@ -27,7 +27,11 @@ export default function Layout({ children }: { children: ReactElement }) {
     <div className="flex min-h-dvh flex-col">
       <header className="border-b border-border/60 bg-paper/80 backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link route="inventory.index" className="kraft-title text-2xl font-bold text-primary">
+          <Link
+            route="inventory.index"
+            className="kraft-title flex items-center gap-2 text-2xl font-bold text-primary"
+          >
+            <img src="/logo.svg" alt="" className="size-8" />
             Mon Garde-Manger
           </Link>
 
