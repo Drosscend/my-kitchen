@@ -1,7 +1,7 @@
 import { ArrowRightLeftIcon } from 'lucide-react'
 import { useState } from 'react'
+import { SectionCard } from '~/components/section_card'
 import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Input } from '~/components/ui/input'
 import {
   Select,
@@ -87,65 +87,60 @@ export function UnitConverter() {
         )
 
   return (
-    <Card className="kraft-card">
-      <CardHeader className="pb-2">
-        <CardTitle className="kraft-title text-base">Convertisseur</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <Input
-          type="number"
-          inputMode="decimal"
-          min={0}
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          aria-label="Valeur à convertir"
-        />
+    <SectionCard title="Convertisseur">
+      <Input
+        type="number"
+        inputMode="decimal"
+        min={0}
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        aria-label="Valeur à convertir"
+      />
 
-        <div className="flex items-center gap-2">
-          <UnitSelect value={from} onChange={setFrom} label="Unité de départ" />
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Inverser les unités"
-            onClick={() => {
-              setFrom(to)
-              setTo(from)
-            }}
-          >
-            <ArrowRightLeftIcon />
-          </Button>
-          <UnitSelect value={to} onChange={setTo} label="Unité d'arrivée" />
-        </div>
+      <div className="flex items-center gap-2">
+        <UnitSelect value={from} onChange={setFrom} label="Unité de départ" />
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Inverser les unités"
+          onClick={() => {
+            setFrom(to)
+            setTo(from)
+          }}
+        >
+          <ArrowRightLeftIcon />
+        </Button>
+        <UnitSelect value={to} onChange={setTo} label="Unité d'arrivée" />
+      </div>
 
-        {crossing && (
-          <Select
-            value={String(ingredientIndex)}
-            onValueChange={(next) => next !== null && setIngredientIndex(Number(next))}
-          >
-            <SelectTrigger className="w-full" aria-label="Ingrédient">
-              <SelectValue>{INGREDIENT_DENSITIES[ingredientIndex]?.name}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {INGREDIENT_DENSITIES.map((ingredient, index) => (
-                <SelectItem key={ingredient.name} value={String(index)}>
-                  {ingredient.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {crossing && (
+        <Select
+          value={String(ingredientIndex)}
+          onValueChange={(next) => next !== null && setIngredientIndex(Number(next))}
+        >
+          <SelectTrigger className="w-full" aria-label="Ingrédient">
+            <SelectValue>{INGREDIENT_DENSITIES[ingredientIndex]?.name}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {INGREDIENT_DENSITIES.map((ingredient, index) => (
+              <SelectItem key={ingredient.name} value={String(index)}>
+                {ingredient.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      <div className="rounded-md bg-paper-light px-4 py-4 text-center">
+        {result === null ? (
+          <p className="text-sm text-muted-foreground">Entre une valeur</p>
+        ) : (
+          <p className="kraft-title text-2xl font-bold">
+            {formatResult(result)}{' '}
+            <span className="text-sm text-muted-foreground">{CONVERSION_UNITS[to].label}</span>
+          </p>
         )}
-
-        <div className="rounded-md bg-muted/50 px-3 py-3 text-center">
-          {result === null ? (
-            <p className="text-sm text-muted-foreground">Entre une valeur</p>
-          ) : (
-            <p className="text-lg font-semibold">
-              {formatResult(result)}{' '}
-              <span className="text-sm text-muted-foreground">{CONVERSION_UNITS[to].label}</span>
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SectionCard>
   )
 }

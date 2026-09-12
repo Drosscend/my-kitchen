@@ -1,18 +1,15 @@
 import { SearchIcon, XIcon } from 'lucide-react'
+import { SectionCard } from '~/components/section_card'
 import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Field, FieldLabel } from '~/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '~/components/ui/input-group'
-import { type Catalog, type Ingredient } from '~/inventory/catalog'
+import { type Catalog } from '~/inventory/catalog'
 import { CatalogSelect } from '~/inventory/catalog_select'
-import { CopyButton } from '~/inventory/copy_button'
 import { IngredientForm } from '~/inventory/ingredient_form'
-import { StatsSummary } from '~/inventory/stats_summary'
 import { type InventoryFilters } from '~/inventory/use_inventory_filter'
 
 interface InventoryActionsProps {
-  ingredients: Ingredient[]
   catalog: Catalog
   filters: InventoryFilters
   hasActiveFilters: boolean
@@ -20,28 +17,7 @@ interface InventoryActionsProps {
   onResetFilters: () => void
 }
 
-function Section({
-  title,
-  action,
-  children,
-}: {
-  title: string
-  action?: React.ReactNode
-  children: React.ReactNode
-}) {
-  return (
-    <Card className="kraft-card">
-      <CardHeader className="pb-2">
-        <CardTitle className="kraft-title text-base">{title}</CardTitle>
-        {action}
-      </CardHeader>
-      <CardContent className="space-y-3">{children}</CardContent>
-    </Card>
-  )
-}
-
 export function InventoryActions({
-  ingredients,
   catalog,
   filters,
   hasActiveFilters,
@@ -49,21 +25,17 @@ export function InventoryActions({
   onResetFilters,
 }: InventoryActionsProps) {
   return (
-    <div className="space-y-4">
-      <Section title="Résumé">
-        <StatsSummary ingredients={ingredients} />
-      </Section>
-
-      <Section title="Ajouter">
+    <>
+      <SectionCard title="Ajouter">
         <IngredientForm catalog={catalog} />
-      </Section>
+      </SectionCard>
 
-      <Section
+      <SectionCard
         title="Filtres"
         action={
           hasActiveFilters && (
-            <Button variant="ghost" size="xs" onClick={onResetFilters} className="justify-self-end">
-              <XIcon className="size-3" />
+            <Button variant="ghost" size="sm" onClick={onResetFilters}>
+              <XIcon data-icon="inline-start" />
               Réinitialiser
             </Button>
           )
@@ -84,25 +56,27 @@ export function InventoryActions({
           </InputGroup>
         </Field>
 
-        <Field>
-          <FieldLabel>Catégorie</FieldLabel>
-          <CatalogSelect
-            options={catalog.categories}
-            value={filters.category}
-            allLabel="Toutes"
-            onValueChange={(category) => onUpdateFilters({ category })}
-          />
-        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field>
+            <FieldLabel>Catégorie</FieldLabel>
+            <CatalogSelect
+              options={catalog.categories}
+              value={filters.category}
+              allLabel="Toutes"
+              onValueChange={(category) => onUpdateFilters({ category })}
+            />
+          </Field>
 
-        <Field>
-          <FieldLabel>État</FieldLabel>
-          <CatalogSelect
-            options={catalog.states}
-            value={filters.state}
-            allLabel="Tous"
-            onValueChange={(state) => onUpdateFilters({ state })}
-          />
-        </Field>
+          <Field>
+            <FieldLabel>État</FieldLabel>
+            <CatalogSelect
+              options={catalog.states}
+              value={filters.state}
+              allLabel="Tous"
+              onValueChange={(state) => onUpdateFilters({ state })}
+            />
+          </Field>
+        </div>
 
         <Field orientation="horizontal">
           <Checkbox
@@ -125,11 +99,7 @@ export function InventoryActions({
             Périssables uniquement
           </FieldLabel>
         </Field>
-      </Section>
-
-      <Section title="Actions">
-        <CopyButton disabled={ingredients.length === 0} />
-      </Section>
-    </div>
+      </SectionCard>
+    </>
   )
 }

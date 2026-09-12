@@ -5,26 +5,32 @@ import { type InventorySort, type SortField } from '~/inventory/use_inventory_fi
 
 interface InventoryTableProps {
   ingredients: Ingredient[]
+  total: number
   catalog: Catalog
   sort: InventorySort
   onSort: (field: SortField) => void
 }
 
+const HEADER =
+  'px-4 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground uppercase'
+
 function SortableHeader({
   field,
   sort,
   onSort,
+  className,
   children,
 }: {
   field: SortField
   sort: InventorySort
   onSort: (field: SortField) => void
+  className?: string
   children: string
 }) {
   const Icon = sort.direction === 'asc' ? ArrowUpIcon : ArrowDownIcon
 
   return (
-    <th className="px-3 py-2 text-left">
+    <th className={`${HEADER} ${className ?? ''}`}>
       <button
         type="button"
         onClick={() => onSort(field)}
@@ -37,12 +43,14 @@ function SortableHeader({
   )
 }
 
-export function InventoryTable({ ingredients, catalog, sort, onSort }: InventoryTableProps) {
+export function InventoryTable({ ingredients, total, catalog, sort, onSort }: InventoryTableProps) {
   if (ingredients.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-        <PackageIcon className="mb-4 size-12 opacity-50" />
-        <p className="text-sm">Aucun ingrédient</p>
+      <div className="flex flex-col items-center justify-center gap-3 px-6 py-20 text-muted-foreground">
+        <PackageIcon className="size-12 opacity-50" />
+        <p className="text-sm">
+          {total === 0 ? 'Aucun ingrédient' : 'Aucun ingrédient ne correspond aux filtres'}
+        </p>
       </div>
     )
   }
@@ -51,20 +59,20 @@ export function InventoryTable({ ingredients, catalog, sort, onSort }: Inventory
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b-2 border-border">
-            <SortableHeader field="name" sort={sort} onSort={onSort}>
+          <tr className="border-b border-border">
+            <SortableHeader field="name" sort={sort} onSort={onSort} className="pl-5">
               Nom
             </SortableHeader>
             <SortableHeader field="quantity" sort={sort} onSort={onSort}>
               Quantité
             </SortableHeader>
-            <th className="px-3 py-2 text-left">Unité</th>
+            <th className={HEADER}>Unité</th>
             <SortableHeader field="category" sort={sort} onSort={onSort}>
               Catégorie
             </SortableHeader>
-            <th className="px-3 py-2 text-left">État</th>
-            <th className="px-3 py-2 text-left">Alerte</th>
-            <th className="w-10 px-3 py-2" />
+            <th className={HEADER}>État</th>
+            <th className={HEADER}>Alerte</th>
+            <th className="w-12 pr-5" />
           </tr>
         </thead>
         <tbody>
@@ -73,6 +81,11 @@ export function InventoryTable({ ingredients, catalog, sort, onSort }: Inventory
           ))}
         </tbody>
       </table>
+      <p className="border-t border-border/60 px-5 py-3 text-xs text-muted-foreground">
+        {ingredients.length === total
+          ? `${total} ingrédients`
+          : `${ingredients.length} ingrédients sur ${total}`}
+      </p>
     </div>
   )
 }

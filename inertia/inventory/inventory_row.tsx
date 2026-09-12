@@ -128,9 +128,9 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
 
   return (
     <tr className="group border-b border-border/50 transition-colors hover:bg-paper-light/50">
-      <td className="px-3 py-2">
+      <td className="px-4 py-3 first:pl-5 last:pr-5">
         <div className="flex items-center gap-2">
-          <CategoryIcon className="size-4 shrink-0 text-muted-foreground" />
+          <CategoryIcon className="size-4 shrink-0 text-secondary" />
           {editing === 'name' ? (
             <Input
               ref={(input) => input?.focus()}
@@ -138,20 +138,20 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
               onChange={(event) => setDraftName(event.target.value)}
               onBlur={commitName}
               onKeyDown={(event) => onKeyDown(event, commitName)}
-              className="h-6 text-xs"
+              className="h-7 text-sm"
             />
           ) : (
             <button
               type="button"
               onClick={() => startEditing('name')}
-              className="cursor-text text-left underline-offset-2 hover:underline"
+              className="cursor-text text-left font-medium underline-offset-2 hover:underline"
             >
               {ingredient.name}
             </button>
           )}
         </div>
       </td>
-      <td className="px-3 py-2">
+      <td className="px-4 py-3 first:pl-5 last:pr-5">
         <InputGroup className="w-28">
           <InputGroupAddon align="inline-start">
             <InputGroupButton
@@ -172,7 +172,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
             onChange={(event) => setDraftQuantity(event.target.value)}
             onBlur={commitQuantity}
             onKeyDown={(event) => onKeyDown(event, commitQuantity)}
-            className="text-center text-xs"
+            className="text-center text-sm"
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton aria-label="Ajouter une unité" onClick={() => adjust(1)}>
@@ -181,14 +181,14 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
           </InputGroupAddon>
         </InputGroup>
       </td>
-      <td className="px-3 py-2">
+      <td className="px-4 py-3 first:pl-5 last:pr-5">
         {selectCell(
           'unit',
           catalog.units,
           <span className="text-muted-foreground">{ingredient.unitLabel}</span>
         )}
       </td>
-      <td className="px-3 py-2">
+      <td className="px-4 py-3 first:pl-5 last:pr-5">
         {selectCell(
           'category',
           catalog.categories,
@@ -197,7 +197,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
           </Badge>
         )}
       </td>
-      <td className="px-3 py-2">
+      <td className="px-4 py-3 first:pl-5 last:pr-5">
         {selectCell(
           'state',
           catalog.states,
@@ -207,7 +207,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
           </>
         )}
       </td>
-      <td className="px-3 py-2">
+      <td className="px-4 py-3 first:pl-5 last:pr-5">
         <div className="flex flex-wrap gap-1">
           {ingredient.perishable && (
             <Badge variant="warning" className="text-xs">
@@ -221,7 +221,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
           )}
         </div>
       </td>
-      <td className="px-3 py-2">
+      <td className="px-4 py-3 first:pl-5 last:pr-5">
         <AlertDialog>
           <AlertDialogTrigger
             render={

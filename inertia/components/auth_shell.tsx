@@ -8,7 +8,8 @@ interface AuthShellProps {
 
 export function AuthShell({ title, children, footer }: AuthShellProps) {
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-10 sm:px-6">
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-12 sm:px-8">
+      <img src="/logo.svg" alt="" className="mb-6 size-16" />
       <section className="kraft-card rounded-lg p-6 sm:p-8">
         <h1 className="kraft-title mb-6 text-3xl font-bold text-primary">{title}</h1>
         {children}

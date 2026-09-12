@@ -62,7 +62,7 @@ export function DeleteRecipeDialog({
 export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
   if (recipes.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border py-16 text-center">
+      <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border px-6 py-24 text-center">
         <BookOpenIcon className="size-10 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
           Aucune recette. Ton assistant les ajoute depuis le serveur MCP.
@@ -72,47 +72,46 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="kraft-title text-xl font-bold">Mes recettes</h2>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {recipes.map((recipe) => (
-          <Card key={recipe.id} className="kraft-card relative transition-shadow hover:shadow-md">
-            <CardContent className="pt-4">
-              <Link
-                route="recipes.show"
-                routeParams={{ id: recipe.id }}
-                className="kraft-title block pr-8 text-base font-semibold after:absolute after:inset-0"
-              >
-                {recipe.title}
-              </Link>
-              {recipe.description && (
-                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                  {recipe.description}
-                </p>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+      {recipes.map((recipe) => (
+        <Card
+          key={recipe.id}
+          className="kraft-card relative gap-0 py-0 transition-shadow hover:shadow-md"
+        >
+          <CardContent className="flex h-full flex-col p-5">
+            <Link
+              route="recipes.show"
+              routeParams={{ id: recipe.id }}
+              className="kraft-title block pr-8 text-xl leading-tight font-bold after:absolute after:inset-0"
+            >
+              {recipe.title}
+            </Link>
+            {recipe.description && (
+              <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                {recipe.description}
+              </p>
+            )}
+            <div className="mt-auto flex gap-2 pt-4">
+              {recipe.ingredientCount > 0 && (
+                <Badge variant="secondary">{plural(recipe.ingredientCount, 'ingrédient')}</Badge>
               )}
-              <div className="mt-3 flex gap-2">
-                {recipe.ingredientCount > 0 && (
-                  <Badge variant="secondary">{plural(recipe.ingredientCount, 'ingrédient')}</Badge>
-                )}
-                {recipe.stepCount > 0 && (
-                  <Badge variant="secondary">{plural(recipe.stepCount, 'étape')}</Badge>
-                )}
-              </div>
-            </CardContent>
-            <span className="absolute top-3 right-3 z-10">
-              <DeleteRecipeDialog
-                recipe={recipe}
-                trigger={
-                  <Button variant="ghost" size="icon-xs" aria-label={`Supprimer ${recipe.title}`}>
-                    <Trash2Icon className="size-3.5 text-muted-foreground" />
-                  </Button>
-                }
-              />
-            </span>
-          </Card>
-        ))}
-      </div>
+              {recipe.stepCount > 0 && (
+                <Badge variant="secondary">{plural(recipe.stepCount, 'étape')}</Badge>
+              )}
+            </div>
+          </CardContent>
+          <span className="absolute top-3 right-3 z-10">
+            <DeleteRecipeDialog
+              recipe={recipe}
+              trigger={
+                <Button variant="ghost" size="icon-sm" aria-label={`Supprimer ${recipe.title}`}>
+                  <Trash2Icon className="text-muted-foreground" />
+                </Button>
+              }
+            />
+          </span>
+        </Card>
+      ))}
     </div>
   )
 }

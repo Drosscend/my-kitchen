@@ -1,4 +1,6 @@
 import { Head } from '@inertiajs/react'
+import { Page, PageHeader } from '~/components/page'
+import { Badge } from '~/components/ui/badge'
 import { RecipeLibrary } from '~/recipes/recipe_library'
 import { type RecipeSummary } from '~/recipes/types'
 import { UnitConverter } from '~/recipes/unit_converter'
@@ -10,19 +12,27 @@ export default function Recipes({ recipes }: PageProps) {
   return (
     <>
       <Head title="Recettes" />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
-          <div className="lg:hidden">
-            <UnitConverter />
-          </div>
-          <div className="order-2 space-y-6 lg:order-1">
+      <Page>
+        <PageHeader
+          title="Recettes"
+          actions={
+            recipes.length > 0 && (
+              <Badge variant="outline" className="px-3 py-1 text-sm">
+                {recipes.length} {recipes.length > 1 ? 'recettes' : 'recette'}
+              </Badge>
+            )
+          }
+        />
+
+        <div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-10">
+          <div className="min-w-0">
             <RecipeLibrary recipes={recipes} />
           </div>
-          <div className="order-1 hidden lg:order-2 lg:block">
+          <aside className="xl:sticky xl:top-8 xl:self-start">
             <UnitConverter />
-          </div>
+          </aside>
         </div>
-      </main>
+      </Page>
     </>
   )
 }

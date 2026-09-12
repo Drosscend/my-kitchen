@@ -1,8 +1,11 @@
 import { Head } from '@inertiajs/react'
-import { Card, CardContent } from '~/components/ui/card'
+import { Page, PageHeader } from '~/components/page'
+import { Card } from '~/components/ui/card'
 import { type Catalog, type Ingredient } from '~/inventory/catalog'
+import { CopyPantryButton } from '~/inventory/copy_pantry_button'
 import { InventoryActions } from '~/inventory/inventory_actions'
 import { InventoryTable } from '~/inventory/inventory_table'
+import { StatsSummary } from '~/inventory/stats_summary'
 import { useInventoryFilter } from '~/inventory/use_inventory_filter'
 import { type InertiaProps } from '~/types'
 
@@ -11,38 +14,40 @@ type PageProps = InertiaProps<{ ingredients: Ingredient[]; catalog: Catalog }>
 export default function Inventory({ ingredients, catalog }: PageProps) {
   const { filters, sort, filtered, hasActiveFilters, updateFilters, toggleSort, resetFilters } =
     useInventoryFilter(ingredients)
-  const actions = (
-    <InventoryActions
-      ingredients={ingredients}
-      catalog={catalog}
-      filters={filters}
-      hasActiveFilters={hasActiveFilters}
-      onUpdateFilters={updateFilters}
-      onResetFilters={resetFilters}
-    />
-  )
 
   return (
     <>
       <Head title="Inventaire" />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
-          <div className="lg:hidden">{actions}</div>
+      <Page>
+        <PageHeader
+          title="Inventaire"
+          actions={<CopyPantryButton disabled={ingredients.length === 0} />}
+        />
 
-          <Card className="kraft-card order-2 lg:order-1">
-            <CardContent className="pt-4">
-              <InventoryTable
-                ingredients={filtered}
-                catalog={catalog}
-                sort={sort}
-                onSort={toggleSort}
-              />
-            </CardContent>
+        <StatsSummary ingredients={ingredients} />
+
+        <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-10">
+          <Card className="kraft-card order-2 min-w-0 py-0 xl:order-1">
+            <InventoryTable
+              ingredients={filtered}
+              total={ingredients.length}
+              catalog={catalog}
+              sort={sort}
+              onSort={toggleSort}
+            />
           </Card>
 
-          <div className="order-1 hidden lg:order-2 lg:block">{actions}</div>
+          <aside className="order-1 space-y-6 xl:sticky xl:top-8 xl:order-2 xl:self-start">
+            <InventoryActions
+              catalog={catalog}
+              filters={filters}
+              hasActiveFilters={hasActiveFilters}
+              onUpdateFilters={updateFilters}
+              onResetFilters={resetFilters}
+            />
+          </aside>
         </div>
-      </main>
+      </Page>
     </>
   )
 }

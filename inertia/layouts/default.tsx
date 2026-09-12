@@ -1,10 +1,30 @@
 import { Form, Link } from '@adonisjs/inertia/react'
 import { usePage } from '@inertiajs/react'
+import { cn } from 'cn'
 import { ClipboardListIcon, CookingPotIcon, LogOutIcon, UserRoundIcon } from 'lucide-react'
-import { type ReactElement, useEffect } from 'react'
+import { type ReactElement, type ReactNode, useEffect } from 'react'
 import { toast } from 'sonner'
+import { CONTAINER } from '~/components/page'
 import { Button } from '~/components/ui/button'
 import { Toaster } from '~/components/ui/sonner'
+
+type Route = 'inventory.index' | 'recipes.index' | 'account.show'
+
+function NavLink({ route, path, children }: { route: Route; path: string; children: ReactNode }) {
+  const { url } = usePage()
+  const active = path === '/' ? url === '/' : url.startsWith(path)
+
+  return (
+    <Button
+      variant="ghost"
+      nativeButton={false}
+      className={cn('gap-1.5 px-2 sm:px-3', active && 'bg-paper-light text-foreground')}
+      render={<Link route={route} aria-current={active ? 'page' : undefined} />}
+    >
+      {children}
+    </Button>
+  )
+}
 
 export default function Layout({ children }: { children: ReactElement }) {
   const { url, flash, props } = usePage()
@@ -26,49 +46,34 @@ export default function Layout({ children }: { children: ReactElement }) {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="border-b border-border/60 bg-paper/80 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+        <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-6')}>
           <Link
             route="inventory.index"
-            className="kraft-title flex items-center gap-2 text-2xl font-bold text-primary"
+            className="kraft-title flex shrink-0 items-center gap-2.5 text-2xl font-bold whitespace-nowrap text-primary"
           >
-            <img src="/logo.svg" alt="" className="size-8" />
-            Mon Garde-Manger
+            <img src="/logo.svg" alt="" className="size-9" />
+            <span className="hidden sm:inline">Mon Garde-Manger</span>
           </Link>
 
           <nav className="flex items-center gap-1" aria-label="Navigation">
             {props.user ? (
               <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  nativeButton={false}
-                  render={<Link route="inventory.index" />}
-                >
+                <NavLink route="inventory.index" path="/">
                   <ClipboardListIcon data-icon="inline-start" />
-                  Inventaire
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  nativeButton={false}
-                  render={<Link route="recipes.index" />}
-                >
+                  <span className="hidden sm:inline">Inventaire</span>
+                </NavLink>
+                <NavLink route="recipes.index" path="/recipes">
                   <CookingPotIcon data-icon="inline-start" />
-                  Recettes
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  nativeButton={false}
-                  render={<Link route="account.show" />}
-                >
+                  <span className="hidden sm:inline">Recettes</span>
+                </NavLink>
+                <NavLink route="account.show" path="/account">
                   <UserRoundIcon data-icon="inline-start" />
-                  Mon compte
-                </Button>
-                <Form route="session.destroy">
-                  <Button type="submit" variant="ghost" size="sm">
+                  <span className="hidden sm:inline">Mon compte</span>
+                </NavLink>
+                <Form route="session.destroy" className="ml-2 border-l border-border/60 pl-3">
+                  <Button type="submit" variant="ghost" className="gap-1.5 px-2 sm:px-3">
                     <LogOutIcon data-icon="inline-start" />
-                    Se déconnecter
+                    <span className="hidden sm:inline">Se déconnecter</span>
                   </Button>
                 </Form>
               </>
@@ -76,13 +81,17 @@ export default function Layout({ children }: { children: ReactElement }) {
               <>
                 <Button
                   variant="ghost"
-                  size="sm"
                   nativeButton={false}
+                  className="px-3"
                   render={<Link route="session.create" />}
                 >
                   Se connecter
                 </Button>
-                <Button size="sm" nativeButton={false} render={<Link route="new_account.create" />}>
+                <Button
+                  nativeButton={false}
+                  className="px-3"
+                  render={<Link route="new_account.create" />}
+                >
                   Créer un compte
                 </Button>
               </>
