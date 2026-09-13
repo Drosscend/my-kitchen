@@ -1,7 +1,7 @@
 import { PlayIcon, RotateCcwIcon, SquareIcon } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { type TimerState } from '~/cooking/types'
-import { formatDuration, formatTimer } from '~/recipes/format'
+import { formatTimer } from '~/recipes/format'
 
 interface RecipeTimerProps {
   id: string
@@ -20,52 +20,42 @@ export function RecipeTimer({ id, duration, timer, onStart, onStop, onReset }: R
   const done = timer !== undefined && timer.remaining === 0
   const remaining = timer?.remaining ?? duration
 
+  const main = done
+    ? { label: 'Terminé !', icon: RotateCcwIcon, action: () => onReset(id) }
+    : running
+      ? { label: 'Pause', icon: SquareIcon, action: () => onStop(id) }
+      : paused
+        ? { label: 'Reprendre', icon: PlayIcon, action: () => onStart(id, duration) }
+        : { label: 'Démarrer', icon: PlayIcon, action: () => onStart(id, duration) }
+  const MainIcon = main.icon
+  const accent = done ? '' : 'border-accent/40 text-accent hover:bg-accent/10 hover:text-accent'
+
   return (
-    <div className="flex flex-col items-center gap-3 py-6">
-      <div className="text-5xl font-semibold text-accent" style={TABULAR}>
-        {formatTimer(remaining)}
-      </div>
-      <div className="text-sm text-muted-foreground">{formatDuration(duration)}</div>
-      <div className="mt-2 flex items-center gap-2">
-        {done ? (
-          <Button
-            size="lg"
-            variant="secondary"
-            className="rounded-full px-6"
-            onClick={() => onReset(id)}
-          >
-            Terminé ! <RotateCcwIcon data-icon="inline-end" />
-          </Button>
-        ) : paused ? (
-          <>
-            <Button size="lg" className="rounded-full px-6" onClick={() => onStart(id, duration)}>
-              <PlayIcon data-icon="inline-start" /> Reprendre
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="rounded-full"
-              aria-label="Réinitialiser le chrono"
-              onClick={() => onReset(id)}
-            >
-              <RotateCcwIcon />
-            </Button>
-          </>
-        ) : running ? (
-          <Button
-            size="lg"
-            variant="outline"
-            className="rounded-full px-6"
-            onClick={() => onStop(id)}
-          >
-            <SquareIcon data-icon="inline-start" /> Pause
-          </Button>
-        ) : (
-          <Button size="lg" className="rounded-full px-6" onClick={() => onStart(id, duration)}>
-            <PlayIcon data-icon="inline-start" /> Démarrer
-          </Button>
-        )}
-      </div>
+    <div className="relative flex items-center justify-center border-t border-border px-4 py-3">
+      <Button
+        size="lg"
+        variant={done ? 'secondary' : 'outline'}
+        className={`h-16 min-w-72 gap-5 rounded-xl border-2 ${accent}`}
+        onClick={main.action}
+      >
+        <span className="text-4xl font-semibold sm:text-5xl" style={TABULAR}>
+          {formatTimer(remaining)}
+        </span>
+        <span className="flex items-center gap-2 text-base">
+          <MainIcon className="size-5" /> {main.label}
+        </span>
+      </Button>
+      {(running || paused) && (
+        <Button
+          size="icon-lg"
+          variant="ghost"
+          className="absolute right-4 size-14 rounded-xl text-muted-foreground [&_svg]:size-6"
+          aria-label="Réinitialiser le chrono"
+          onClick={() => onReset(id)}
+        >
+          <RotateCcwIcon />
+        </Button>
+      )}
     </div>
   )
 }

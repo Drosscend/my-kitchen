@@ -56,9 +56,9 @@ export function CookingMode({
     canGoPrev: !onIngredients,
     canGoNext: !lastStep,
   })
-  const runningTimers = recipe.steps
+  const otherRunningTimers = recipe.steps
     .map((step, index) => ({ step, index, timer: activeTimers[step.ref] }))
-    .filter(({ timer }) => timer?.running)
+    .filter(({ timer, index }) => timer?.running && index !== currentStepIndex)
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-paper">
@@ -84,48 +84,56 @@ export function CookingMode({
       </div>
 
       <div
-        className="flex flex-1 items-center justify-center overflow-auto p-8"
+        className="flex-1 overflow-auto"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="w-full max-w-3xl text-center">
-          {onIngredients ? (
-            <>
-              <h2 className="kraft-title mb-8 text-3xl font-bold sm:text-4xl">Ingrédients</h2>
-              <ul className="mx-auto max-w-md space-y-3 text-left text-xl sm:text-2xl">
-                {recipe.ingredients.map((ingredient) => (
-                  <li key={ingredient.ref}>{formatIngredient(ingredient, scale)}</li>
-                ))}
-              </ul>
-            </>
-          ) : currentStep ? (
-            <>
-              {currentStep.title && (
-                <h2 className="kraft-title mb-6 text-3xl font-bold sm:text-4xl">
-                  {currentStep.title}
+        <div className="flex min-h-full items-center justify-center px-6 py-8 sm:px-8">
+          <div className="w-full max-w-3xl">
+            {onIngredients ? (
+              <>
+                <h2 className="kraft-title mb-8 text-center text-3xl font-bold sm:text-4xl lg:text-5xl">
+                  Ingrédients
                 </h2>
-              )}
-              {currentStep.timerSeconds && (
-                <RecipeTimer
-                  id={currentStep.ref}
-                  duration={currentStep.timerSeconds}
-                  timer={activeTimers[currentStep.ref]}
-                  onStart={onStartTimer}
-                  onStop={onStopTimer}
-                  onReset={onResetTimer}
-                />
-              )}
-              <p className="mt-6 text-xl leading-relaxed text-foreground/80 sm:text-2xl">
-                {resolveStep(currentStep, ingredients, scale)}
-              </p>
-            </>
-          ) : null}
+                <ul className="mx-auto max-w-xl space-y-4 text-xl sm:text-2xl lg:text-3xl">
+                  {recipe.ingredients.map((ingredient) => (
+                    <li key={ingredient.ref} className="flex items-baseline gap-3">
+                      <span className="size-2 shrink-0 rounded-full bg-accent/60" />
+                      <span>{formatIngredient(ingredient, scale)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : currentStep ? (
+              <>
+                {currentStep.title && (
+                  <h2 className="kraft-title mb-6 text-center text-3xl font-bold sm:text-4xl lg:text-5xl">
+                    {currentStep.title}
+                  </h2>
+                )}
+                <p className="text-xl leading-relaxed text-foreground/80 sm:text-2xl sm:leading-relaxed lg:text-3xl lg:leading-relaxed">
+                  {resolveStep(currentStep, ingredients, scale)}
+                </p>
+              </>
+            ) : null}
+          </div>
         </div>
       </div>
 
-      {runningTimers.length > 0 && (
+      {currentStep?.timerSeconds && (
+        <RecipeTimer
+          id={currentStep.ref}
+          duration={currentStep.timerSeconds}
+          timer={activeTimers[currentStep.ref]}
+          onStart={onStartTimer}
+          onStop={onStopTimer}
+          onReset={onResetTimer}
+        />
+      )}
+
+      {otherRunningTimers.length > 0 && (
         <div className="flex items-center justify-center gap-4 border-t border-border bg-accent/10 px-4 py-2">
-          {runningTimers.map(({ step, index, timer }) => (
+          {otherRunningTimers.map(({ step, index, timer }) => (
             <button
               key={step.ref}
               type="button"
