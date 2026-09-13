@@ -31,11 +31,11 @@ export function RecipeTimer({ id, duration, timer, onStart, onStop, onReset }: R
   const accent = done ? '' : 'border-accent/40 text-accent hover:bg-accent/10 hover:text-accent'
 
   return (
-    <div className="relative flex items-center justify-center border-t border-border px-4 py-3">
+    <div className="flex items-center justify-center gap-3 border-t border-border px-4 py-3">
       <Button
         size="lg"
         variant={done ? 'secondary' : 'outline'}
-        className={`h-16 min-w-72 gap-5 rounded-xl border-2 ${accent}`}
+        className={`h-16 w-full max-w-72 gap-4 rounded-xl border-2 ${accent}`}
         onClick={main.action}
       >
         <span className="text-4xl font-semibold sm:text-5xl" style={TABULAR}>
@@ -49,7 +49,7 @@ export function RecipeTimer({ id, duration, timer, onStart, onStop, onReset }: R
         <Button
           size="icon-lg"
           variant="ghost"
-          className="absolute right-4 size-14 rounded-xl text-muted-foreground [&_svg]:size-6"
+          className="size-14 shrink-0 rounded-xl text-muted-foreground [&_svg]:size-6"
           aria-label="Réinitialiser le chrono"
           onClick={() => onReset(id)}
         >
