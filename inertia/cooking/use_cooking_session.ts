@@ -123,10 +123,10 @@ export function useCookingSession(initial: CookingSessionPayload) {
       .filter((delay) => delay > 0)
       .map((delay) => setTimeout(playTimerSound, delay))
 
-    if (timeouts.length === 0) {
-      return
-    }
+    return () => timeouts.forEach(clearTimeout)
+  }, [syncedTimers])
 
+  useEffect(() => {
     void acquireWakeLock()
 
     function onVisibility() {
@@ -138,11 +138,10 @@ export function useCookingSession(initial: CookingSessionPayload) {
     document.addEventListener('visibilitychange', onVisibility)
 
     return () => {
-      timeouts.forEach(clearTimeout)
       document.removeEventListener('visibilitychange', onVisibility)
       releaseWakeLock()
     }
-  }, [syncedTimers])
+  }, [])
 
   function update(change: CookingSessionUpdate) {
     const current = latest.current

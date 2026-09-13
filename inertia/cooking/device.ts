@@ -38,8 +38,8 @@ export function playTimerSound() {
 }
 
 /**
- * Keeps the screen on while a timer runs: a sleeping phone throttles
- * timeouts and blocks the vibration.
+ * Keeps the screen on for the whole cooking mode: hands are busy and a
+ * sleeping phone throttles timeouts and blocks the vibration.
  */
 export async function acquireWakeLock() {
   if (!('wakeLock' in navigator) || wakeLock) {
