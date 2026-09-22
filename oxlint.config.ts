@@ -6,6 +6,7 @@ export default defineConfig({
     '**/build/**',
     '**/public/assets/**',
     'types/db.ts',
+    'inertia/cn_tables.ts',
     // Vendored from dmmulroy/anti-slop, kept diffable with upstream.
     'tools/oxlint/anti-slop/**',
     // shadcn components, kept diffable with the registry.
