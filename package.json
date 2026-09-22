@@ -84,7 +84,7 @@
     "@vitejs/plugin-react": "^6.0.5",
     "hot-hook": "^1.0.0",
     "kysely-codegen": "^0.20.0",
-    "oxc-transform-react": "^0.151.0",
+    "oxc-transform-react": "^0.145.0",
     "oxfmt": "^0.70.0",
     "oxlint": "^1.79.0",
     "pg": "^8.23.0",
