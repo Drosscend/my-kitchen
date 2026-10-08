@@ -18,8 +18,10 @@ export async function migrateTestDatabase() {
 }
 
 /**
- * Every other table hangs off users through cascading foreign keys.
+ * Every other table hangs off users through cascading foreign keys,
+ * except the OAuth clients and sessions that belong to no account.
  */
 export async function resetDatabase() {
+  await db.deleteFrom('oauth_models').execute()
   await db.deleteFrom('users').execute()
 }

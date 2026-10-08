@@ -6,24 +6,6 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
-  'mcp': {
-    methods: ["POST","GET","DELETE"],
-    pattern: '/mcp',
-    tokens: [{"old":"/mcp","type":0,"val":"mcp","end":""}],
-    types: placeholder as Registry['mcp']['types'],
-  },
-  'up': {
-    methods: ["GET","HEAD"],
-    pattern: '/up',
-    tokens: [{"old":"/up","type":0,"val":"up","end":""}],
-    types: placeholder as Registry['up']['types'],
-  },
-  'health': {
-    methods: ["GET","HEAD"],
-    pattern: '/health',
-    tokens: [{"old":"/health","type":0,"val":"health","end":""}],
-    types: placeholder as Registry['health']['types'],
-  },
   'inventory.index': {
     methods: ["GET","HEAD"],
     pattern: '/',
@@ -77,6 +59,54 @@ const routes = {
     pattern: '/recipes/:id',
     tokens: [{"old":"/recipes/:id","type":0,"val":"recipes","end":""},{"old":"/recipes/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['recipes.destroy']['types'],
+  },
+  'mcp': {
+    methods: ["POST","GET","DELETE"],
+    pattern: '/mcp',
+    tokens: [{"old":"/mcp","type":0,"val":"mcp","end":""}],
+    types: placeholder as Registry['mcp']['types'],
+  },
+  'mcp.protected_resource': {
+    methods: ["GET","HEAD"],
+    pattern: '/.well-known/oauth-protected-resource/mcp',
+    tokens: [{"old":"/.well-known/oauth-protected-resource/mcp","type":0,"val":".well-known","end":""},{"old":"/.well-known/oauth-protected-resource/mcp","type":0,"val":"oauth-protected-resource","end":""},{"old":"/.well-known/oauth-protected-resource/mcp","type":0,"val":"mcp","end":""}],
+    types: placeholder as Registry['mcp.protected_resource']['types'],
+  },
+  'mcp.protected_resource.root': {
+    methods: ["GET","HEAD"],
+    pattern: '/.well-known/oauth-protected-resource',
+    tokens: [{"old":"/.well-known/oauth-protected-resource","type":0,"val":".well-known","end":""},{"old":"/.well-known/oauth-protected-resource","type":0,"val":"oauth-protected-resource","end":""}],
+    types: placeholder as Registry['mcp.protected_resource.root']['types'],
+  },
+  'oauth.authorization.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/oauth/interaction/:uid',
+    tokens: [{"old":"/oauth/interaction/:uid","type":0,"val":"oauth","end":""},{"old":"/oauth/interaction/:uid","type":0,"val":"interaction","end":""},{"old":"/oauth/interaction/:uid","type":1,"val":"uid","end":""}],
+    types: placeholder as Registry['oauth.authorization.show']['types'],
+  },
+  'oauth.authorization.approve': {
+    methods: ["POST"],
+    pattern: '/oauth/interaction/:uid',
+    tokens: [{"old":"/oauth/interaction/:uid","type":0,"val":"oauth","end":""},{"old":"/oauth/interaction/:uid","type":0,"val":"interaction","end":""},{"old":"/oauth/interaction/:uid","type":1,"val":"uid","end":""}],
+    types: placeholder as Registry['oauth.authorization.approve']['types'],
+  },
+  'oauth.authorization.deny': {
+    methods: ["POST"],
+    pattern: '/oauth/interaction/:uid/deny',
+    tokens: [{"old":"/oauth/interaction/:uid/deny","type":0,"val":"oauth","end":""},{"old":"/oauth/interaction/:uid/deny","type":0,"val":"interaction","end":""},{"old":"/oauth/interaction/:uid/deny","type":1,"val":"uid","end":""},{"old":"/oauth/interaction/:uid/deny","type":0,"val":"deny","end":""}],
+    types: placeholder as Registry['oauth.authorization.deny']['types'],
+  },
+  'up': {
+    methods: ["GET","HEAD"],
+    pattern: '/up',
+    tokens: [{"old":"/up","type":0,"val":"up","end":""}],
+    types: placeholder as Registry['up']['types'],
+  },
+  'health': {
+    methods: ["GET","HEAD"],
+    pattern: '/health',
+    tokens: [{"old":"/health","type":0,"val":"health","end":""}],
+    types: placeholder as Registry['health']['types'],
   },
   'new_account.create': {
     methods: ["GET","HEAD"],
@@ -180,17 +210,11 @@ const routes = {
     tokens: [{"old":"/account","type":0,"val":"account","end":""}],
     types: placeholder as Registry['account.destroy']['types'],
   },
-  'account.mcp_tokens.store': {
-    methods: ["POST"],
-    pattern: '/account/mcp-tokens',
-    tokens: [{"old":"/account/mcp-tokens","type":0,"val":"account","end":""},{"old":"/account/mcp-tokens","type":0,"val":"mcp-tokens","end":""}],
-    types: placeholder as Registry['account.mcp_tokens.store']['types'],
-  },
-  'account.mcp_tokens.destroy': {
+  'account.oauth_connections.destroy': {
     methods: ["DELETE"],
-    pattern: '/account/mcp-tokens/:id',
-    tokens: [{"old":"/account/mcp-tokens/:id","type":0,"val":"account","end":""},{"old":"/account/mcp-tokens/:id","type":0,"val":"mcp-tokens","end":""},{"old":"/account/mcp-tokens/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['account.mcp_tokens.destroy']['types'],
+    pattern: '/account/oauth-connections/:id',
+    tokens: [{"old":"/account/oauth-connections/:id","type":0,"val":"account","end":""},{"old":"/account/oauth-connections/:id","type":0,"val":"oauth-connections","end":""},{"old":"/account/oauth-connections/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['account.oauth_connections.destroy']['types'],
   },
   'cooking.start': {
     methods: ["POST"],

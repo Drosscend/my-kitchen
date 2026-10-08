@@ -54,14 +54,18 @@ export interface Ingredients {
   user_id: string;
 }
 
-export interface McpTokens {
+export interface OauthModels {
+  account_id: string | null;
+  client_name: string | null;
+  consumed_at: Timestamp | null;
   created_at: Generated<Timestamp>;
+  expires_at: Timestamp | null;
+  grant_id: string | null;
   id: string;
+  kind: string;
   last_used_at: Timestamp | null;
-  name: string;
-  prefix: string;
-  token_hash: string;
-  user_id: string;
+  payload: Json;
+  uid: string | null;
 }
 
 export interface PasswordResetTokens {
@@ -117,7 +121,7 @@ export interface DB {
   cooking_sessions: CookingSessions;
   email_verification_tokens: EmailVerificationTokens;
   ingredients: Ingredients;
-  mcp_tokens: McpTokens;
+  oauth_models: OauthModels;
   password_reset_tokens: PasswordResetTokens;
   recipe_ingredients: RecipeIngredients;
   recipe_steps: RecipeSteps;

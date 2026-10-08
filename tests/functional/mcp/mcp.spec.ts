@@ -1,21 +1,14 @@
-import app from '@adonisjs/core/services/app'
 import { test } from '@japa/runner'
-import { CreateMcpToken } from '#identity/actions/create_mcp_token'
+import { authorize } from '#tests/helpers/oauth'
 import { addRecipe, BREAD, storedRecipes } from '#tests/helpers/recipes'
 import { resetState } from '#tests/helpers/state'
 import { createUser } from '#tests/helpers/users'
 import type { User } from '#identity/domain/user'
 import type { ApiClient, ApiResponse } from '@japa/api-client'
 
-async function issueToken(user: User) {
-  const createMcpToken = await app.container.make(CreateMcpToken)
-  const result = await createMcpToken.execute({ userId: user.getIdentifier(), name: 'Tests' })
-
-  if (!result.ok) {
-    throw new Error('Cannot issue the test token')
-  }
-
-  return result.value
+async function issueToken(client: ApiClient, user: User) {
+  const { tokens } = await authorize(client, user)
+  return tokens.access_token
 }
 
 interface ToolCall {
@@ -96,18 +89,22 @@ const FLOUR = { name: 'Farine', quantity: 500, unit: 'g', category: 'starches' }
 test.group('MCP', (group) => {
   group.each.setup(() => resetState())
 
-  test('refuses requests without a valid personal token', async ({ client }) => {
+  test('refuses requests without a valid access token', async ({ client, assert }) => {
     const missing = await rpc(client, null, 'tools/list', {})
-    const wrong = await rpc(client, 'mk_not-a-real-token-value', 'tools/list', {})
+    const wrong = await rpc(client, 'not-a-real-token-value', 'tools/list', {})
 
     missing.assertStatus(401)
-    missing.assertHeader('www-authenticate')
+    assert.include(
+      missing.header('www-authenticate'),
+      'resource_metadata="http://localhost:3333/.well-known/oauth-protected-resource/mcp"'
+    )
     wrong.assertStatus(401)
+    assert.include(wrong.header('www-authenticate'), 'error="invalid_token"')
   })
 
   test('introduces itself with the site name and icon', async ({ client, assert }) => {
     const ada = await createUser('ada@example.com')
-    const token = await issueToken(ada)
+    const token = await issueToken(client, ada)
 
     const response = await rpc(client, token, 'initialize', {
       protocolVersion: '2025-11-25',
@@ -128,7 +125,7 @@ test.group('MCP', (group) => {
   }) => {
     const ada = await createUser('ada@example.com')
     const bob = await createUser('bob@example.com')
-    const token = await issueToken(ada)
+    const token = await issueToken(client, ada)
     await client
       .post('/inventory')
       .loginAs(bob)
@@ -177,7 +174,7 @@ test.group('MCP', (group) => {
     assert,
   }) => {
     const ada = await createUser('ada@example.com')
-    const token = await issueToken(ada)
+    const token = await issueToken(client, ada)
     const added = await rpc(client, token, 'tools/call', {
       name: 'add_ingredient',
       arguments: FLOUR,
@@ -199,7 +196,7 @@ test.group('MCP', (group) => {
 
   test('consumes nothing when one of the ingredients is unknown', async ({ client, assert }) => {
     const ada = await createUser('ada@example.com')
-    const token = await issueToken(ada)
+    const token = await issueToken(client, ada)
     const added = await rpc(client, token, 'tools/call', {
       name: 'add_ingredient',
       arguments: FLOUR,
@@ -226,7 +223,7 @@ test.group('MCP', (group) => {
 
   test('adds, reads, replaces and deletes recipes as documents', async ({ client, assert }) => {
     const ada = await createUser('ada@example.com')
-    const token = await issueToken(ada)
+    const token = await issueToken(client, ada)
 
     const added = await rpc(client, token, 'tools/call', {
       name: 'add_recipe',
@@ -262,7 +259,7 @@ test.group('MCP', (group) => {
     assert,
   }) => {
     const ada = await createUser('ada@example.com')
-    const token = await issueToken(ada)
+    const token = await issueToken(client, ada)
 
     const duplicate = await rpc(client, token, 'tools/call', {
       name: 'add_recipe',
@@ -287,7 +284,7 @@ test.group('MCP', (group) => {
     const ada = await createUser('ada@example.com')
     const bob = await createUser('bob@example.com')
     await addRecipe(bob, BREAD)
-    const token = await issueToken(ada)
+    const token = await issueToken(client, ada)
 
     const listed = await rpc(client, token, 'tools/call', { name: 'list_recipes', arguments: {} })
 

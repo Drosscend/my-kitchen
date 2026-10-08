@@ -8,7 +8,7 @@ Kitchen inventory, recipe library, shared cooking mode and an MCP server for ass
 - Recipe library filled by assistants through MCP, with servings scaling and a unit converter.
 - Cooking mode step by step with synced timers, shared with any phone through a QR code or a six digit code.
 - Accounts with confirmed e-mail addresses and password reset by mail.
-- MCP endpoint at `/mcp` exposing the pantry and the recipes as tools, authenticated by personal tokens created on the account page.
+- MCP endpoint at `/mcp` exposing the pantry and the recipes as tools, authorized through the embedded OAuth server.
 
 ## Requirements
 
@@ -57,10 +57,12 @@ node ace create:user --name='Ada' --email='ada@example.com' --password='a-secure
 
 ## MCP
 
-Create a token on the account page, then register the server in the client:
+Add `https://<domain>/mcp` as a server in the client, without any header: it discovers the OAuth server from the endpoint, opens the consent page in the browser and keeps its tokens itself.
 
-- claude.ai and Claude Desktop: add a custom connector with the server URL and, under the advanced request headers, `Authorization` set to `Bearer <token>`;
-- Claude Code: `claude mcp add --transport http garde-manger https://<domain>/mcp --header "Authorization: Bearer <token>"`.
+- claude.ai, Claude Desktop and ChatGPT: add a custom connector with the server URL;
+- Claude Code: `claude mcp add --transport http garde-manger https://<domain>/mcp`, then `/mcp` to sign in.
+
+The account page lists the connected assistants and revokes their access. The authorization server lives under `/oauth`: discovery at `/.well-known/oauth-authorization-server`, protected resource metadata at `/.well-known/oauth-protected-resource/mcp`, clients identified by a metadata document or registered dynamically, PKCE required, rotating refresh tokens.
 
 Tools: `list_ingredients`, `add_ingredient`, `update_ingredient`, `consume_ingredients`, `remove_ingredient`, `list_recipes`, `get_recipe`, `add_recipe`, `update_recipe`, `delete_recipe`. Recipes are JSON documents with `title`, `description`, `base_servings`, `ingredients` with `id`, `name`, `amount`, `unit`, `steps` with `id`, `title`, `content` mentioning ingredients as `{id}` and the step timer as `{timer}`, `timer_seconds`, and `notes`.
 
