@@ -1,3 +1,5 @@
 # Authenticate the MCP endpoint with personal tokens
 
+Superseded by [0008](0008-oauth-authorization-server-for-the-mcp-endpoint.md).
+
 The remote MCP server at `/mcp` accepts a personal token in the `Authorization: Bearer` header, created and revoked from the account page, stored hashed with a visible prefix. claude.ai, Claude Desktop and Claude Code all send static headers to a custom connector, so an OAuth 2.1 authorization server (discovery metadata, client registration, PKCE flows) would add a whole capability for no user of this application. The endpoint answers 401 with a bare `WWW-Authenticate: Bearer` challenge and publishes no OAuth metadata; OAuth stays the path to take the day a client without header support has to connect.

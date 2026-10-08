@@ -7,42 +7,6 @@ import type { InferInput, SimpleError } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
-  'mcp': {
-    methods: ["POST","GET","DELETE"]
-    pattern: '/mcp'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
-    }
-  }
-  'up': {
-    methods: ["GET","HEAD"]
-    pattern: '/up'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
-    }
-  }
-  'health': {
-    methods: ["GET","HEAD"]
-    pattern: '/health'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
-    }
-  }
   'inventory.index': {
     methods: ["GET","HEAD"]
     pattern: '/'
@@ -149,6 +113,102 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#app/recipes/controllers/delete_recipe_controller').default['execute']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/recipes/controllers/delete_recipe_controller').default['execute']>>>
+    }
+  }
+  'mcp': {
+    methods: ["POST","GET","DELETE"]
+    pattern: '/mcp'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
+    }
+  }
+  'mcp.protected_resource': {
+    methods: ["GET","HEAD"]
+    pattern: '/.well-known/oauth-protected-resource/mcp'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
+    }
+  }
+  'mcp.protected_resource.root': {
+    methods: ["GET","HEAD"]
+    pattern: '/.well-known/oauth-protected-resource'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
+    }
+  }
+  'oauth.authorization.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/oauth/interaction/:uid'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { uid: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/oauth/controllers/authorize_client_controller').default['render']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/oauth/controllers/authorize_client_controller').default['render']>>>
+    }
+  }
+  'oauth.authorization.approve': {
+    methods: ["POST"]
+    pattern: '/oauth/interaction/:uid'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { uid: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/oauth/controllers/authorize_client_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/oauth/controllers/authorize_client_controller').default['execute']>>>
+    }
+  }
+  'oauth.authorization.deny': {
+    methods: ["POST"]
+    pattern: '/oauth/interaction/:uid/deny'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { uid: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/oauth/controllers/deny_client_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/oauth/controllers/deny_client_controller').default['execute']>>>
+    }
+  }
+  'up': {
+    methods: ["GET","HEAD"]
+    pattern: '/up'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
+    }
+  }
+  'health': {
+    methods: ["GET","HEAD"]
+    pattern: '/health'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
     }
   }
   'new_account.create': {
@@ -355,28 +415,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/delete_account_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'account.mcp_tokens.store': {
-    methods: ["POST"]
-    pattern: '/account/mcp-tokens'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#app/identity/controllers/create_mcp_token_controller').default)['validator']>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#app/identity/controllers/create_mcp_token_controller').default)['validator']>>
-      response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/create_mcp_token_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/create_mcp_token_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'account.mcp_tokens.destroy': {
+  'account.oauth_connections.destroy': {
     methods: ["DELETE"]
-    pattern: '/account/mcp-tokens/:id'
+    pattern: '/account/oauth-connections/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/revoke_mcp_token_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/revoke_mcp_token_controller').default['execute']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/revoke_oauth_connection_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/revoke_oauth_connection_controller').default['execute']>>>
     }
   }
   'cooking.start': {

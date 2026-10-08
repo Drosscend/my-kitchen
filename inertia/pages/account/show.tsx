@@ -1,7 +1,7 @@
 import { Form, useRouter } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
 import { cn } from 'cn'
-import { KeyRoundIcon, Trash2Icon } from 'lucide-react'
+import { PlugIcon, Trash2Icon } from 'lucide-react'
 import { type ReactNode } from 'react'
 import { type Data } from '@generated/data'
 import { ConfirmDeleteDialog } from '~/components/confirm_delete_dialog'
@@ -14,9 +14,8 @@ import { type InertiaProps } from '~/types'
 
 type PageProps = InertiaProps<{
   account: Data.Identity.AccountDetails
-  mcpTokens: Data.Identity.McpToken[]
+  oauthConnections: Data.Identity.OauthConnection[]
   mcpUrl: string
-  newMcpToken: string | null
 }>
 
 function formatDate(value: string) {
@@ -47,19 +46,23 @@ function Section({
   )
 }
 
-function RevokeTokenDialog({ token }: { token: Data.Identity.McpToken }) {
+function RevokeConnectionDialog({ connection }: { connection: Data.Identity.OauthConnection }) {
   const router = useRouter()
+  const name = connection.clientName ?? 'cette application'
 
   return (
     <ConfirmDeleteDialog
-      title="Révoquer ce token ?"
-      description={`« ${token.name} » ne pourra plus appeler le serveur MCP.`}
+      title="Révoquer cet accès ?"
+      description={`${name} ne pourra plus appeler le serveur MCP sans une nouvelle autorisation.`}
       confirmLabel="Révoquer"
       onConfirm={() =>
-        router.visit({ route: 'account.mcp_tokens.destroy', routeParams: { id: token.id } })
+        router.visit({
+          route: 'account.oauth_connections.destroy',
+          routeParams: { id: connection.id },
+        })
       }
       trigger={
-        <Button variant="ghost" size="icon-sm" aria-label={`Révoquer ${token.name}`}>
+        <Button variant="ghost" size="icon-sm" aria-label={`Révoquer ${name}`}>
           <Trash2Icon className="text-muted-foreground" />
         </Button>
       }
@@ -67,7 +70,7 @@ function RevokeTokenDialog({ token }: { token: Data.Identity.McpToken }) {
   )
 }
 
-export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }: PageProps) {
+export default function ShowAccount({ account, oauthConnections, mcpUrl }: PageProps) {
   return (
     <>
       <Head title="Mon compte" />
@@ -198,68 +201,37 @@ export default function ShowAccount({ account, mcpTokens, mcpUrl, newMcpToken }:
               </div>
             </div>
 
-            <Form key={newMcpToken ?? 'empty'} route="account.mcp_tokens.store" errorBag="mcp">
-              {({ errors, processing }) => (
-                <Field data-invalid={Boolean(errors.name)}>
-                  <FieldLabel htmlFor="mcp-token-name">Nouveau token</FieldLabel>
-                  <div className="flex max-w-md gap-2">
-                    <Input
-                      id="mcp-token-name"
-                      name="name"
-                      placeholder="Nom, par exemple Claude"
-                      required
-                      aria-invalid={Boolean(errors.name)}
-                    />
-                    <Button type="submit" disabled={processing} className="shrink-0">
-                      Créer
-                    </Button>
-                  </div>
-                  {errors.name && <FieldError>{errors.name}</FieldError>}
-                </Field>
-              )}
-            </Form>
+            <p className="text-sm text-muted-foreground">
+              Ajoute cette adresse comme connecteur dans Claude ou ChatGPT : l'assistant t'enverra
+              ici pour autoriser son accès.
+            </p>
 
-            {newMcpToken && (
-              <div className="space-y-3 rounded-lg border border-accent/40 bg-accent/10 p-4">
-                <p className="text-sm font-medium">
-                  Token créé. Copie-le maintenant, il ne sera plus affiché.
-                </p>
-                <CopyButton
-                  text={() => `Bearer ${newMcpToken}`}
-                  label="Copier le token"
-                  className="h-auto w-full justify-start gap-3 bg-paper-light px-3 py-2 text-left font-mono text-sm break-all whitespace-normal"
-                >
-                  Bearer {newMcpToken}
-                </CopyButton>
+            {oauthConnections.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Applications connectées</p>
+                <ul className="space-y-2">
+                  {oauthConnections.map((connection) => (
+                    <li
+                      key={connection.id}
+                      className="flex items-center justify-between gap-4 rounded-md bg-paper-light px-4 py-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="flex items-center gap-2 text-sm font-medium">
+                          <PlugIcon className="size-3.5 shrink-0 text-muted-foreground" />
+                          {connection.clientName ?? 'Application inconnue'}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Autorisée le {formatDate(connection.createdAt)}
+                          {connection.lastUsedAt
+                            ? `, utilisée le ${formatDate(connection.lastUsedAt)}`
+                            : ', jamais utilisée'}
+                        </p>
+                      </div>
+                      <RevokeConnectionDialog connection={connection} />
+                    </li>
+                  ))}
+                </ul>
               </div>
-            )}
-
-            {mcpTokens.length > 0 && (
-              <ul className="space-y-2">
-                {mcpTokens.map((token) => (
-                  <li
-                    key={token.id}
-                    className="flex items-center justify-between gap-4 rounded-md bg-paper-light px-4 py-3"
-                  >
-                    <div className="min-w-0">
-                      <p className="flex items-center gap-2 text-sm font-medium">
-                        <KeyRoundIcon className="size-3.5 shrink-0 text-muted-foreground" />
-                        {token.name}
-                      </p>
-                      <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-                        Bearer {token.prefix}…
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        Créé le {formatDate(token.createdAt)}
-                        {token.lastUsedAt
-                          ? `, utilisé le ${formatDate(token.lastUsedAt)}`
-                          : ', jamais utilisé'}
-                      </p>
-                    </div>
-                    <RevokeTokenDialog token={token} />
-                  </li>
-                ))}
-              </ul>
             )}
           </div>
         </Section>

@@ -1,6 +1,7 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
 import { emailField, passwordField } from '#app/identity/validators'
+import { INTENDED_URL_KEY } from '#app/middleware/auth_middleware'
 import { VerifyUserCredentials } from '#identity/actions/verify_user_credentials'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -27,6 +28,12 @@ export default class LoginController {
     }
 
     await auth.use('web').login(result.value)
+    const intendedUrl = String(session.pull(INTENDED_URL_KEY, ''))
+
+    if (intendedUrl.startsWith('/') && !intendedUrl.startsWith('//')) {
+      return response.redirect(intendedUrl)
+    }
+
     return response.redirect().toRoute('inventory.index')
   }
 }

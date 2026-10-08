@@ -8,15 +8,17 @@ import { UserIdentifier } from '#identity/domain/user_identifier'
 
 /**
  * One stateless handler for the process. Every request builds a server
- * bound to the token's owner, carried as the auth `clientId`.
+ * bound to the token's owner, carried in the auth `extra.userId`.
  */
 const mcpHandler = createMcpHandler(
   async ({ authInfo }) => {
-    if (!authInfo) {
+    const owner = authInfo?.extra?.userId
+
+    if (!owner) {
       throw new Error('The MCP handler only serves authenticated requests')
     }
 
-    const userId = UserIdentifier.fromString(authInfo.clientId)
+    const userId = UserIdentifier.fromString(String(owner))
     const server = new McpServer({
       name: 'mon-garde-manger',
       title: 'Mon Garde-Manger',

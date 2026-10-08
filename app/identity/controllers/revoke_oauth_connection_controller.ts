@@ -1,14 +1,14 @@
 import { inject } from '@adonisjs/core'
 import { identityErrorMessages } from '#app/identity/error_messages'
-import { RevokeMcpToken } from '#identity/actions/revoke_mcp_token'
+import { RevokeOAuthConnection } from '#identity/actions/revoke_oauth_connection'
 import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
-export default class RevokeMcpTokenController {
-  constructor(private readonly revokeMcpToken: RevokeMcpToken) {}
+export default class RevokeOAuthConnectionController {
+  constructor(private readonly revokeOAuthConnection: RevokeOAuthConnection) {}
 
   async execute({ response, auth, session, params }: HttpContext) {
-    const result = await this.revokeMcpToken.execute({
+    const result = await this.revokeOAuthConnection.execute({
       userId: auth.getUserOrFail().getIdentifier(),
       id: params.id,
     })
@@ -18,7 +18,7 @@ export default class RevokeMcpTokenController {
       return response.redirect().toRoute('account.show')
     }
 
-    session.flash('success', 'Token révoqué')
+    session.flash('success', 'Accès révoqué')
     return response.redirect().toRoute('account.show')
   }
 }

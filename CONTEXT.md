@@ -13,8 +13,8 @@ A single use, hashed token mailed as a link to the address a user must confirm, 
 **Password reset token**:
 A single use, hashed token mailed as a link to a user who forgot their password. Changing the password revokes it.
 
-**MCP token**:
-A personal access token, shown once and stored hashed, that an assistant sends as a bearer to the MCP endpoint. It acts as its owner.
+**Connected application**:
+An assistant a user authorized on the consent page to call the MCP endpoint in their name, an OAuth grant in the code. It holds rotating tokens, stored hashed, until it expires or the user revokes it from the account page.
 
 ## Inventory
 

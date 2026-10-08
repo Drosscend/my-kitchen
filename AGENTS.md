@@ -17,7 +17,7 @@ Use Kysely with Postgres for persistence. Keep database invariants in migrations
 
 ## Capabilities
 
-`identity` (accounts, MCP tokens), `inventory` (the pantry), `recipes` (the library) and `cooking` (shared sessions) each have their `app/<capability>` delivery slice and `src/<capability>` core. `app/mcp` is delivery only: it adapts the MCP SDK to the same Actions and Queries, one stateless server per request bound to the token owner.
+`identity` (accounts, connected applications), `inventory` (the pantry), `recipes` (the library) and `cooking` (shared sessions) each have their `app/<capability>` delivery slice and `src/<capability>` core. `app/mcp` is delivery only: it adapts the MCP SDK to the same Actions and Queries, one stateless server per request bound to the token owner. `app/oauth` mounts the oidc-provider authorization server that issues those tokens; its storage lives in `src/identity`.
 
 ## Interface
 
