@@ -39,7 +39,7 @@
     "@adonisjs/auth": "^10.1.0",
     "@adonisjs/core": "^7.6.0",
     "@adonisjs/cors": "^3.0.0",
-    "@adonisjs/inertia": "^5.0.4",
+    "@adonisjs/inertia": "^5.0.5",
     "@adonisjs/limiter": "^3.0.1",
     "@adonisjs/mail": "^10.4.0",
     "@adonisjs/session": "^8.3.0",
