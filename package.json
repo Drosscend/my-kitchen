@@ -57,7 +57,7 @@
     "class-variance-authority": "^0.7.1",
     "cn": "^0.5.0",
     "edge.js": "^6.5.1",
-    "kysely": "^0.29.7",
+    "kysely": "^0.29.8",
     "kysely-postgres-js": "^5.0.1",
     "lucide-react": "^1.61.0",
     "oidc-provider": "^9.12.2",
