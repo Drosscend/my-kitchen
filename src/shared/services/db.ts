@@ -6,7 +6,7 @@ import postgres from 'postgres'
 import env from '#start/env'
 import type { DB } from '#types/db'
 
-const sql = postgres(env.get('DATABASE_URL').release(), { max: 20 })
+const sql = postgres(env.get('DATABASE_URL').release(), { max: 20, prepare: false })
 
 export const db = new Kysely<DB>({
   dialect: new PostgresJSDialect({ postgres: sql }),
