@@ -110,6 +110,23 @@ test.group('Cooking sessions', (group) => {
     expired.assertStatus(404)
   })
 
+  test('answers 404 to devices polling an unknown or expired session', async ({ client }) => {
+    const user = await createUser('ada@example.com')
+    const { code } = await startSession(client, user)
+
+    const unknown = await client.get('/cook/000000/state').header('accept', 'application/json')
+    await db
+      .updateTable('cooking_sessions')
+      .set({ expires_at: new Date(Date.now() - 1000) })
+      .where('code', '=', code)
+      .execute()
+    const expired = await client.get(`/cook/${code}/state`).header('accept', 'application/json')
+
+    unknown.assertStatus(404)
+    unknown.assertBodyContains({ error: 'Session introuvable ou expirée' })
+    expired.assertStatus(404)
+  })
+
   test('closes a session for every device and never reopens it', async ({ client }) => {
     const user = await createUser('ada@example.com')
     const { code } = await startSession(client, user)

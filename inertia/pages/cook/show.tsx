@@ -30,9 +30,11 @@ export default function CookingSession({ session: initial, user }: PageProps) {
   return (
     <>
       <Head title={session.recipe.title} />
-      {session.closed ? (
+      {session.closed || session.expired ? (
         <main className="flex flex-1 flex-col items-center justify-center gap-2 p-4 text-center">
-          <p className="text-lg">Session terminée</p>
+          <p className="text-lg">
+            {session.expired ? 'Session introuvable ou expirée' : 'Session terminée'}
+          </p>
         </main>
       ) : (
         <CookingMode

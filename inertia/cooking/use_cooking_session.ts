@@ -15,6 +15,7 @@ import {
 } from '~/cooking/types'
 
 const POLL_INTERVAL_MS = 500
+const MAX_RETRY_DELAY_MS = 30_000
 
 function computeTimers(synced: Record<string, SyncedTimer>, now: number): ActiveTimers {
   const timers: ActiveTimers = {}
@@ -39,13 +40,13 @@ function computeTimers(synced: Record<string, SyncedTimer>, now: number): Active
  */
 export function useCookingSession(initial: CookingSessionPayload) {
   const [session, setSession] = useState(initial)
+  const [expired, setExpired] = useState(false)
   const clockOffset = useRef(0)
   const [activeTimers, setActiveTimers] = useState(() =>
     computeTimers(initial.state.activeTimers, initial.serverNow)
   )
   const latest = useRef(session)
   const lastUpdate = useRef(initial.state.updatedAt)
-  const polling = useRef(false)
   // In-flight PATCH count. A poll answer that left before them describes
   // an earlier state, and applying it would undo the change just made.
   const pending = useRef(0)
@@ -70,33 +71,51 @@ export function useCookingSession(initial: CookingSessionPayload) {
   useEffect(() => {
     clockOffset.current = initial.serverNow - Date.now()
 
-    const interval = setInterval(async () => {
-      if (polling.current || pending.current > 0) {
+    let delay = POLL_INTERVAL_MS
+    let stopped = false
+
+    async function poll() {
+      if (latest.current.state.closed) {
         return
       }
 
-      polling.current = true
+      if (pending.current === 0) {
+        try {
+          const response = await fetch(stateUrl, { headers: { accept: 'application/json' } })
 
-      try {
-        const response = await fetch(stateUrl, { headers: { accept: 'application/json' } })
+          if (response.status === 404 || response.status === 410) {
+            setExpired(true)
+            return
+          }
 
-        if (!response.ok) {
-          return
+          if (!response.ok) {
+            throw new Error()
+          }
+
+          const payload: CookingSessionPayload = await response.json()
+
+          if (pending.current === 0 && payload.state.updatedAt > lastUpdate.current) {
+            applyRemote(payload)
+          }
+
+          delay = POLL_INTERVAL_MS
+        } catch {
+          // A missed poll is caught up by the next one.
+          delay = Math.min(delay * 2, MAX_RETRY_DELAY_MS)
         }
-
-        const payload: CookingSessionPayload = await response.json()
-
-        if (pending.current === 0 && payload.state.updatedAt > lastUpdate.current) {
-          applyRemote(payload)
-        }
-      } catch {
-        // A missed poll is caught up by the next one.
-      } finally {
-        polling.current = false
       }
-    }, POLL_INTERVAL_MS)
 
-    return () => clearInterval(interval)
+      if (!stopped) {
+        timeout = setTimeout(poll, delay)
+      }
+    }
+
+    let timeout = setTimeout(poll, delay)
+
+    return () => {
+      stopped = true
+      clearTimeout(timeout)
+    }
   }, [stateUrl, initial.serverNow])
 
   const syncedTimers = session.state.activeTimers
@@ -216,6 +235,7 @@ export function useCookingSession(initial: CookingSessionPayload) {
     recipe: session.recipe,
     scale: session.scale,
     closed: session.state.closed,
+    expired,
     currentStepIndex: session.state.currentStepIndex,
     activeTimers,
     prevStep: () => goToStep(session.state.currentStepIndex - 1),
