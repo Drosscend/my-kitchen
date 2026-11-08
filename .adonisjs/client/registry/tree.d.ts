@@ -24,7 +24,11 @@ export interface ApiDefinition {
   }
   recipes: {
     index: typeof routes['recipes.index']
+    create: typeof routes['recipes.create']
+    store: typeof routes['recipes.store']
     show: typeof routes['recipes.show']
+    edit: typeof routes['recipes.edit']
+    update: typeof routes['recipes.update']
     destroy: typeof routes['recipes.destroy']
   }
   oauth: {

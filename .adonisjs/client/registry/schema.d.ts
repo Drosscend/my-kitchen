@@ -203,6 +203,32 @@ export interface Registry {
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/recipes/controllers/recipe_library_controller').default['render']>>>
     }
   }
+  'recipes.create': {
+    methods: ["GET","HEAD"]
+    pattern: '/recipes/new'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/recipes/controllers/new_recipe_controller').default['render']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/recipes/controllers/new_recipe_controller').default['render']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/recipes/controllers/new_recipe_controller').default['render']>>>
+    }
+  }
+  'recipes.store': {
+    methods: ["POST"]
+    pattern: '/recipes'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/recipes/validators').recipeValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#app/recipes/validators').recipeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/recipes/controllers/add_recipe_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/recipes/controllers/add_recipe_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/recipes/controllers/add_recipe_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'recipes.show': {
     methods: ["GET","HEAD"]
     pattern: '/recipes/:id'
@@ -214,6 +240,32 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#app/recipes/controllers/recipe_controller').default['render']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/recipes/controllers/recipe_controller').default['render']>>>
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/recipes/controllers/recipe_controller').default['render']>>>
+    }
+  }
+  'recipes.edit': {
+    methods: ["GET","HEAD"]
+    pattern: '/recipes/:id/edit'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/recipes/controllers/edit_recipe_controller').default['render']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/recipes/controllers/edit_recipe_controller').default['render']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/recipes/controllers/edit_recipe_controller').default['render']>>>
+    }
+  }
+  'recipes.update': {
+    methods: ["PUT"]
+    pattern: '/recipes/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/recipes/validators').recipeValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#app/recipes/validators').recipeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/recipes/controllers/update_recipe_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/recipes/controllers/update_recipe_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/recipes/controllers/update_recipe_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'recipes.destroy': {
@@ -506,13 +558,13 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/recipes/:id/cook'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#app/cooking/controllers/start_cooking_session_controller').default)['validator']>>
+      body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#app/cooking/controllers/start_cooking_session_controller').default)['validator']>>
+      query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#app/cooking/controllers/start_cooking_session_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/cooking/controllers/start_cooking_session_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
-      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/cooking/controllers/start_cooking_session_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/cooking/controllers/start_cooking_session_controller').default['execute']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/cooking/controllers/start_cooking_session_controller').default['execute']>>>
     }
   }
   'cooking.join': {

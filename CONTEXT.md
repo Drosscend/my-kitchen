@@ -45,7 +45,7 @@ A fresh ingredient of a perishable category. Freezing suspends perishability.
 A document owned by a user: title, description, base servings, notes, ingredients and steps.
 
 **Ref**:
-The short key of a recipe ingredient or step, chosen by whoever wrote the recipe. A step mentions an ingredient as `{ref}` and its own timer as `{timer}`; timers of a cooking session are tracked under the step ref.
+The short key of a recipe ingredient or step, chosen by the assistant or derived from the ingredient name by the recipe editor, and kept when the ingredient is renamed. A step mentions an ingredient as `{ref}` and its own timer as `{timer}`; timers of a cooking session are tracked under the step ref.
 
 **Recipe document**:
 The JSON shape assistants send to the MCP tools: snake_case keys, `id` as the ref.

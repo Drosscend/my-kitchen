@@ -98,11 +98,35 @@ const routes = {
     tokens: [[0,"recipes"]],
     types: placeholder as Registry['recipes.index']['types'],
   },
+  'recipes.create': {
+    methods: ["GET","HEAD"],
+    pattern: '/recipes/new',
+    tokens: [[0,"recipes"],[0,"new"]],
+    types: placeholder as Registry['recipes.create']['types'],
+  },
+  'recipes.store': {
+    methods: ["POST"],
+    pattern: '/recipes',
+    tokens: [[0,"recipes"]],
+    types: placeholder as Registry['recipes.store']['types'],
+  },
   'recipes.show': {
     methods: ["GET","HEAD"],
     pattern: '/recipes/:id',
     tokens: [[0,"recipes"],[1,"id"]],
     types: placeholder as Registry['recipes.show']['types'],
+  },
+  'recipes.edit': {
+    methods: ["GET","HEAD"],
+    pattern: '/recipes/:id/edit',
+    tokens: [[0,"recipes"],[1,"id"],[0,"edit"]],
+    types: placeholder as Registry['recipes.edit']['types'],
+  },
+  'recipes.update': {
+    methods: ["PUT"],
+    pattern: '/recipes/:id',
+    tokens: [[0,"recipes"],[1,"id"]],
+    types: placeholder as Registry['recipes.update']['types'],
   },
   'recipes.destroy': {
     methods: ["DELETE"],

@@ -5,7 +5,7 @@ Kitchen inventory, recipe library, shared cooking mode and an MCP server for ass
 ## Features
 
 - Pantry with categories, units, fresh or frozen state, batches with their own expiry date, low stock and expiry alerts, Markdown copy for assistants.
-- Recipe library filled by assistants through MCP, with servings scaling and a unit converter.
+- Recipe library written in the app or by assistants through MCP, with ingredient mentions in the steps, timers and a unit converter.
 - Cooking mode step by step with synced timers, shared with any phone through a QR code or a six digit code.
 - Accounts with confirmed e-mail addresses and password reset by mail.
 - MCP endpoint at `/mcp` exposing the pantry and the recipes as tools, authorized through the embedded OAuth server.

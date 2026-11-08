@@ -19,7 +19,11 @@ export type ScannedRoutes = {
     'inventory.batches.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'batchId': ParamValue} }
     'inventory.batches.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'batchId': ParamValue} }
     'recipes.index': { paramsTuple?: []; params?: {} }
+    'recipes.create': { paramsTuple?: []; params?: {} }
+    'recipes.store': { paramsTuple?: []; params?: {} }
     'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recipes.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recipes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'oauth.authorization.approve': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
@@ -54,6 +58,7 @@ export type ScannedRoutes = {
     'inventory.store': { paramsTuple?: []; params?: {} }
     'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.batches.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recipes.store': { paramsTuple?: []; params?: {} }
     'oauth.authorization.approve': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'oauth.authorization.deny': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'new_account.store': { paramsTuple?: []; params?: {} }
@@ -77,7 +82,9 @@ export type ScannedRoutes = {
     'inventory.index': { paramsTuple?: []; params?: {} }
     'inventory.markdown': { paramsTuple?: []; params?: {} }
     'recipes.index': { paramsTuple?: []; params?: {} }
+    'recipes.create': { paramsTuple?: []; params?: {} }
     'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recipes.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -106,7 +113,9 @@ export type ScannedRoutes = {
     'inventory.index': { paramsTuple?: []; params?: {} }
     'inventory.markdown': { paramsTuple?: []; params?: {} }
     'recipes.index': { paramsTuple?: []; params?: {} }
+    'recipes.create': { paramsTuple?: []; params?: {} }
     'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recipes.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -123,6 +132,9 @@ export type ScannedRoutes = {
     'inventory.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.batches.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'batchId': ParamValue} }
     'cooking.state.update': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+  }
+  PUT: {
+    'recipes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

@@ -1,16 +1,15 @@
-import { Link, useRouter } from '@adonisjs/inertia/react'
+import { Link } from '@adonisjs/inertia/react'
 import {
   BookOpenIcon,
   CarrotIcon,
+  PlusIcon,
   SearchIcon,
   SearchXIcon,
   TimerIcon,
-  Trash2Icon,
   UsersIcon,
 } from 'lucide-react'
-import { ConfirmDeleteDialog } from '~/components/confirm_delete_dialog'
 import { Button } from '~/components/ui/button'
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '~/components/ui/empty'
+import { Empty, EmptyContent, EmptyHeader, EmptyMedia, EmptyTitle } from '~/components/ui/empty'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '~/components/ui/input-group'
 import { type CatalogOption } from '~/inventory/catalog'
 import { CatalogSelect } from '~/inventory/catalog_select'
@@ -31,23 +30,6 @@ const MAGNETS: Swatch[] = ['tomato', 'sage', 'cornflower', 'mustard', 'cinnamon'
 
 function magnetFor(id: string) {
   return MAGNETS[[...id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % MAGNETS.length]
-}
-
-export function DeleteRecipeDialog({ id, title }: { id: string; title: string }) {
-  const router = useRouter()
-
-  return (
-    <ConfirmDeleteDialog
-      title="Supprimer la recette ?"
-      description={`« ${title} » disparaît définitivement de la bibliothèque.`}
-      onConfirm={() => router.visit({ route: 'recipes.destroy', routeParams: { id } })}
-      trigger={
-        <Button variant="ghost" size="icon" aria-label={`Supprimer ${title}`}>
-          <Trash2Icon className="text-muted-foreground" />
-        </Button>
-      }
-    />
-  )
 }
 
 function RecipeCard({ recipe, magnet }: { recipe: RecipeSummary; magnet: Swatch }) {
@@ -105,8 +87,13 @@ export function RecipeLibrary({ recipes }: { recipes: RecipeSummary[] }) {
             <BookOpenIcon />
           </EmptyMedia>
           <EmptyTitle>Aucune recette</EmptyTitle>
-          <EmptyDescription>Ton assistant les ajoute depuis le serveur MCP.</EmptyDescription>
         </EmptyHeader>
+        <EmptyContent>
+          <Button nativeButton={false} render={<Link route="recipes.create" />}>
+            <PlusIcon data-icon="inline-start" />
+            Créer une recette
+          </Button>
+        </EmptyContent>
       </Empty>
     )
   }

@@ -24,6 +24,8 @@ declare module '@adonisjs/inertia/types' {
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.tsx'))['default']>
     'inventory/index': ExtractProps<(typeof import('../../inertia/pages/inventory/index.tsx'))['default']>
     'oauth/authorize': ExtractProps<(typeof import('../../inertia/pages/oauth/authorize.tsx'))['default']>
+    'recipes/create': ExtractProps<(typeof import('../../inertia/pages/recipes/create.tsx'))['default']>
+    'recipes/edit': ExtractProps<(typeof import('../../inertia/pages/recipes/edit.tsx'))['default']>
     'recipes/index': ExtractProps<(typeof import('../../inertia/pages/recipes/index.tsx'))['default']>
     'recipes/show': ExtractProps<(typeof import('../../inertia/pages/recipes/show.tsx'))['default']>
   }

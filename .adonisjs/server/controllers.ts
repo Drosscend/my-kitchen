@@ -46,9 +46,13 @@ export const controllers = {
     DenyClient: () => import('#app/oauth/controllers/deny_client_controller'),
   },
   recipes: {
+    AddRecipe: () => import('#app/recipes/controllers/add_recipe_controller'),
     DeleteRecipe: () => import('#app/recipes/controllers/delete_recipe_controller'),
+    EditRecipe: () => import('#app/recipes/controllers/edit_recipe_controller'),
+    NewRecipe: () => import('#app/recipes/controllers/new_recipe_controller'),
     Recipe: () => import('#app/recipes/controllers/recipe_controller'),
     RecipeLibrary: () => import('#app/recipes/controllers/recipe_library_controller'),
+    UpdateRecipe: () => import('#app/recipes/controllers/update_recipe_controller'),
   },
   shared: {
     HealthChecks: () => import('#app/shared/controllers/health_checks_controller'),
