@@ -82,12 +82,22 @@ export default class DbSeed extends BaseCommand {
       }
     }
 
-    for (const content of SEED_RECIPES) {
+    for (const [index, content] of SEED_RECIPES.entries()) {
       const added = await addRecipe.execute({ userId, content })
 
       if (!added.ok) {
         throw new Error(`Invalid seed recipe ${content.title}`)
       }
+
+      const createdAt = new Date(Date.now() - index * 5 * DAY_IN_MILLISECONDS)
+      await db
+        .updateTable('recipes')
+        .set({
+          created_at: createdAt,
+          updated_at: new Date(createdAt.getTime() + (index % 3) * DAY_IN_MILLISECONDS),
+        })
+        .where('id', '=', added.value.id)
+        .execute()
     }
 
     this.logger.success(
