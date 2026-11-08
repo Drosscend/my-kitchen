@@ -9,7 +9,7 @@ export interface SeedBatch {
   inDays: number | null
 }
 
-export interface SeedIngredient {
+interface SeedIngredient {
   name: string
   category: IngredientCategory
   unit: IngredientUnit

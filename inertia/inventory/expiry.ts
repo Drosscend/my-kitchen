@@ -2,7 +2,7 @@ import { type Batch } from '~/inventory/catalog'
 
 const dateFormat = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' })
 
-export function formatExpiryDate(expiresOn: string) {
+function formatExpiryDate(expiresOn: string) {
   return dateFormat.format(new Date(`${expiresOn}T12:00:00`))
 }
 
