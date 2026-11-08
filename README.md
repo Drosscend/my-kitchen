@@ -55,6 +55,12 @@ Create a user with an already confirmed address from the command line:
 node ace create:user --name='Ada' --email='ada@example.com' --password='a-secure-password'
 ```
 
+Then replace its pantry and recipes with about a hundred sample ingredients and sixteen recipes (disabled in production):
+
+```bash
+npm run db:seed -- --email=ada@example.com
+```
+
 ## MCP
 
 Add `https://<domain>/mcp` as a server in the client, without any header: it discovers the OAuth server from the endpoint, opens the consent page in the browser and keeps its tokens itself.

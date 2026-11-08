@@ -18,6 +18,7 @@ Les règles du dépôt sont dans [AGENTS.md](AGENTS.md), l'architecture dans [do
 docker compose up -d      # Postgres 17 et Mailpit (http://localhost:8025)
 npm run dev               # http://localhost:3333
 npm run db:migrate        # migrations Kysely
+npm run db:seed -- --email=<e-mail>  # remplace inventaire et recettes par des données d’exemple
 npm run db:codegen        # régénère types/db.ts depuis la base
 npm run lint && npm run format && npm run typecheck && npm test
 ```

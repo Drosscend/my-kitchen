@@ -17,6 +17,7 @@
     "db:migrate": "node ace migrate",
     "db:fresh": "node ace migrate:fresh",
     "db:rollback": "node ace migrate:rollback",
+    "db:seed": "node ace db:seed",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --check .",
@@ -33,7 +34,8 @@
     "#types/*": "./types/*.js",
     "#tests/*": "./tests/*.js",
     "#start/*": "./start/*.js",
-    "#config/*": "./config/*.js"
+    "#config/*": "./config/*.js",
+    "#database/*": "./database/*.js"
   },
   "dependencies": {
     "@adonisjs/auth": "^10.1.0",
