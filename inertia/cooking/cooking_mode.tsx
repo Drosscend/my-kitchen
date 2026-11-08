@@ -15,7 +15,6 @@ import { type Recipe } from '~/recipes/types'
 
 interface CookingModeProps {
   recipe: Recipe
-  scale: number
   currentStepIndex: number
   activeTimers: ActiveTimers
   onPrevStep: () => void
@@ -31,7 +30,6 @@ interface CookingModeProps {
 
 export function CookingMode({
   recipe,
-  scale,
   currentStepIndex,
   activeTimers,
   onPrevStep,
@@ -96,7 +94,7 @@ export function CookingMode({
                 <ul className="divide-y divide-ruling text-xl sm:text-2xl lg:text-3xl">
                   {recipe.ingredients.map((ingredient) => (
                     <li key={ingredient.ref} className="py-3 sm:py-4">
-                      {formatIngredient(ingredient, scale)}
+                      {formatIngredient(ingredient)}
                     </li>
                   ))}
                 </ul>
@@ -107,7 +105,7 @@ export function CookingMode({
                   <h2 className="mb-6 text-3xl sm:text-4xl lg:text-5xl">{currentStep.title}</h2>
                 )}
                 <p className="text-2xl leading-snug text-pretty sm:text-3xl sm:leading-snug lg:text-4xl lg:leading-snug">
-                  {resolveStep(currentStep, ingredients, scale)}
+                  {resolveStep(currentStep, ingredients)}
                 </p>
               </>
             ) : null}

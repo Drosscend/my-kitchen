@@ -3,14 +3,13 @@ import { CookingPotIcon } from 'lucide-react'
 import { useState } from 'react'
 import { CopyButton } from '~/components/copy_button'
 import { Button } from '~/components/ui/button'
+import { plural } from '~/plural'
 import { formatAmount, formatRecipeText, ingredientsByRef } from '~/recipes/format'
 import { NotesRenderer } from '~/recipes/notes_renderer'
 import { RecipeStepDisplay } from '~/recipes/recipe_step'
-import { ServingsControl } from '~/recipes/servings_control'
 import { type Recipe } from '~/recipes/types'
 
 export function RecipeDetail({ recipe }: { recipe: Recipe }) {
-  const [scale, setScale] = useState(1)
   const [completed, setCompleted] = useState<string[]>([])
   const ingredients = ingredientsByRef(recipe.ingredients)
 
@@ -33,21 +32,14 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
           {recipe.steps.length > 0 && (
             <Form route="cooking.start" routeParams={{ id: recipe.id }}>
               {({ processing }) => (
-                <>
-                  <input type="hidden" name="scale" value={scale} />
-                  <Button type="submit" size="lg" disabled={processing}>
-                    <CookingPotIcon data-icon="inline-start" />
-                    Cuisiner
-                  </Button>
-                </>
+                <Button type="submit" size="lg" disabled={processing}>
+                  <CookingPotIcon data-icon="inline-start" />
+                  Cuisiner
+                </Button>
               )}
             </Form>
           )}
-          <CopyButton
-            text={() => formatRecipeText(recipe, scale)}
-            label="Copier la recette"
-            size="lg"
-          />
+          <CopyButton text={() => formatRecipeText(recipe)} label="Copier la recette" size="lg" />
         </div>
       </header>
 
@@ -56,11 +48,9 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
           <section className="rounded-xl bg-card px-5 pt-5 pb-2 mb-2.5 paper-stack">
             <div className="mb-4 flex items-center justify-between gap-4">
               <h2 className="text-xl">Ingrédients</h2>
-              <ServingsControl
-                scale={scale}
-                baseServings={recipe.baseServings}
-                onScaleChange={setScale}
-              />
+              <span className="text-muted-foreground tabular-nums">
+                {plural(recipe.baseServings, 'portion')}
+              </span>
             </div>
             {recipe.ingredients.length > 0 && (
               <ul className="divide-y divide-ruling">
@@ -72,7 +62,7 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
                     <span>{ingredient.name}</span>
                     {ingredient.amount !== null && (
                       <span className="shrink-0 text-muted-foreground tabular-nums">
-                        {formatAmount(ingredient.amount * scale)} {ingredient.unit}
+                        {formatAmount(ingredient.amount)} {ingredient.unit}
                       </span>
                     )}
                   </li>
@@ -95,7 +85,6 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
                     completed={completed.includes(step.ref)}
                     onToggle={toggleStep}
                     ingredients={ingredients}
-                    scale={scale}
                   />
                 ))}
               </ol>

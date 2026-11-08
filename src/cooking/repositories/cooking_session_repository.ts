@@ -10,7 +10,6 @@ interface CreateSessionPayload {
   code: string
   userId: UserIdentifier
   recipe: RecipeView
-  scale: number
   state: CookingSessionState
   expiresAt: Date
 }
@@ -40,7 +39,6 @@ export class CookingSessionRepository {
           code: payload.code,
           user_id: payload.userId.toString(),
           recipe: sql`${payload.recipe}::jsonb`,
-          scale: payload.scale,
           state: sql`${payload.state}::jsonb`,
           expires_at: payload.expiresAt,
         })
@@ -94,7 +92,6 @@ export class CookingSessionRepository {
       .selectFrom('cooking_sessions')
       .select((eb) => [
         'code',
-        'scale',
         'updated_at',
         // Both columns are written by this repository from the typed values.
         eb.ref('recipe').$castTo<RecipeView>().as('recipe'),
@@ -112,7 +109,6 @@ export class CookingSessionRepository {
     return {
       code: record.code,
       recipe: record.recipe,
-      scale: record.scale,
       state: record.state,
       updatedAt: record.updated_at,
     }

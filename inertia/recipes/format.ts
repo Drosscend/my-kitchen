@@ -58,9 +58,9 @@ export function formatTimer(seconds: number) {
   return `${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`
 }
 
-export function formatIngredient(ingredient: RecipeIngredient, scale: number) {
+export function formatIngredient(ingredient: RecipeIngredient) {
   return [
-    ingredient.amount === null ? '' : formatAmount(ingredient.amount * scale),
+    ingredient.amount === null ? '' : formatAmount(ingredient.amount),
     ingredient.unit ?? '',
     ingredient.name,
   ]
@@ -120,11 +120,7 @@ export function splitStep(
   return parts
 }
 
-export function resolveStep(
-  step: RecipeStep,
-  ingredients: Map<string, RecipeIngredient>,
-  scale: number
-) {
+export function resolveStep(step: RecipeStep, ingredients: Map<string, RecipeIngredient>) {
   return splitStep(step, ingredients, { appendTimer: false })
     .map((part) => {
       switch (part.kind) {
@@ -133,13 +129,13 @@ export function resolveStep(
         case 'timer':
           return formatDuration(part.seconds)
         case 'ingredient':
-          return formatIngredient(part.ingredient, scale)
+          return formatIngredient(part.ingredient)
       }
     })
     .join('')
 }
 
-export function formatRecipeText(recipe: Recipe, scale: number) {
+export function formatRecipeText(recipe: Recipe) {
   const ingredients = ingredientsByRef(recipe.ingredients)
   const lines = [recipe.title]
 
@@ -149,9 +145,7 @@ export function formatRecipeText(recipe: Recipe, scale: number) {
 
   if (recipe.ingredients.length > 0) {
     lines.push('', 'INGRÉDIENTS')
-    lines.push(
-      ...recipe.ingredients.map((ingredient) => `• ${formatIngredient(ingredient, scale)}`)
-    )
+    lines.push(...recipe.ingredients.map((ingredient) => `• ${formatIngredient(ingredient)}`))
   }
 
   if (recipe.steps.length > 0) {
@@ -159,7 +153,7 @@ export function formatRecipeText(recipe: Recipe, scale: number) {
     lines.push(
       ...recipe.steps.map(
         (step, index) =>
-          `${index + 1}. ${step.title ? `${step.title} : ` : ''}${resolveStep(step, ingredients, scale)}`
+          `${index + 1}. ${step.title ? `${step.title} : ` : ''}${resolveStep(step, ingredients)}`
       )
     )
   }

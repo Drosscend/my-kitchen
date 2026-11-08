@@ -27,7 +27,6 @@ export type CookingSessionUpdate = Partial<CookingSessionState>
 export interface CookingSession {
   code: string
   recipe: RecipeView
-  scale: number
   state: CookingSessionState
   updatedAt: Date
 }

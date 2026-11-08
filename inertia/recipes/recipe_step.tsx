@@ -9,7 +9,6 @@ interface RecipeStepProps {
   completed: boolean
   onToggle: (ref: string) => void
   ingredients: Map<string, RecipeIngredient>
-  scale: number
 }
 
 export function RecipeStepDisplay({
@@ -18,7 +17,6 @@ export function RecipeStepDisplay({
   completed,
   onToggle,
   ingredients,
-  scale,
 }: RecipeStepProps) {
   const parts = splitStep(step, ingredients, { appendTimer: true })
 
@@ -53,7 +51,7 @@ export function RecipeStepDisplay({
           if (part.kind === 'ingredient') {
             return (
               <span key={key} className="highlight px-0.5 font-semibold">
-                {formatIngredient(part.ingredient, scale)}
+                {formatIngredient(part.ingredient)}
               </span>
             )
           }

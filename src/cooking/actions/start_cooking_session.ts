@@ -13,7 +13,6 @@ import type { RecipeNotFoundError } from '#recipes/domain/recipe'
 export interface StartCookingSessionParams {
   userId: UserIdentifier
   recipeId: string
-  scale: number
 }
 
 export interface CodeExhaustedError {
@@ -50,7 +49,6 @@ export class StartCookingSession {
         code,
         userId: params.userId,
         recipe,
-        scale: params.scale,
         state: INITIAL_STATE,
         expiresAt: new Date(now.getTime() + COOKING_SESSION_TTL_MS),
       })

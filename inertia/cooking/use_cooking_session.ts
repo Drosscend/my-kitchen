@@ -233,7 +233,6 @@ export function useCookingSession(initial: CookingSessionPayload) {
 
   return {
     recipe: session.recipe,
-    scale: session.scale,
     closed: session.state.closed,
     expired,
     currentStepIndex: session.state.currentStepIndex,

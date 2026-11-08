@@ -10,7 +10,6 @@ export default class CookingSessionTransformer extends BaseTransformer<CookingSe
     return {
       code: this.resource.code,
       recipe: this.resource.recipe,
-      scale: this.resource.scale,
       state: { ...this.resource.state, updatedAt: this.resource.updatedAt.getTime() },
       serverNow: Date.now(),
     }

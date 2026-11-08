@@ -39,7 +39,6 @@ export default function CookingSession({ session: initial, user }: PageProps) {
       ) : (
         <CookingMode
           recipe={session.recipe}
-          scale={session.scale}
           currentStepIndex={session.currentStepIndex}
           activeTimers={session.activeTimers}
           onPrevStep={session.prevStep}

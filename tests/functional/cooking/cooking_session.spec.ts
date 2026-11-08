@@ -14,7 +14,6 @@ async function startSession(client: ApiClient, user: User) {
     .post(`/recipes/${recipe.id}/cook`)
     .loginAs(user)
     .withCsrfToken()
-    .form({ scale: 2 })
     .redirects(0)
   const code = String(response.header('location')).replace('/cook/', '')
 
@@ -40,13 +39,12 @@ test.group('Cooking sessions', (group) => {
     page.assertInertiaPropsContains({
       session: {
         code,
-        scale: 2,
         recipe: { title: 'Pain maison' },
         state: { currentStepIndex: -1 },
       },
     })
     state.assertStatus(200)
-    state.assertBodyContains({ code, scale: 2, state: { closed: false } })
+    state.assertBodyContains({ code, state: { closed: false } })
   })
 
   test('only starts sessions on recipes of the account', async ({ client }) => {

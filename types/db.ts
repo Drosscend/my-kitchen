@@ -27,7 +27,6 @@ export interface CookingSessions {
   code: string;
   expires_at: Timestamp;
   recipe: Json;
-  scale: number;
   state: Json;
   updated_at: Generated<Timestamp>;
   user_id: string;
