@@ -35,14 +35,15 @@ export class VerifyEmail {
       }
 
       const userId = UserIdentifier.fromString(token.userId)
-      const user = await this.users.markEmailVerified(userId, email.value, new Date())
+      const owner = await this.users.findUserByEmail(email.value)
 
-      if (!user.ok) {
-        return err(user.error)
+      if (owner && owner.id !== token.userId) {
+        return err({ type: 'email_already_taken' })
       }
 
+      const user = await this.users.markEmailVerified(userId, email.value, new Date())
       await this.tokens.deleteForUser(userId)
-      return ok(user.value)
+      return ok(user)
     })
   }
 }

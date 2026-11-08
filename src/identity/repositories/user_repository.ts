@@ -77,27 +77,16 @@ export class UserRepository {
    * Also stores the verified address, so confirming a link issued for a
    * new address is what makes the change effective.
    */
-  async markEmailVerified(
-    id: UserIdentifier,
-    email: EmailAddress,
-    verifiedAt: Date
-  ): Promise<Result<User, EmailAlreadyTakenError>> {
-    try {
-      const record = await this.transactions
-        .currentDatabase()
-        .updateTable('users')
-        .set({ email: email.toString(), email_verified_at: verifiedAt, updated_at: verifiedAt })
-        .where('id', '=', id.toString())
-        .returning(userColumns)
-        .executeTakeFirstOrThrow()
+  async markEmailVerified(id: UserIdentifier, email: EmailAddress, verifiedAt: Date) {
+    const record = await this.transactions
+      .currentDatabase()
+      .updateTable('users')
+      .set({ email: email.toString(), email_verified_at: verifiedAt, updated_at: verifiedAt })
+      .where('id', '=', id.toString())
+      .returning(userColumns)
+      .executeTakeFirstOrThrow()
 
-      return ok(this.#toDomain(record))
-    } catch (error) {
-      if (this.#isEmailTaken(error)) {
-        return err({ type: 'email_already_taken' })
-      }
-      throw error
-    }
+    return this.#toDomain(record)
   }
 
   async updateName(id: UserIdentifier, name: string | null) {
