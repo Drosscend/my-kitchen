@@ -173,3 +173,13 @@ input[type='number'] {
     inset 0 -2px 0 rgb(41 35 30 / 0.22),
     0 3px 4px -1px rgb(41 35 30 / 0.35);
 }
+
+@utility ruled {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(1.75rem - 1px),
+    var(--color-ruling) calc(1.75rem - 1px),
+    var(--color-ruling) 1.75rem
+  );
+}

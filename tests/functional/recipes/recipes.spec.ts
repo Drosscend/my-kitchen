@@ -18,7 +18,15 @@ test.group('Recipes', (group) => {
 
     library.assertInertiaComponent('recipes/index')
     library.assertInertiaPropsContains({
-      recipes: [{ title: 'Pain maison', ingredientCount: 2, stepCount: 2 }],
+      recipes: [
+        {
+          title: 'Pain maison',
+          baseServings: 2,
+          ingredientNames: ['Farine', 'Eau'],
+          stepCount: 2,
+          timerSeconds: 3600,
+        },
+      ],
     })
     page.assertInertiaPropsContains({
       recipe: {

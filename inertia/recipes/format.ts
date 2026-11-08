@@ -170,3 +170,27 @@ export function formatRecipeText(recipe: Recipe, scale: number) {
 
   return lines.join('\n').trim()
 }
+
+const relativeDays = new Intl.RelativeTimeFormat('fr', { numeric: 'auto' })
+const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000
+
+/**
+ * "aujourd’hui", "hier", "il y a 3 jours", then weeks, months and years.
+ */
+export function formatSince(date: string | Date, now = new Date()) {
+  const days = Math.round((new Date(date).getTime() - now.getTime()) / DAY_IN_MILLISECONDS)
+
+  if (days > -7) {
+    return relativeDays.format(days, 'day')
+  }
+
+  if (days > -30) {
+    return relativeDays.format(Math.round(days / 7), 'week')
+  }
+
+  if (days > -365) {
+    return relativeDays.format(Math.round(days / 30), 'month')
+  }
+
+  return relativeDays.format(Math.round(days / 365), 'year')
+}

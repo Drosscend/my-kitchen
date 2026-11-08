@@ -3,6 +3,16 @@ import type { RecipeSummary } from '#recipes/queries/recipe_library_query'
 
 export default class RecipeSummaryTransformer extends BaseTransformer<RecipeSummary> {
   toObject() {
-    return this.pick(this.resource, ['id', 'title', 'description', 'ingredientCount', 'stepCount'])
+    return this.pick(this.resource, [
+      'id',
+      'title',
+      'description',
+      'baseServings',
+      'ingredientNames',
+      'stepCount',
+      'timerSeconds',
+      'createdAt',
+      'updatedAt',
+    ])
   }
 }

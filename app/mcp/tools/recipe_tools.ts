@@ -139,7 +139,18 @@ export async function registerRecipeTools(server: McpServer, userId: UserIdentif
       }),
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
-    async () => toolResult({ recipes: await library.execute(userId) })
+    async () => {
+      const recipes = await library.execute(userId)
+      return toolResult({
+        recipes: recipes.map((recipe) => ({
+          id: recipe.id,
+          title: recipe.title,
+          description: recipe.description,
+          ingredientCount: recipe.ingredientNames.length,
+          stepCount: recipe.stepCount,
+        })),
+      })
+    }
   )
 
   server.registerTool(
