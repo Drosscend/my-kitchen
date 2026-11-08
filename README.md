@@ -12,7 +12,7 @@ Kitchen inventory, recipe library, shared cooking mode and an MCP server for ass
 
 ## Requirements
 
-- Node.js 24 or newer;
+- Node.js 26 or newer;
 - Docker with Docker Compose.
 
 ## Installation
