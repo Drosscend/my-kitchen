@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import { today } from '#inventory/domain/expiry'
 import { authorize } from '#tests/helpers/oauth'
 import { addRecipe, BREAD, storedRecipes } from '#tests/helpers/recipes'
 import { resetState } from '#tests/helpers/state'
@@ -154,6 +155,8 @@ test.group('MCP', (group) => {
       'list_ingredients',
       'add_ingredient',
       'update_ingredient',
+      'add_ingredient_batch',
+      'update_ingredient_batch',
       'consume_ingredients',
       'remove_ingredient',
       'list_recipes',
@@ -219,6 +222,38 @@ test.group('MCP', (group) => {
 
     assert.equal(errorText(consumed), 'Ingrédient introuvable : nope')
     assert.containsSubset(structured(listed), { ingredients: [{ id, quantity: 500 }] })
+  })
+
+  test('restocks with dated batches and lists what expires soon', async ({ client, assert }) => {
+    const ada = await createUser('ada@example.com')
+    const token = await issueToken(client, ada)
+    const tomorrow = new Date(Date.parse(today()) + 86_400_000).toISOString().slice(0, 10)
+    const milk = await rpc(client, token, 'tools/call', {
+      name: 'add_ingredient',
+      arguments: { name: 'Lait', quantity: 1, unit: 'L', category: 'dairy' },
+    })
+    await rpc(client, token, 'tools/call', { name: 'add_ingredient', arguments: FLOUR })
+    const id = structured<{ ingredient: { id: string } }>(milk).ingredient.id
+
+    const restocked = await rpc(client, token, 'tools/call', {
+      name: 'add_ingredient_batch',
+      arguments: { id, quantity: 2, expiresOn: tomorrow },
+    })
+    const expiring = await rpc(client, token, 'tools/call', {
+      name: 'list_ingredients',
+      arguments: { expiringWithinDays: 3 },
+    })
+
+    assert.containsSubset(structured(restocked), {
+      ingredient: {
+        quantity: 3,
+        batches: [{ quantity: 2, expiresOn: tomorrow, expiryKind: 'use_by' }],
+      },
+    })
+    assert.containsSubset(structured(expiring), {
+      ingredients: [{ id, expiryStatus: 'soon', expiresOn: tomorrow, daysLeft: 1 }],
+    })
+    assert.lengthOf(structured<{ ingredients: object[] }>(expiring).ingredients, 1)
   })
 
   test('adds, reads, replaces and deletes recipes as documents', async ({ client, assert }) => {

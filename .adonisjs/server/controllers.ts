@@ -27,11 +27,14 @@ export const controllers = {
     VerifyEmail: () => import('#app/identity/controllers/verify_email_controller'),
   },
   inventory: {
+    AddIngredientBatch: () => import('#app/inventory/controllers/add_ingredient_batch_controller'),
     AddIngredient: () => import('#app/inventory/controllers/add_ingredient_controller'),
     AdjustIngredientQuantity: () => import('#app/inventory/controllers/adjust_ingredient_quantity_controller'),
     Inventory: () => import('#app/inventory/controllers/inventory_controller'),
     InventoryMarkdown: () => import('#app/inventory/controllers/inventory_markdown_controller'),
+    RemoveIngredientBatch: () => import('#app/inventory/controllers/remove_ingredient_batch_controller'),
     RemoveIngredient: () => import('#app/inventory/controllers/remove_ingredient_controller'),
+    UpdateIngredientBatch: () => import('#app/inventory/controllers/update_ingredient_batch_controller'),
     UpdateIngredient: () => import('#app/inventory/controllers/update_ingredient_controller'),
   },
   mcp: {

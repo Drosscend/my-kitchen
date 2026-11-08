@@ -9,6 +9,12 @@ const AdjustIngredientQuantityController = () =>
   import('#app/inventory/controllers/adjust_ingredient_quantity_controller')
 const RemoveIngredientController = () =>
   import('#app/inventory/controllers/remove_ingredient_controller')
+const AddIngredientBatchController = () =>
+  import('#app/inventory/controllers/add_ingredient_batch_controller')
+const UpdateIngredientBatchController = () =>
+  import('#app/inventory/controllers/update_ingredient_batch_controller')
+const RemoveIngredientBatchController = () =>
+  import('#app/inventory/controllers/remove_ingredient_batch_controller')
 const InventoryMarkdownController = () =>
   import('#app/inventory/controllers/inventory_markdown_controller')
 
@@ -24,5 +30,14 @@ router
       .post('inventory/:id/adjust', [AdjustIngredientQuantityController, 'execute'])
       .as('inventory.adjust')
     router.delete('inventory/:id', [RemoveIngredientController, 'execute']).as('inventory.destroy')
+    router
+      .post('inventory/:id/batches', [AddIngredientBatchController, 'execute'])
+      .as('inventory.batches.store')
+    router
+      .patch('inventory/:id/batches/:batchId', [UpdateIngredientBatchController, 'execute'])
+      .as('inventory.batches.update')
+    router
+      .delete('inventory/:id/batches/:batchId', [RemoveIngredientBatchController, 'execute'])
+      .as('inventory.batches.destroy')
   })
   .use([middleware.auth(), middleware.verified()])

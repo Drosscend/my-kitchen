@@ -15,6 +15,10 @@ export default class IngredientTransformer extends BaseTransformer<IngredientVie
       'stateLabel',
       'lowStock',
       'perishable',
+      'batches',
+      'expiryStatus',
+      'expiresOn',
+      'daysLeft',
       'updatedAt',
     ])
   }

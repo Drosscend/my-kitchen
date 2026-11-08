@@ -1,6 +1,16 @@
 import { INGREDIENT_STATE_VALUES, INGREDIENT_STATES } from '#inventory/domain/catalog'
 import type { IngredientView } from '#inventory/queries/inventory_query'
 
+/**
+ * Dated batches only, in consumption order: the rest of the stock has no date.
+ */
+function expiries(item: IngredientView) {
+  return item.batches
+    .filter((batch) => batch.expiresOn !== null)
+    .map((batch) => `, ${batch.expiryKindLabel} ${batch.expiresOn} : ${batch.quantity}`)
+    .join('')
+}
+
 function section(items: IngredientView[], title: string) {
   const byCategory = new Map<string, IngredientView[]>()
 
@@ -15,7 +25,7 @@ function section(items: IngredientView[], title: string) {
 
     for (const item of categoryItems) {
       const perishable = item.perishable ? ' (périssable)' : ''
-      lines.push(`- ${item.name}: ${item.quantity} ${item.unitLabel}${perishable}`)
+      lines.push(`- ${item.name}: ${item.quantity} ${item.unitLabel}${perishable}${expiries(item)}`)
     }
   }
 

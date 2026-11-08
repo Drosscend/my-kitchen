@@ -12,13 +12,15 @@ import {
 import { type Data } from '@generated/data'
 
 export type Ingredient = Data.Inventory.Ingredient
+export type Batch = Ingredient['batches'][number]
 
 export type CatalogOption = { value: string; label: string }
 
 export type Catalog = {
-  categories: CatalogOption[]
+  categories: (CatalogOption & { defaultExpiryKind: string })[]
   units: CatalogOption[]
   states: CatalogOption[]
+  expiryKinds: CatalogOption[]
 }
 
 export const CATEGORY_ICONS = {

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { type Ingredient } from '~/inventory/catalog'
+import { isExpiringSoon } from '~/inventory/expiry'
 
 export interface InventoryFilters {
   search: string
@@ -7,9 +8,10 @@ export interface InventoryFilters {
   state: string
   lowStockOnly: boolean
   perishableOnly: boolean
+  expiringOnly: boolean
 }
 
-export type SortField = 'name' | 'quantity' | 'category' | 'updatedAt'
+export type SortField = 'name' | 'quantity' | 'category' | 'expiry' | 'updatedAt'
 
 export interface InventorySort {
   field: SortField
@@ -22,6 +24,7 @@ const DEFAULT_FILTERS: InventoryFilters = {
   state: 'all',
   lowStockOnly: false,
   perishableOnly: false,
+  expiringOnly: false,
 }
 
 const DEFAULT_SORT: InventorySort = { field: 'name', direction: 'asc' }
@@ -34,6 +37,11 @@ function compare(a: Ingredient, b: Ingredient, field: SortField) {
       return a.quantity - b.quantity
     case 'category':
       return a.categoryLabel.localeCompare(b.categoryLabel, 'fr')
+    case 'expiry':
+      if (a.expiresOn === null || b.expiresOn === null) {
+        return Number(a.expiresOn === null) - Number(b.expiresOn === null)
+      }
+      return a.expiresOn.localeCompare(b.expiresOn)
     case 'updatedAt':
       return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
   }
@@ -50,6 +58,7 @@ export function useInventoryFilter(ingredients: Ingredient[]) {
     .filter((ingredient) => filters.state === 'all' || ingredient.state === filters.state)
     .filter((ingredient) => !filters.lowStockOnly || ingredient.lowStock)
     .filter((ingredient) => !filters.perishableOnly || ingredient.perishable)
+    .filter((ingredient) => !filters.expiringOnly || isExpiringSoon(ingredient.expiryStatus))
     .sort((a, b) => (sort.direction === 'asc' ? 1 : -1) * compare(a, b, sort.field))
 
   function updateFilters(changes: Partial<InventoryFilters>) {

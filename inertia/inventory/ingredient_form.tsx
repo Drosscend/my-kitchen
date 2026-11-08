@@ -14,9 +14,26 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
   const [unit, setUnit] = useState(DEFAULTS.unit)
   const [category, setCategory] = useState(DEFAULTS.category)
   const [state, setState] = useState(DEFAULTS.state)
+  const [expiryKind, setExpiryKind] = useState(defaultExpiryKind(DEFAULTS.category))
+
+  function defaultExpiryKind(value: string) {
+    return (
+      catalog.categories.find((option) => option.value === value)?.defaultExpiryKind ?? 'use_by'
+    )
+  }
+
+  function changeCategory(value: string) {
+    setCategory(value)
+    setExpiryKind(defaultExpiryKind(value))
+  }
 
   return (
-    <Form route="inventory.store" onSuccess={() => setName('')} className="space-y-3">
+    <Form
+      route="inventory.store"
+      onSuccess={() => setName('')}
+      resetOnSuccess={['expiresOn']}
+      className="space-y-3"
+    >
       {({ errors, processing }) => (
         <>
           <Field data-invalid={Boolean(errors.name)}>
@@ -68,9 +85,33 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
               name="category"
               options={catalog.categories}
               value={category}
-              onValueChange={setCategory}
+              onValueChange={changeCategory}
             />
           </Field>
+
+          <div className="grid grid-cols-[minmax(0,1fr)_6rem] gap-3">
+            <Field data-invalid={Boolean(errors.expiresOn)}>
+              <FieldLabel htmlFor="new-expires-on">Péremption</FieldLabel>
+              <Input
+                id="new-expires-on"
+                name="expiresOn"
+                type="date"
+                aria-invalid={Boolean(errors.expiresOn)}
+              />
+              {errors.expiresOn && <FieldError>{errors.expiresOn}</FieldError>}
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="new-expiry-kind">Type</FieldLabel>
+              <CatalogSelect
+                id="new-expiry-kind"
+                name="expiryKind"
+                options={catalog.expiryKinds}
+                value={expiryKind}
+                onValueChange={setExpiryKind}
+              />
+            </Field>
+          </div>
 
           <Field>
             <FieldLabel htmlFor="new-state">État</FieldLabel>

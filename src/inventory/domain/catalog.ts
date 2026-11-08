@@ -1,17 +1,66 @@
 /**
  * Fixed catalog of the pantry: labels, low stock thresholds (in grams or
- * millilitres) and perishability per category. The only source for these
- * values, the client receives them as page props.
+ * millilitres), perishability, the days before an expiry date that make a
+ * batch urgent, and the expiry kind a new date starts with, per category.
+ * The only source for these values, the client receives them as page props.
  */
 export const INGREDIENT_CATEGORIES = {
-  vegetables: { label: 'Légumes', lowStockThreshold: 200, perishable: true },
-  fruits: { label: 'Fruits', lowStockThreshold: 200, perishable: true },
-  meat: { label: 'Viandes', lowStockThreshold: 300, perishable: false },
-  fish: { label: 'Poissons', lowStockThreshold: 200, perishable: true },
-  dairy: { label: 'Produits laitiers', lowStockThreshold: 500, perishable: true },
-  spices: { label: 'Épices', lowStockThreshold: 50, perishable: false },
-  starches: { label: 'Féculents', lowStockThreshold: 500, perishable: false },
-  other: { label: 'Autres', lowStockThreshold: 100, perishable: false },
+  vegetables: {
+    label: 'Légumes',
+    lowStockThreshold: 200,
+    perishable: true,
+    expiryWarningDays: 2,
+    defaultExpiryKind: 'use_by',
+  },
+  fruits: {
+    label: 'Fruits',
+    lowStockThreshold: 200,
+    perishable: true,
+    expiryWarningDays: 2,
+    defaultExpiryKind: 'use_by',
+  },
+  meat: {
+    label: 'Viandes',
+    lowStockThreshold: 300,
+    perishable: false,
+    expiryWarningDays: 2,
+    defaultExpiryKind: 'use_by',
+  },
+  fish: {
+    label: 'Poissons',
+    lowStockThreshold: 200,
+    perishable: true,
+    expiryWarningDays: 1,
+    defaultExpiryKind: 'use_by',
+  },
+  dairy: {
+    label: 'Produits laitiers',
+    lowStockThreshold: 500,
+    perishable: true,
+    expiryWarningDays: 3,
+    defaultExpiryKind: 'use_by',
+  },
+  spices: {
+    label: 'Épices',
+    lowStockThreshold: 50,
+    perishable: false,
+    expiryWarningDays: 30,
+    defaultExpiryKind: 'best_before',
+  },
+  starches: {
+    label: 'Féculents',
+    lowStockThreshold: 500,
+    perishable: false,
+    expiryWarningDays: 14,
+    defaultExpiryKind: 'best_before',
+  },
+  other: {
+    label: 'Autres',
+    lowStockThreshold: 100,
+    perishable: false,
+    expiryWarningDays: 7,
+    defaultExpiryKind: 'best_before',
+  },
 } as const
 
 export const INGREDIENT_UNITS = {
@@ -28,9 +77,19 @@ export const INGREDIENT_STATES = {
   frozen: { label: 'Congelé' },
 } as const
 
+/**
+ * A use by date (DLC) is a safety limit, a best before date (DDM) only a
+ * quality one.
+ */
+export const EXPIRY_KINDS = {
+  use_by: { label: 'DLC' },
+  best_before: { label: 'DDM' },
+} as const
+
 export type IngredientCategory = keyof typeof INGREDIENT_CATEGORIES
 export type IngredientUnit = keyof typeof INGREDIENT_UNITS
 export type IngredientState = keyof typeof INGREDIENT_STATES
+export type ExpiryKind = keyof typeof EXPIRY_KINDS
 
 function keysOf<TCatalog extends object>(catalog: TCatalog) {
   // SAFETY: The catalogs are object literals, so their runtime keys are exactly their key type.
@@ -40,6 +99,7 @@ function keysOf<TCatalog extends object>(catalog: TCatalog) {
 export const INGREDIENT_CATEGORY_VALUES = keysOf(INGREDIENT_CATEGORIES)
 export const INGREDIENT_UNIT_VALUES = keysOf(INGREDIENT_UNITS)
 export const INGREDIENT_STATE_VALUES = keysOf(INGREDIENT_STATES)
+export const EXPIRY_KIND_VALUES = keysOf(EXPIRY_KINDS)
 
 export function isIngredientCategory(value: string): value is IngredientCategory {
   return Object.hasOwn(INGREDIENT_CATEGORIES, value)
@@ -51,6 +111,10 @@ export function isIngredientUnit(value: string): value is IngredientUnit {
 
 export function isIngredientState(value: string): value is IngredientState {
   return Object.hasOwn(INGREDIENT_STATES, value)
+}
+
+export function isExpiryKind(value: string): value is ExpiryKind {
+  return Object.hasOwn(EXPIRY_KINDS, value)
 }
 
 interface CatalogRecord {
@@ -102,11 +166,13 @@ export function catalogOptions() {
     categories: INGREDIENT_CATEGORY_VALUES.map((value) => ({
       value,
       label: INGREDIENT_CATEGORIES[value].label,
+      defaultExpiryKind: INGREDIENT_CATEGORIES[value].defaultExpiryKind,
     })),
     units: INGREDIENT_UNIT_VALUES.map((value) => ({ value, label: INGREDIENT_UNITS[value].label })),
     states: INGREDIENT_STATE_VALUES.map((value) => ({
       value,
       label: INGREDIENT_STATES[value].label,
     })),
+    expiryKinds: EXPIRY_KIND_VALUES.map((value) => ({ value, label: EXPIRY_KINDS[value].label })),
   }
 }

@@ -11,6 +11,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '~/components/ui/input-group'
+import { BatchesDialog } from '~/inventory/batches_dialog'
 import {
   CATEGORY_ICONS,
   type Catalog,
@@ -18,6 +19,8 @@ import {
   type Ingredient,
 } from '~/inventory/catalog'
 import { CatalogSelect } from '~/inventory/catalog_select'
+import { expiryBadge } from '~/inventory/expiry'
+import { plural } from '~/plural'
 
 const VISIT_OPTIONS = { preserveScroll: true, preserveState: true } as const
 
@@ -34,6 +37,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
   const [draftName, setDraftName] = useState(ingredient.name)
   const [draftQuantity, setDraftQuantity] = useState(String(ingredient.quantity))
   const CategoryIcon = CATEGORY_ICONS[ingredient.category]
+  const badge = expiryBadge(ingredient)
 
   function update(
     changes: Partial<Pick<Ingredient, 'name' | 'quantity' | 'unit' | 'category' | 'state'>>
@@ -206,6 +210,32 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
             <span className="text-muted-foreground">{ingredient.stateLabel}</span>
           </>
         )}
+      </td>
+      <td className="px-4 py-3 first:pl-5 last:pr-5">
+        <BatchesDialog
+          ingredient={ingredient}
+          catalog={catalog}
+          trigger={
+            <button
+              type="button"
+              aria-label={`Gérer les lots : ${ingredient.name}`}
+              className="flex cursor-pointer flex-col items-start gap-0.5 text-xs underline-offset-2 hover:underline"
+            >
+              {badge?.variant ? (
+                <Badge variant={badge.variant} className="text-xs">
+                  {badge.label}
+                </Badge>
+              ) : (
+                <span className="text-muted-foreground">{badge?.label ?? 'Sans date'}</span>
+              )}
+              {ingredient.batches.length > 1 && (
+                <span className="text-muted-foreground">
+                  {plural(ingredient.batches.length, 'lot')}
+                </span>
+              )}
+            </button>
+          }
+        />
       </td>
       <td className="px-4 py-3 first:pl-5 last:pr-5">
         <div className="flex flex-wrap gap-1">

@@ -101,6 +101,17 @@ export function InventoryActions({
             Périssables uniquement
           </FieldLabel>
         </Field>
+
+        <Field orientation="horizontal">
+          <Checkbox
+            id="filter-expiring"
+            checked={filters.expiringOnly}
+            onCheckedChange={(checked) => onUpdateFilters({ expiringOnly: checked })}
+          />
+          <FieldLabel htmlFor="filter-expiring" className="cursor-pointer">
+            À consommer vite uniquement
+          </FieldLabel>
+        </Field>
       </SectionCard>
     </>
   )

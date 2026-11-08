@@ -9,12 +9,13 @@ import {
   type InvalidIngredientError,
 } from '#inventory/domain/ingredient'
 import { IngredientRepository } from '#inventory/repositories/ingredient_repository'
+import { TransactionManager } from '#shared/services/transaction_manager'
 import type { UserIdentifier } from '#identity/domain/user_identifier'
 
 export interface UpdateIngredientParams {
   userId: UserIdentifier
   id: string
-  changes: IngredientChanges
+  changes: IngredientChanges & { quantity?: number }
 }
 
 export type UpdateIngredientError = IngredientNotFoundError | InvalidIngredientError
@@ -22,10 +23,13 @@ export type UpdateIngredientResult = Result<Ingredient, UpdateIngredientError>
 
 @inject()
 export class UpdateIngredient {
-  constructor(private readonly ingredients: IngredientRepository) {}
+  constructor(
+    private readonly ingredients: IngredientRepository,
+    private readonly transactions: TransactionManager
+  ) {}
 
   async execute(params: UpdateIngredientParams): Promise<UpdateIngredientResult> {
-    const changes: IngredientChanges = { ...params.changes }
+    const { quantity: requestedQuantity, ...changes } = params.changes
 
     if (changes.name !== undefined) {
       const name = validateName(changes.name)
@@ -37,14 +41,10 @@ export class UpdateIngredient {
       changes.name = name.value
     }
 
-    if (changes.quantity !== undefined) {
-      const quantity = validateQuantity(changes.quantity)
+    const quantity = requestedQuantity === undefined ? null : validateQuantity(requestedQuantity)
 
-      if (!quantity.ok) {
-        return err(quantity.error)
-      }
-
-      changes.quantity = quantity.value
+    if (quantity && !quantity.ok) {
+      return err(quantity.error)
     }
 
     const ingredient = await this.ingredients.findForUser(params.userId, params.id)
@@ -53,8 +53,10 @@ export class UpdateIngredient {
       return err({ type: 'ingredient_not_found' })
     }
 
-    const updated = ingredient.with(changes, new Date())
-    await this.ingredients.update(updated)
+    const now = new Date()
+    const changed = ingredient.with(changes, now)
+    const updated = quantity ? changed.withQuantity(quantity.value, now) : changed
+    await this.transactions.run(() => this.ingredients.update(updated))
     return ok(updated)
   }
 }

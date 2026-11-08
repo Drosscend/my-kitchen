@@ -1,6 +1,7 @@
 import { inject } from '@adonisjs/core'
 import { err, ok, type Result } from '#core/result'
 import { IngredientRepository } from '#inventory/repositories/ingredient_repository'
+import { TransactionManager } from '#shared/services/transaction_manager'
 import type { UserIdentifier } from '#identity/domain/user_identifier'
 import type { Ingredient, IngredientNotFoundError } from '#inventory/domain/ingredient'
 
@@ -14,7 +15,10 @@ export type AdjustIngredientQuantityResult = Result<Ingredient, IngredientNotFou
 
 @inject()
 export class AdjustIngredientQuantity {
-  constructor(private readonly ingredients: IngredientRepository) {}
+  constructor(
+    private readonly ingredients: IngredientRepository,
+    private readonly transactions: TransactionManager
+  ) {}
 
   async execute(params: AdjustIngredientQuantityParams): Promise<AdjustIngredientQuantityResult> {
     const ingredient = await this.ingredients.findForUser(params.userId, params.id)
@@ -24,7 +28,7 @@ export class AdjustIngredientQuantity {
     }
 
     const adjusted = ingredient.adjustedBy(params.delta, new Date())
-    await this.ingredients.update(adjusted)
+    await this.transactions.run(() => this.ingredients.update(adjusted))
     return ok(adjusted)
   }
 }

@@ -1,6 +1,13 @@
-import { AlertTriangleIcon, ClipboardListIcon, LeafIcon, SnowflakeIcon } from 'lucide-react'
+import {
+  AlertTriangleIcon,
+  ClipboardListIcon,
+  HourglassIcon,
+  LeafIcon,
+  SnowflakeIcon,
+} from 'lucide-react'
 import { type ReactNode } from 'react'
 import { type Ingredient } from '~/inventory/catalog'
+import { isExpiringSoon } from '~/inventory/expiry'
 
 function Stat({ icon, value, label }: { icon: ReactNode; value: number; label: string }) {
   return (
@@ -18,11 +25,16 @@ function Stat({ icon, value, label }: { icon: ReactNode; value: number; label: s
 
 export function StatsSummary({ ingredients }: { ingredients: Ingredient[] }) {
   return (
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
       <Stat
         icon={<ClipboardListIcon className="size-5 text-primary" />}
         value={ingredients.length}
         label="Ingrédients"
+      />
+      <Stat
+        icon={<HourglassIcon className="size-5 text-destructive" />}
+        value={ingredients.filter((ingredient) => isExpiringSoon(ingredient.expiryStatus)).length}
+        label="À consommer vite"
       />
       <Stat
         icon={<LeafIcon className="size-5 text-secondary" />}

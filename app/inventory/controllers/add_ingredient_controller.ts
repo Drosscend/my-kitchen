@@ -1,13 +1,13 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
 import { ingredientErrorMessages } from '#app/inventory/error_messages'
-import { ingredientFields } from '#app/inventory/validators'
+import { expiryFields, ingredientFields } from '#app/inventory/validators'
 import { AddIngredient } from '#inventory/actions/add_ingredient'
 import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class AddIngredientController {
-  static readonly validator = vine.create(ingredientFields)
+  static readonly validator = vine.create({ ...ingredientFields, ...expiryFields })
 
   constructor(private readonly addIngredient: AddIngredient) {}
 

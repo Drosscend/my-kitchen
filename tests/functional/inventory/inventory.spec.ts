@@ -1,4 +1,6 @@
 import { test } from '@japa/runner'
+import { sql } from 'kysely'
+import { today } from '#inventory/domain/expiry'
 import { db } from '#shared/services/db'
 import { assertRedirectedTo } from '#tests/helpers/http'
 import { resetState } from '#tests/helpers/state'
@@ -13,13 +15,43 @@ const TOMATOES = {
   state: 'fresh',
 }
 
+const YOGURTS = {
+  name: 'Yaourts',
+  quantity: 4,
+  unit: 'piece',
+  category: 'dairy',
+  state: 'fresh',
+}
+
 async function storedIngredients(user: User) {
   return db
     .selectFrom('ingredients')
-    .select(['id', 'name', 'quantity', 'unit', 'category', 'state'])
+    .select([
+      'id',
+      'name',
+      sql<number>`coalesce((select sum(quantity) from ingredient_batches where ingredient_id = ingredients.id), 0)`.as(
+        'quantity'
+      ),
+      'unit',
+      'category',
+      'state',
+    ])
     .where('user_id', '=', user.id)
     .orderBy('name')
     .execute()
+}
+
+async function storedBatches(ingredientId: string) {
+  return db
+    .selectFrom('ingredient_batches')
+    .select(['id', 'quantity', sql<string | null>`expires_on::text`.as('expiresOn'), 'expiry_kind'])
+    .where('ingredient_id', '=', ingredientId)
+    .orderBy(sql`expires_on asc nulls last`)
+    .execute()
+}
+
+function inDays(days: number) {
+  return new Date(Date.parse(today()) + days * 86_400_000).toISOString().slice(0, 10)
 }
 
 test.group('Inventory', (group) => {
@@ -111,6 +143,94 @@ test.group('Inventory', (group) => {
         { name: 'Tomates cerises', unitLabel: 'g', lowStock: false, perishable: true },
       ],
     })
+  })
+
+  test('tracks batches with their own expiry date and consumes the earliest first', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createUser('ada@example.com')
+    await client
+      .post('/inventory')
+      .loginAs(user)
+      .withCsrfToken()
+      .form({ ...YOGURTS, expiresOn: inDays(1) })
+      .redirects(0)
+    const [ingredient] = await storedIngredients(user)
+    await client
+      .post(`/inventory/${ingredient.id}/batches`)
+      .loginAs(user)
+      .withCsrfToken()
+      .form({ quantity: 4, expiresOn: inDays(10) })
+      .redirects(0)
+
+    const page = await client.get('/').loginAs(user).withInertia()
+    page.assertInertiaPropsContains({
+      ingredients: [
+        { name: 'Yaourts', quantity: 8, expiryStatus: 'soon', expiresOn: inDays(1), daysLeft: 1 },
+      ],
+    })
+
+    await client
+      .post(`/inventory/${ingredient.id}/adjust`)
+      .loginAs(user)
+      .withCsrfToken()
+      .form({ delta: -5 })
+      .redirects(0)
+    const [batch] = await storedBatches(ingredient.id)
+    assert.deepEqual(await storedBatches(ingredient.id), [
+      { id: batch.id, quantity: 3, expiresOn: inDays(10), expiry_kind: 'use_by' },
+    ])
+
+    await client
+      .patch(`/inventory/${ingredient.id}/batches/${batch.id}`)
+      .loginAs(user)
+      .withCsrfToken()
+      .form({ expiresOn: '', quantity: 2 })
+      .redirects(0)
+    assert.deepEqual(await storedBatches(ingredient.id), [
+      { id: batch.id, quantity: 2, expiresOn: null, expiry_kind: null },
+    ])
+
+    await client
+      .delete(`/inventory/${ingredient.id}/batches/${batch.id}`)
+      .loginAs(user)
+      .withCsrfToken()
+      .redirects(0)
+    assert.include((await storedIngredients(user))[0], { name: 'Yaourts', quantity: 0 })
+  })
+
+  test('refuses invalid dates and batches of another account', async ({ client, assert }) => {
+    const ada = await createUser('ada@example.com')
+    const bob = await createUser('bob@example.com')
+    await client.post('/inventory').loginAs(ada).withCsrfToken().form(YOGURTS).redirects(0)
+    const [ingredient] = await storedIngredients(ada)
+    const [batch] = await storedBatches(ingredient.id)
+
+    const invalid = await client
+      .post(`/inventory/${ingredient.id}/batches`)
+      .loginAs(ada)
+      .withCsrfToken()
+      .form({ quantity: 1, expiresOn: '2026-02-30' })
+      .redirects(0)
+    const stolen = await client
+      .patch(`/inventory/${ingredient.id}/batches/${batch.id}`)
+      .loginAs(bob)
+      .withCsrfToken()
+      .form({ quantity: 1 })
+      .redirects(0)
+    const missing = await client
+      .delete(`/inventory/${ingredient.id}/batches/nope`)
+      .loginAs(ada)
+      .withCsrfToken()
+      .redirects(0)
+
+    invalid.assertFlashMessage('error', "La date de péremption n'est pas valide")
+    stolen.assertFlashMessage('error', 'Ingrédient introuvable')
+    missing.assertFlashMessage('error', 'Lot introuvable')
+    assert.deepEqual(await storedBatches(ingredient.id), [
+      { id: batch.id, quantity: 4, expiresOn: null, expiry_kind: null },
+    ])
   })
 
   test('renders the pantry as Markdown for an assistant', async ({ client, assert }) => {

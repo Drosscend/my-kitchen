@@ -80,6 +80,9 @@ export function InventoryTable({ ingredients, total, catalog, sort, onSort }: In
               Catégorie
             </SortableHeader>
             <th className={HEADER}>État</th>
+            <SortableHeader field="expiry" sort={sort} onSort={onSort}>
+              Péremption
+            </SortableHeader>
             <th className={HEADER}>Alerte</th>
             <th className="w-12 pr-5" />
           </tr>
