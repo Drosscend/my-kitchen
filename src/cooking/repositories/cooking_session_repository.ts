@@ -1,6 +1,6 @@
 import { inject } from '@adonisjs/core'
 import { sql } from 'kysely'
-import postgres from 'postgres'
+import { PostgresError } from 'postgres'
 import { TransactionManager } from '#shared/services/transaction_manager'
 import type { CookingSession, CookingSessionState } from '#cooking/domain/cooking_session'
 import type { UserIdentifier } from '#identity/domain/user_identifier'
@@ -48,7 +48,7 @@ export class CookingSessionRepository {
 
       return true
     } catch (error) {
-      if (error instanceof postgres.PostgresError && error.code === '23505') {
+      if (error instanceof PostgresError && error.code === '23505') {
         return false
       }
       throw error

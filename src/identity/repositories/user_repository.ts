@@ -1,5 +1,5 @@
 import { inject } from '@adonisjs/core'
-import postgres from 'postgres'
+import { PostgresError } from 'postgres'
 import { err, ok, type Result } from '#core/result'
 import { EmailAddress } from '#identity/domain/email_address'
 import { User } from '#identity/domain/user'
@@ -120,7 +120,7 @@ export class UserRepository {
 
   #isEmailTaken(cause: unknown) {
     return (
-      cause instanceof postgres.PostgresError &&
+      cause instanceof PostgresError &&
       cause.code === '23505' &&
       cause.constraint_name === 'users_email_unique'
     )
