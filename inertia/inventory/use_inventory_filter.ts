@@ -13,11 +13,6 @@ export interface InventoryFilters {
 
 export type SortField = 'name' | 'quantity' | 'category' | 'expiry' | 'updatedAt'
 
-export interface InventorySort {
-  field: SortField
-  direction: 'asc' | 'desc'
-}
-
 const DEFAULT_FILTERS: InventoryFilters = {
   search: '',
   category: 'all',
@@ -27,7 +22,7 @@ const DEFAULT_FILTERS: InventoryFilters = {
   expiringOnly: false,
 }
 
-const DEFAULT_SORT: InventorySort = { field: 'name', direction: 'asc' }
+const DESCENDING: SortField[] = ['updatedAt']
 
 function compare(a: Ingredient, b: Ingredient, field: SortField) {
   switch (field) {
@@ -49,7 +44,7 @@ function compare(a: Ingredient, b: Ingredient, field: SortField) {
 
 export function useInventoryFilter(ingredients: Ingredient[]) {
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
-  const [sort, setSort] = useState(DEFAULT_SORT)
+  const [sort, setSort] = useState<SortField>('name')
   const search = filters.search.trim().toLowerCase()
 
   const filtered = ingredients
@@ -59,17 +54,10 @@ export function useInventoryFilter(ingredients: Ingredient[]) {
     .filter((ingredient) => !filters.lowStockOnly || ingredient.lowStock)
     .filter((ingredient) => !filters.perishableOnly || ingredient.perishable)
     .filter((ingredient) => !filters.expiringOnly || isExpiringSoon(ingredient.expiryStatus))
-    .sort((a, b) => (sort.direction === 'asc' ? 1 : -1) * compare(a, b, sort.field))
+    .sort((a, b) => (DESCENDING.includes(sort) ? -1 : 1) * compare(a, b, sort))
 
   function updateFilters(changes: Partial<InventoryFilters>) {
     setFilters((current) => ({ ...current, ...changes }))
-  }
-
-  function toggleSort(field: SortField) {
-    setSort((current) => ({
-      field,
-      direction: current.field === field && current.direction === 'asc' ? 'desc' : 'asc',
-    }))
   }
 
   return {
@@ -78,7 +66,7 @@ export function useInventoryFilter(ingredients: Ingredient[]) {
     filtered,
     hasActiveFilters: JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS),
     updateFilters,
-    toggleSort,
+    setSort,
     resetFilters: () => setFilters(DEFAULT_FILTERS),
   }
 }

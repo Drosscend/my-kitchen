@@ -15,10 +15,15 @@ export default function ShowRecipe({ recipe }: PageProps) {
     <>
       <Head title={recipe.title} />
       <Page>
-        <div className="mb-6 flex items-center justify-between">
-          <Button variant="ghost" nativeButton={false} render={<Link route="recipes.index" />}>
+        <div className="-mt-2 mb-4 flex items-center justify-between sm:mb-6">
+          <Button
+            variant="ghost"
+            nativeButton={false}
+            className="-ml-2.5 text-muted-foreground"
+            render={<Link route="recipes.index" />}
+          >
             <ArrowLeftIcon data-icon="inline-start" />
-            Toutes les recettes
+            Recettes
           </Button>
           <DeleteRecipeDialog id={recipe.id} title={recipe.title} />
         </div>

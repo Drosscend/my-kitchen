@@ -1,7 +1,5 @@
 import { type Batch } from '~/inventory/catalog'
 
-type BadgeVariant = 'destructive' | 'warning' | 'outline'
-
 const dateFormat = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' })
 
 export function formatExpiryDate(expiresOn: string) {
@@ -9,32 +7,26 @@ export function formatExpiryDate(expiresOn: string) {
 }
 
 /**
- * What a row says about its most urgent batch, and how loudly.
+ * What a row says about its most urgent batch.
  */
-export function expiryBadge({
+export function expiryLabel({
   expiryStatus,
   expiresOn,
   daysLeft,
-}: Pick<Batch, 'expiryStatus' | 'expiresOn' | 'daysLeft'>): {
-  label: string
-  variant: BadgeVariant | null
-} | null {
+}: Pick<Batch, 'expiryStatus' | 'expiresOn' | 'daysLeft'>) {
   if (expiresOn === null || daysLeft === null) {
-    return null
+    return 'Sans date'
   }
 
   switch (expiryStatus) {
     case 'expired':
-      return { label: 'Périmé', variant: 'destructive' }
+      return 'Périmé'
     case 'check':
-      return { label: 'DDM dépassée', variant: 'outline' }
+      return 'À vérifier'
     case 'soon':
-      return {
-        label: daysLeft === 0 ? "Aujourd'hui" : daysLeft === 1 ? 'Demain' : `Dans ${daysLeft} j`,
-        variant: 'warning',
-      }
+      return daysLeft === 0 ? "Aujourd'hui" : daysLeft === 1 ? 'Demain' : `Dans ${daysLeft} j`
     default:
-      return { label: formatExpiryDate(expiresOn), variant: null }
+      return formatExpiryDate(expiresOn)
   }
 }
 

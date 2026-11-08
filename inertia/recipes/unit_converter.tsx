@@ -1,15 +1,10 @@
-import { ArrowRightLeftIcon } from 'lucide-react'
+import { ArrowRightLeftIcon, ScaleIcon } from 'lucide-react'
 import { useState } from 'react'
-import { SectionCard } from '~/components/section_card'
+import { DialogSheet } from '~/components/dialog_sheet'
 import { Button } from '~/components/ui/button'
+import { Dialog, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
 import { Input } from '~/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select'
+import { CatalogSelect } from '~/inventory/catalog_select'
 import {
   CONVERSION_UNIT_VALUES,
   CONVERSION_UNITS,
@@ -31,6 +26,16 @@ function formatResult(value: number) {
   return Math.abs(value) >= 1 ? value.toFixed(2) : value.toFixed(3)
 }
 
+const UNIT_OPTIONS = CONVERSION_UNIT_VALUES.map((unit) => ({
+  value: unit,
+  label: CONVERSION_UNITS[unit].label,
+}))
+
+const INGREDIENT_OPTIONS = INGREDIENT_DENSITIES.map((ingredient, index) => ({
+  value: String(index),
+  label: ingredient.name,
+}))
+
 function UnitSelect({
   value,
   onChange,
@@ -41,18 +46,19 @@ function UnitSelect({
   label: string
 }) {
   return (
-    <Select value={value} onValueChange={(next) => next !== null && onChange(next)}>
-      <SelectTrigger className="flex-1" aria-label={label}>
-        <SelectValue>{CONVERSION_UNITS[value].label}</SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        {CONVERSION_UNIT_VALUES.map((unit) => (
-          <SelectItem key={unit} value={unit}>
-            {CONVERSION_UNITS[unit].label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <CatalogSelect
+      options={UNIT_OPTIONS}
+      value={value}
+      ariaLabel={label}
+      triggerClassName="min-w-0 flex-1"
+      onValueChange={(next) => {
+        const option = UNIT_OPTIONS.find((candidate) => candidate.value === next)
+
+        if (option) {
+          onChange(option.value)
+        }
+      }}
+    />
   )
 }
 
@@ -74,60 +80,66 @@ export function UnitConverter() {
         )
 
   return (
-    <SectionCard title="Convertisseur">
-      <Input
-        type="number"
-        inputMode="decimal"
-        min={0}
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        aria-label="Valeur à convertir"
+    <Dialog>
+      <DialogTrigger
+        render={
+          <Button variant="outline" size="lg">
+            <ScaleIcon data-icon="inline-start" />
+            Convertisseur
+          </Button>
+        }
       />
+      <DialogSheet>
+        <DialogHeader>
+          <DialogTitle className="text-xl font-extrabold">Convertisseur</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-3">
+          <Input
+            type="number"
+            inputMode="decimal"
+            min={0}
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            aria-label="Valeur à convertir"
+          />
 
-      <div className="flex items-center gap-2">
-        <UnitSelect value={from} onChange={setFrom} label="Unité de départ" />
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Inverser les unités"
-          onClick={() => {
-            setFrom(to)
-            setTo(from)
-          }}
-        >
-          <ArrowRightLeftIcon />
-        </Button>
-        <UnitSelect value={to} onChange={setTo} label="Unité d'arrivée" />
-      </div>
+          <div className="flex items-center gap-2">
+            <UnitSelect value={from} onChange={setFrom} label="Unité de départ" />
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Inverser les unités"
+              onClick={() => {
+                setFrom(to)
+                setTo(from)
+              }}
+            >
+              <ArrowRightLeftIcon />
+            </Button>
+            <UnitSelect value={to} onChange={setTo} label="Unité d'arrivée" />
+          </div>
 
-      {crossing && (
-        <Select
-          value={String(ingredientIndex)}
-          onValueChange={(next) => next !== null && setIngredientIndex(Number(next))}
-        >
-          <SelectTrigger className="w-full" aria-label="Ingrédient">
-            <SelectValue>{INGREDIENT_DENSITIES[ingredientIndex].name}</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {INGREDIENT_DENSITIES.map((ingredient, index) => (
-              <SelectItem key={ingredient.name} value={String(index)}>
-                {ingredient.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
+          {crossing && (
+            <CatalogSelect
+              options={INGREDIENT_OPTIONS}
+              value={String(ingredientIndex)}
+              ariaLabel="Ingrédient"
+              onValueChange={(next) => setIngredientIndex(Number(next))}
+            />
+          )}
 
-      <div className="rounded-md bg-paper-light px-4 py-4 text-center">
-        {result === null ? (
-          <p className="text-sm text-muted-foreground">Entre une valeur</p>
-        ) : (
-          <p className="kraft-title text-2xl font-bold">
-            {formatResult(result)}{' '}
-            <span className="text-sm text-muted-foreground">{CONVERSION_UNITS[to].label}</span>
-          </p>
-        )}
-      </div>
-    </SectionCard>
+          <div className="rounded-lg bg-muted px-4 py-5 text-center">
+            {result === null ? (
+              <p className="text-sm text-muted-foreground">Entre une valeur</p>
+            ) : (
+              <p className="text-3xl font-bold tabular-nums font-stretch-80%">
+                {formatResult(result)}{' '}
+                <span className="text-sm text-muted-foreground">{CONVERSION_UNITS[to].label}</span>
+              </p>
+            )}
+          </div>
+        </div>
+      </DialogSheet>
+    </Dialog>
   )
 }

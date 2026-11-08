@@ -16,9 +16,11 @@ export function ServingsControl({ scale, baseServings, onScaleChange }: Servings
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm text-muted-foreground">Portions</span>
-      <InputGroup className="w-auto">
+      <InputGroup className="h-8.5 w-auto rounded-full bg-card">
         <InputGroupAddon align="inline-start">
           <InputGroupButton
+            size="icon-sm"
+            className="rounded-full text-muted-foreground"
             onClick={() => onScaleChange(Math.max(step, scale - step))}
             disabled={scale <= step}
             aria-label="Diminuer les portions"
@@ -26,14 +28,13 @@ export function ServingsControl({ scale, baseServings, onScaleChange }: Servings
             <MinusIcon />
           </InputGroupButton>
         </InputGroupAddon>
-        <span
-          className="flex min-w-6 items-center justify-center px-2 text-center text-xs"
-          style={{ fontVariantNumeric: 'tabular-nums' }}
-        >
+        <span className="flex min-w-6 items-center justify-center px-1 text-center text-sm font-semibold tabular-nums">
           {servings}
         </span>
         <InputGroupAddon align="inline-end">
           <InputGroupButton
+            size="icon-sm"
+            className="rounded-full bg-muted"
             onClick={() => onScaleChange(Math.min(MAX_SCALE, scale + step))}
             disabled={scale >= MAX_SCALE}
             aria-label="Augmenter les portions"

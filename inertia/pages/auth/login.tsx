@@ -55,7 +55,7 @@ export default function Login() {
 
               <Link
                 route="password.forgot"
-                className="text-center text-xs text-muted-foreground hover:text-primary hover:underline"
+                className="text-center text-sm text-muted-foreground hover:text-primary hover:underline"
               >
                 Mot de passe oublié ?
               </Link>

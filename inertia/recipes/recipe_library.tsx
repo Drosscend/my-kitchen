@@ -1,16 +1,10 @@
 import { Link, useRouter } from '@adonisjs/inertia/react'
 import { BookOpenIcon, Trash2Icon } from 'lucide-react'
 import { ConfirmDeleteDialog } from '~/components/confirm_delete_dialog'
-import { EmptyState } from '~/components/empty_state'
-import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
-import { Card, CardContent } from '~/components/ui/card'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '~/components/ui/empty'
 import { plural } from '~/plural'
 import { type RecipeSummary } from '~/recipes/types'
-
-interface RecipeLibraryProps {
-  recipes: RecipeSummary[]
-}
 
 export function DeleteRecipeDialog({ id, title }: { id: string; title: string }) {
   const router = useRouter()
@@ -21,7 +15,7 @@ export function DeleteRecipeDialog({ id, title }: { id: string; title: string })
       description={`« ${title} » disparaît définitivement de la bibliothèque.`}
       onConfirm={() => router.visit({ route: 'recipes.destroy', routeParams: { id } })}
       trigger={
-        <Button variant="ghost" size="icon-sm" aria-label={`Supprimer ${title}`}>
+        <Button variant="ghost" size="icon" aria-label={`Supprimer ${title}`}>
           <Trash2Icon className="text-muted-foreground" />
         </Button>
       }
@@ -29,49 +23,46 @@ export function DeleteRecipeDialog({ id, title }: { id: string; title: string })
   )
 }
 
-export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
+export function RecipeLibrary({ recipes }: { recipes: RecipeSummary[] }) {
   if (recipes.length === 0) {
     return (
-      <EmptyState icon={BookOpenIcon} className="rounded-lg border border-dashed border-border">
-        Aucune recette. Ton assistant les ajoute depuis le serveur MCP.
-      </EmptyState>
+      <Empty className="rounded-xl border bg-card">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <BookOpenIcon />
+          </EmptyMedia>
+          <EmptyTitle>Aucune recette</EmptyTitle>
+          <EmptyDescription>Ton assistant les ajoute depuis le serveur MCP.</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <ul className="mb-2.5 grid grid-cols-1 overflow-hidden rounded-xl bg-card paper-stack lg:grid-cols-2">
       {recipes.map((recipe) => (
-        <Card
+        <li
           key={recipe.id}
-          className="kraft-card relative gap-0 py-0 transition-shadow hover:shadow-md"
+          className="relative flex flex-col gap-1.5 border-b border-dashed px-4 py-4 transition-colors last:border-b-0 hover:bg-muted/40 sm:px-5 lg:odd:border-r lg:odd:border-solid lg:[&:nth-last-child(2):nth-child(odd)]:border-b-0"
         >
-          <CardContent className="flex h-full flex-col p-5">
-            <Link
-              route="recipes.show"
-              routeParams={{ id: recipe.id }}
-              className="kraft-title block pr-8 text-xl leading-tight font-bold after:absolute after:inset-0"
-            >
-              {recipe.title}
-            </Link>
-            {recipe.description && (
-              <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                {recipe.description}
-              </p>
+          <Link
+            route="recipes.show"
+            routeParams={{ id: recipe.id }}
+            className="text-xl leading-tight font-extrabold tracking-tight font-stretch-80% after:absolute after:inset-0"
+          >
+            {recipe.title}
+          </Link>
+          {recipe.description && (
+            <p className="line-clamp-2 text-sm text-muted-foreground">{recipe.description}</p>
+          )}
+          <p className="mt-1 flex gap-4 text-xs text-muted-foreground tabular-nums">
+            {recipe.ingredientCount > 0 && (
+              <span>{plural(recipe.ingredientCount, 'ingrédient')}</span>
             )}
-            <div className="mt-auto flex gap-2 pt-4">
-              {recipe.ingredientCount > 0 && (
-                <Badge variant="secondary">{plural(recipe.ingredientCount, 'ingrédient')}</Badge>
-              )}
-              {recipe.stepCount > 0 && (
-                <Badge variant="secondary">{plural(recipe.stepCount, 'étape')}</Badge>
-              )}
-            </div>
-          </CardContent>
-          <span className="absolute top-3 right-3 z-10">
-            <DeleteRecipeDialog id={recipe.id} title={recipe.title} />
-          </span>
-        </Card>
+            {recipe.stepCount > 0 && <span>{plural(recipe.stepCount, 'étape')}</span>}
+          </p>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }

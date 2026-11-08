@@ -6,6 +6,7 @@ import { Field, FieldError, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
 import { type Catalog } from '~/inventory/catalog'
 import { CatalogSelect } from '~/inventory/catalog_select'
+import { categoryIcon, stateIcon } from '~/inventory/option_icons'
 
 const DEFAULTS = { unit: 'g', category: 'vegetables', state: 'fresh' }
 
@@ -32,7 +33,7 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
       route="inventory.store"
       onSuccess={() => setName('')}
       resetOnSuccess={['expiresOn']}
-      className="space-y-3"
+      className="flex flex-col gap-4"
     >
       {({ errors, processing }) => (
         <>
@@ -50,7 +51,7 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
             {errors.name && <FieldError>{errors.name}</FieldError>}
           </Field>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <Field data-invalid={Boolean(errors.quantity)}>
               <FieldLabel htmlFor="new-quantity">Quantité</FieldLabel>
               <Input
@@ -85,11 +86,12 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
               name="category"
               options={catalog.categories}
               value={category}
+              icon={categoryIcon}
               onValueChange={changeCategory}
             />
           </Field>
 
-          <div className="grid grid-cols-[minmax(0,1fr)_6rem] gap-3">
+          <div className="grid grid-cols-[minmax(0,1fr)_7rem] gap-4">
             <Field data-invalid={Boolean(errors.expiresOn)}>
               <FieldLabel htmlFor="new-expires-on">Péremption</FieldLabel>
               <Input
@@ -120,13 +122,14 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
               name="state"
               options={catalog.states}
               value={state}
+              icon={stateIcon}
               onValueChange={setState}
             />
           </Field>
 
-          <Button type="submit" className="w-full" disabled={processing}>
+          <Button type="submit" size="lg" className="mt-2 w-full" disabled={processing}>
             <PlusIcon data-icon="inline-start" />
-            Ajouter
+            Ajouter l'ingrédient
           </Button>
         </>
       )}

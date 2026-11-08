@@ -1,18 +1,19 @@
 import { Head } from '@inertiajs/react'
 import { Page, PageHeader } from '~/components/page'
-import { Card } from '~/components/ui/card'
+import { AddIngredientDialog } from '~/inventory/add_ingredient_dialog'
 import { type Catalog, type Ingredient } from '~/inventory/catalog'
 import { CopyPantryButton } from '~/inventory/copy_pantry_button'
-import { InventoryActions } from '~/inventory/inventory_actions'
-import { InventoryTable } from '~/inventory/inventory_table'
-import { StatsSummary } from '~/inventory/stats_summary'
+import { InventoryList } from '~/inventory/inventory_list'
+import { InventoryToolbar } from '~/inventory/inventory_toolbar'
+import { UrgentShelf } from '~/inventory/urgent_shelf'
 import { useInventoryFilter } from '~/inventory/use_inventory_filter'
+import { plural } from '~/plural'
 import { type InertiaProps } from '~/types'
 
 type PageProps = InertiaProps<{ ingredients: Ingredient[]; catalog: Catalog }>
 
 export default function Inventory({ ingredients, catalog }: PageProps) {
-  const { filters, sort, filtered, hasActiveFilters, updateFilters, toggleSort, resetFilters } =
+  const { filters, sort, filtered, hasActiveFilters, updateFilters, setSort, resetFilters } =
     useInventoryFilter(ingredients)
 
   return (
@@ -21,31 +22,33 @@ export default function Inventory({ ingredients, catalog }: PageProps) {
       <Page>
         <PageHeader
           title="Inventaire"
-          actions={<CopyPantryButton disabled={ingredients.length === 0} />}
+          meta={
+            filtered.length === ingredients.length
+              ? plural(ingredients.length, 'ingrédient')
+              : `${filtered.length} sur ${ingredients.length}`
+          }
+          actions={
+            <>
+              <CopyPantryButton disabled={ingredients.length === 0} />
+              <AddIngredientDialog catalog={catalog} />
+            </>
+          }
         />
 
-        <StatsSummary ingredients={ingredients} />
+        <UrgentShelf ingredients={ingredients} />
 
-        <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_380px] xl:gap-10">
-          <Card className="kraft-card order-2 min-w-0 py-0 xl:order-1">
-            <InventoryTable
-              ingredients={filtered}
-              total={ingredients.length}
-              catalog={catalog}
-              sort={sort}
-              onSort={toggleSort}
-            />
-          </Card>
-
-          <aside className="order-1 space-y-6 xl:sticky xl:top-8 xl:order-2 xl:self-start">
-            <InventoryActions
-              catalog={catalog}
-              filters={filters}
-              hasActiveFilters={hasActiveFilters}
-              onUpdateFilters={updateFilters}
-              onResetFilters={resetFilters}
-            />
-          </aside>
+        <div className="flex flex-col gap-4">
+          <InventoryToolbar
+            ingredients={ingredients}
+            catalog={catalog}
+            filters={filters}
+            sort={sort}
+            hasActiveFilters={hasActiveFilters}
+            onUpdateFilters={updateFilters}
+            onSort={setSort}
+            onResetFilters={resetFilters}
+          />
+          <InventoryList ingredients={filtered} total={ingredients.length} catalog={catalog} />
         </div>
       </Page>
     </>

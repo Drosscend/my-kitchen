@@ -1,32 +1,43 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import '@fontsource/kalam/400.css';
-@import '@fontsource/kalam/700.css';
+@import '@fontsource-variable/bricolage-grotesque/standard.css';
 
 @source '../';
 
+@custom-variant dark (&:is(.dark *));
+
 @theme inline {
+  --font-sans: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-paper: var(--paper);
-  --color-paper-light: var(--paper-light);
-  --font-handwriting: 'Kalam', cursive;
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-mustard: var(--mustard);
+  --color-tomato: var(--tomato);
+  --color-sage: var(--sage);
+  --color-sage-foreground: var(--sage-foreground);
+  --color-cornflower: var(--cornflower);
+  --color-cinnamon: var(--cinnamon);
+  --color-ruling: var(--ruling);
+  --color-note-expired: var(--note-expired);
+  --color-note-soon: var(--note-soon);
+  --color-note-ok: var(--note-ok);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -36,64 +47,102 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
-/* Palette Kraft Rustique */
+/* Carnet aimanté: kraft paper, blue ink, fridge magnet colours */
 :root {
   color-scheme: light;
-  --background: oklch(0.96 0.02 75);
-  --paper: oklch(0.91 0.03 75);
-  --paper-light: oklch(0.95 0.02 75);
-  --foreground: oklch(0.25 0.05 50);
+  --background: #ece5d6;
+  --foreground: #29231e;
+  --card: #fffefb;
+  --card-foreground: #29231e;
+  --popover: #fffefb;
+  --popover-foreground: #29231e;
+  --primary: #2a4290;
+  --primary-foreground: #ffffff;
+  --secondary: #e3dbca;
+  --secondary-foreground: #29231e;
+  --muted: #f5f1e8;
+  --muted-foreground: #6b6155;
+  --accent: #fceba6;
+  --accent-foreground: #29231e;
+  --destructive: #c0391f;
+  --warning: #e0a82e;
+  --warning-foreground: #6a4700;
+  --border: #e0d7c5;
+  --input: #cbbfa8;
+  --ring: #2a4290;
+  --radius: 0.625rem;
 
-  --card: oklch(0.91 0.03 75);
-  --card-foreground: oklch(0.25 0.05 50);
-  --popover: oklch(0.95 0.02 75);
-  --popover-foreground: oklch(0.25 0.05 50);
-
-  --primary: oklch(0.55 0.15 35);
-  --primary-foreground: oklch(0.98 0.01 75);
-
-  --secondary: oklch(0.55 0.12 75);
-  --secondary-foreground: oklch(0.98 0.01 75);
-
-  --accent: oklch(0.45 0.08 140);
-  --accent-foreground: oklch(0.98 0.01 75);
-
-  --muted: oklch(0.75 0.03 60);
-  --muted-foreground: oklch(0.55 0.04 60);
-
-  --destructive: oklch(0.55 0.18 25);
-
-  --border: oklch(0.7 0.05 60);
-  --input: oklch(0.7 0.05 60);
-  --ring: oklch(0.55 0.15 35);
-
-  --radius: 0.5rem;
+  --mustard: #e9b949;
+  --tomato: #e2684a;
+  --sage: #93ae7e;
+  --sage-foreground: #46622f;
+  --cornflower: #8db2da;
+  --cinnamon: #b08a45;
+  --ruling: #dce3f0;
+  --note-expired: #fde6dd;
+  --note-soon: #fff1c4;
+  --note-ok: #eef3e6;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background font-sans text-foreground antialiased;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .29 0 0 0 0 .22 0 0 0 0 .16 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+      radial-gradient(circle at 1px 1px, rgb(74 55 40 / 0.16) 1px, transparent 1.4px);
+    background-size:
+      160px 160px,
+      16px 16px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-extrabold tracking-tight text-balance font-stretch-80%;
+  }
+
+  [data-swatch='mustard'] {
+    --swatch: var(--color-mustard);
+  }
+
+  [data-swatch='tomato'] {
+    --swatch: var(--color-tomato);
+  }
+
+  [data-swatch='sage'] {
+    --swatch: var(--color-sage);
+  }
+
+  [data-swatch='cornflower'] {
+    --swatch: var(--color-cornflower);
+  }
+
+  [data-swatch='cinnamon'] {
+    --swatch: var(--color-cinnamon);
+  }
+
+  [data-swatch='neutral'] {
+    --swatch: var(--color-input);
   }
 }
 
-.kraft-title {
-  font-family: var(--font-handwriting);
-  letter-spacing: -0.02em;
+@utility page-width {
+  @apply mx-auto w-full max-w-360 px-4 sm:px-6 lg:px-8;
 }
 
-.kraft-card {
-  @apply bg-paper;
-  box-shadow:
-    0 1px 3px oklch(0.25 0.05 50 / 0.1),
-    0 4px 6px oklch(0.25 0.05 50 / 0.05);
-}
-
-.kraft-border-dashed {
-  border-style: dashed;
-  border-color: oklch(0.55 0.04 60 / 0.5);
+@utility highlight {
+  background: linear-gradient(
+      100deg,
+      transparent 1%,
+      color-mix(in srgb, var(--highlight-color, #f4cd46) 55%, transparent) 3%,
+      color-mix(in srgb, var(--highlight-color, #f4cd46) 40%, transparent) 96%,
+      transparent 99%
+    )
+    0 62% / 100% 62% no-repeat;
 }
 
 input[type='number']::-webkit-inner-spin-button,
@@ -105,4 +154,22 @@ input[type='number']::-webkit-outer-spin-button {
 input[type='number'] {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+@utility paper-stack {
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    0 4px 0 -1px #f6f1e6,
+    0 4px 0 0 var(--color-border),
+    0 9px 0 -2px #f1ebde,
+    0 9px 0 -1px var(--color-border);
+}
+
+@utility magnet {
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.7) 0 13%, transparent 18%), var(--swatch);
+  box-shadow:
+    inset 0 -2px 0 rgb(41 35 30 / 0.22),
+    0 3px 4px -1px rgb(41 35 30 / 0.35);
 }

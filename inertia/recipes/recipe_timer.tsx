@@ -12,8 +12,6 @@ interface RecipeTimerProps {
   onReset: (id: string) => void
 }
 
-const TABULAR = { fontVariantNumeric: 'tabular-nums' } as const
-
 export function RecipeTimer({ id, duration, timer, onStart, onStop, onReset }: RecipeTimerProps) {
   const running = timer?.running ?? false
   const paused = timer !== undefined && !timer.running && timer.remaining > 0
@@ -28,17 +26,17 @@ export function RecipeTimer({ id, duration, timer, onStart, onStop, onReset }: R
         ? { label: 'Reprendre', icon: PlayIcon, action: () => onStart(id, duration) }
         : { label: 'Démarrer', icon: PlayIcon, action: () => onStart(id, duration) }
   const MainIcon = main.icon
-  const accent = done ? '' : 'border-accent/40 text-accent hover:bg-accent/10 hover:text-accent'
+  const accent = done ? '' : 'border-primary/40 text-primary hover:bg-primary/10 hover:text-primary'
 
   return (
-    <div className="flex items-center justify-center gap-3 border-t border-border px-4 py-3">
+    <div className="flex items-center justify-center gap-3 border-t px-4 py-3">
       <Button
         size="lg"
         variant={done ? 'secondary' : 'outline'}
         className={`h-16 w-full max-w-72 gap-4 rounded-xl border-2 ${accent}`}
         onClick={main.action}
       >
-        <span className="text-4xl font-semibold sm:text-5xl" style={TABULAR}>
+        <span className="text-4xl font-bold tabular-nums font-stretch-80% sm:text-5xl">
           {formatTimer(remaining)}
         </span>
         <span className="flex items-center gap-2 text-base">

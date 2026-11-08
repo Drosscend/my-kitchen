@@ -61,12 +61,12 @@ export function CookingMode({
     .filter(({ timer, index }) => timer?.running && index !== currentStepIndex)
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-paper">
-      <div className="flex items-center justify-between border-b border-border p-4">
+    <div className="fixed inset-0 z-50 flex flex-col bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+      <div className="flex h-14 items-center justify-between gap-4 px-2 sm:px-4">
         <Button variant="ghost" onClick={onExit}>
           <XIcon data-icon="inline-start" /> Quitter
         </Button>
-        <span className="text-base text-muted-foreground">
+        <span className="text-sm font-medium text-muted-foreground tabular-nums">
           {onIngredients ? 'Ingrédients' : `Étape ${currentStepIndex + 1} / ${totalSteps}`}
         </span>
         <div className="flex w-16 justify-end">
@@ -76,9 +76,9 @@ export function CookingMode({
         </div>
       </div>
 
-      <div className="h-1 bg-muted" aria-hidden>
+      <div className="h-1 bg-secondary" aria-hidden>
         <div
-          className="h-full bg-accent transition-all duration-300"
+          className="h-full bg-primary transition-[width] duration-300"
           style={{ width: `${((currentStepIndex + 1) / totalSteps) * 100}%` }}
         />
       </div>
@@ -92,14 +92,11 @@ export function CookingMode({
           <div className="w-full max-w-3xl">
             {onIngredients ? (
               <>
-                <h2 className="kraft-title mb-8 text-center text-3xl font-bold sm:text-4xl lg:text-5xl">
-                  Ingrédients
-                </h2>
-                <ul className="mx-auto max-w-xl space-y-4 text-xl sm:text-2xl lg:text-3xl">
+                <h2 className="mb-8 text-3xl sm:text-4xl lg:text-5xl">Ingrédients</h2>
+                <ul className="divide-y divide-ruling text-xl sm:text-2xl lg:text-3xl">
                   {recipe.ingredients.map((ingredient) => (
-                    <li key={ingredient.ref} className="flex items-baseline gap-3">
-                      <span className="size-2 shrink-0 rounded-full bg-accent/60" />
-                      <span>{formatIngredient(ingredient, scale)}</span>
+                    <li key={ingredient.ref} className="py-3 sm:py-4">
+                      {formatIngredient(ingredient, scale)}
                     </li>
                   ))}
                 </ul>
@@ -107,11 +104,9 @@ export function CookingMode({
             ) : currentStep ? (
               <>
                 {currentStep.title && (
-                  <h2 className="kraft-title mb-6 text-center text-3xl font-bold sm:text-4xl lg:text-5xl">
-                    {currentStep.title}
-                  </h2>
+                  <h2 className="mb-6 text-3xl sm:text-4xl lg:text-5xl">{currentStep.title}</h2>
                 )}
-                <p className="text-xl leading-relaxed text-foreground/80 sm:text-2xl sm:leading-relaxed lg:text-3xl lg:leading-relaxed">
+                <p className="text-2xl leading-snug text-pretty sm:text-3xl sm:leading-snug lg:text-4xl lg:leading-snug">
                   {resolveStep(currentStep, ingredients, scale)}
                 </p>
               </>
@@ -132,37 +127,35 @@ export function CookingMode({
       )}
 
       {otherRunningTimers.length > 0 && (
-        <div className="flex items-center justify-center gap-4 border-t border-border bg-accent/10 px-4 py-2">
+        <div className="flex flex-wrap items-center justify-center gap-2 border-t bg-secondary px-4 py-2">
           {otherRunningTimers.map(({ step, index, timer }) => (
             <button
               key={step.ref}
               type="button"
               onClick={() => onGoToStep(index)}
-              className="flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm text-accent transition-colors hover:bg-accent/20"
+              className="flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm text-primary transition-colors hover:bg-background"
             >
               <TimerIcon className="size-3.5" />
               <span className="font-medium">{step.title ?? `Étape ${index + 1}`}</span>
-              <span className="font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {formatTimer(timer.remaining)}
-              </span>
+              <span className="font-semibold tabular-nums">{formatTimer(timer.remaining)}</span>
             </button>
           ))}
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-4 border-t border-border p-4">
+      <div className="flex items-center justify-between gap-3 border-t p-4">
         <Button
           variant="outline"
           size="lg"
-          className="h-12 flex-1 text-base sm:min-w-40 sm:flex-none"
+          className="h-14 flex-1 text-base sm:min-w-44 sm:flex-none"
           onClick={onPrevStep}
           disabled={onIngredients}
         >
-          <ArrowLeftIcon data-icon="inline-start" /> Préc.
+          <ArrowLeftIcon data-icon="inline-start" /> Précédent
         </Button>
         <Button
           size="lg"
-          className="h-12 flex-1 text-base sm:min-w-40 sm:flex-none"
+          className="h-14 flex-[2] text-base sm:min-w-44 sm:flex-none"
           onClick={lastStep ? onFinish : onNextStep}
         >
           {lastStep ? (
@@ -171,7 +164,7 @@ export function CookingMode({
             </>
           ) : (
             <>
-              Suiv. <ArrowRightIcon data-icon="inline-end" />
+              Suivant <ArrowRightIcon data-icon="inline-end" />
             </>
           )}
         </Button>

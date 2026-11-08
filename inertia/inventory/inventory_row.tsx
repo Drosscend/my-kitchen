@@ -1,8 +1,5 @@
-import { useRouter } from '@adonisjs/inertia/react'
-import { MinusIcon, PlusIcon, SnowflakeIcon, Trash2Icon } from 'lucide-react'
+import { MinusIcon, PlusIcon, SlidersHorizontalIcon, SnowflakeIcon } from 'lucide-react'
 import { useState, type KeyboardEvent, type ReactNode } from 'react'
-import { ConfirmDeleteDialog } from '~/components/confirm_delete_dialog'
-import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import {
@@ -11,18 +8,14 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '~/components/ui/input-group'
-import { BatchesDialog } from '~/inventory/batches_dialog'
-import {
-  CATEGORY_ICONS,
-  type Catalog,
-  type CatalogOption,
-  type Ingredient,
-} from '~/inventory/catalog'
+import { type Catalog, type CatalogOption, type Ingredient } from '~/inventory/catalog'
 import { CatalogSelect } from '~/inventory/catalog_select'
-import { expiryBadge } from '~/inventory/expiry'
+import { CategoryMark } from '~/inventory/category_mark'
+import { ExpiryStamp } from '~/inventory/expiry_stamp'
+import { IngredientDialog } from '~/inventory/ingredient_dialog'
+import { categoryIcon, stateIcon } from '~/inventory/option_icons'
+import { useIngredientActions } from '~/inventory/use_ingredient_actions'
 import { plural } from '~/plural'
-
-const VISIT_OPTIONS = { preserveScroll: true, preserveState: true } as const
 
 interface InventoryRowProps {
   ingredient: Ingredient
@@ -32,28 +25,12 @@ interface InventoryRowProps {
 type EditableField = 'name' | 'quantity' | 'unit' | 'category' | 'state' | null
 
 export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
-  const router = useRouter()
+  const { update, updateField, adjust } = useIngredientActions(ingredient)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<EditableField>(null)
   const [draftName, setDraftName] = useState(ingredient.name)
   const [draftQuantity, setDraftQuantity] = useState(String(ingredient.quantity))
-  const CategoryIcon = CATEGORY_ICONS[ingredient.category]
-  const badge = expiryBadge(ingredient)
-
-  function update(
-    changes: Partial<Pick<Ingredient, 'name' | 'quantity' | 'unit' | 'category' | 'state'>>
-  ) {
-    router.visit(
-      { route: 'inventory.update', routeParams: { id: ingredient.id } },
-      { ...VISIT_OPTIONS, data: changes }
-    )
-  }
-
-  function adjust(delta: number) {
-    router.visit(
-      { route: 'inventory.adjust', routeParams: { id: ingredient.id } },
-      { ...VISIT_OPTIONS, data: { delta } }
-    )
-  }
+  const frozen = ingredient.state === 'frozen'
 
   function startEditing(field: EditableField) {
     setDraftName(ingredient.name)
@@ -93,7 +70,8 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
     field: 'unit' | 'category' | 'state',
     options: CatalogOption[],
     editLabel: string,
-    label: ReactNode
+    label: ReactNode,
+    icon?: (value: string) => ReactNode
   ) {
     if (editing !== field) {
       return (
@@ -101,7 +79,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
           type="button"
           onClick={() => startEditing(field)}
           aria-label={editLabel}
-          className="flex cursor-pointer items-center gap-1 text-xs underline-offset-2 hover:underline"
+          className="flex h-9 cursor-pointer items-center gap-1.5 truncate text-left text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
           {label}
         </button>
@@ -112,24 +90,58 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
       <CatalogSelect
         options={options}
         value={ingredient[field]}
+        icon={icon}
         open
         onOpenChange={(open) => !open && setEditing(null)}
-        triggerClassName="h-5 min-w-14 border-none bg-transparent px-1 text-xs text-muted-foreground"
         onValueChange={(value) => {
-          if (value !== ingredient[field]) {
-            update({ [field]: value })
-          }
+          updateField(field, value)
           setEditing(null)
         }}
       />
     )
   }
 
+  const expiry = (
+    <>
+      <ExpiryStamp {...ingredient} />
+      {ingredient.batches.length > 1 && (
+        <span className="text-xs text-muted-foreground">
+          {plural(ingredient.batches.length, 'lot')}
+        </span>
+      )}
+    </>
+  )
+
+  const lowStock = ingredient.lowStock && (
+    <span className="highlight shrink-0 px-0.75 text-[13px] font-bold text-destructive [--highlight-color:var(--color-tomato)]">
+      Stock bas
+    </span>
+  )
+
   return (
-    <tr className="group border-b border-border/50 transition-colors hover:bg-paper-light/50">
-      <td className="px-4 py-3 first:pl-5 last:pr-5 max-md:sticky max-md:left-0 max-md:z-10 max-md:bg-card">
-        <div className="flex items-center gap-2">
-          <CategoryIcon className="size-4 shrink-0 text-secondary" />
+    <li className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-3.5 py-2.75 transition-colors hover:bg-muted/60 lg:grid-cols-(--row-columns) lg:gap-x-4 lg:px-5 lg:py-1.75">
+      <div className="min-w-0">
+        <button
+          type="button"
+          onClick={() => setDialogOpen(true)}
+          className="flex w-full min-w-0 items-center gap-2.5 text-left lg:hidden"
+        >
+          <CategoryMark category={ingredient.category} size="sm" />
+          <span className="flex min-w-0 flex-col items-start gap-1.5">
+            <span className="flex max-w-full items-center gap-2">
+              <span className="truncate text-[15.5px] font-semibold">{ingredient.name}</span>
+              {lowStock}
+            </span>
+            <span className="flex items-center gap-2 text-xs text-muted-foreground">
+              {expiry}
+              <span className="truncate">{ingredient.categoryLabel}</span>
+              {frozen && <SnowflakeIcon className="size-3.5 text-primary" aria-label="Congelé" />}
+            </span>
+          </span>
+        </button>
+
+        <div className="hidden min-w-0 items-center gap-2.5 lg:flex">
+          <CategoryMark category={ingredient.category} size="sm" />
           {editing === 'name' ? (
             <Input
               ref={(input) => input?.focus()}
@@ -138,24 +150,27 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
               onChange={(event) => setDraftName(event.target.value)}
               onBlur={commitName}
               onKeyDown={(event) => onKeyDown(event, commitName)}
-              className="h-7 text-sm"
             />
           ) : (
             <button
               type="button"
               onClick={() => startEditing('name')}
               aria-label={`Modifier le nom : ${ingredient.name}`}
-              className="cursor-text text-left font-medium underline-offset-2 hover:underline"
+              className="h-9 cursor-text truncate text-left text-[15px] font-semibold underline-offset-4 hover:underline"
             >
               {ingredient.name}
             </button>
           )}
+          {lowStock}
         </div>
-      </td>
-      <td className="px-4 py-3 first:pl-5 last:pr-5">
-        <InputGroup className="w-28">
+      </div>
+
+      <div className="flex items-center gap-1.5">
+        <InputGroup className="h-9 w-30 rounded-full bg-card">
           <InputGroupAddon align="inline-start">
             <InputGroupButton
+              size="icon-sm"
+              className="rounded-full text-muted-foreground"
               aria-label="Retirer une unité"
               onClick={() => adjust(-1)}
               disabled={ingredient.quantity <= 0}
@@ -167,112 +182,81 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
             type="number"
             min={0}
             step="any"
-            aria-label="Quantité"
+            aria-label={`Quantité, en ${ingredient.unitLabel}`}
             value={editing === 'quantity' ? draftQuantity : String(ingredient.quantity)}
             onFocus={() => startEditing('quantity')}
             onChange={(event) => setDraftQuantity(event.target.value)}
             onBlur={commitQuantity}
             onKeyDown={(event) => onKeyDown(event, commitQuantity)}
-            className="text-center text-sm"
+            className="text-center font-semibold tabular-nums"
           />
           <InputGroupAddon align="inline-end">
-            <InputGroupButton aria-label="Ajouter une unité" onClick={() => adjust(1)}>
+            <InputGroupButton
+              size="icon-sm"
+              className="rounded-full bg-muted"
+              aria-label="Ajouter une unité"
+              onClick={() => adjust(1)}
+            >
               <PlusIcon />
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>
-      </td>
-      <td className="px-4 py-3 first:pl-5 last:pr-5">
+        <span className="w-6 text-xs text-muted-foreground lg:hidden">{ingredient.unitLabel}</span>
+      </div>
+
+      <div className="hidden lg:block">
         {selectCell(
           'unit',
           catalog.units,
           `Modifier l'unité : ${ingredient.unitLabel}`,
-          <span className="text-muted-foreground">{ingredient.unitLabel}</span>
+          ingredient.unitLabel
         )}
-      </td>
-      <td className="px-4 py-3 first:pl-5 last:pr-5">
+      </div>
+      <div className="hidden min-w-0 lg:block">
         {selectCell(
           'category',
           catalog.categories,
           `Modifier la catégorie : ${ingredient.categoryLabel}`,
-          <Badge variant="secondary" className="text-xs hover:bg-secondary/80">
-            {ingredient.categoryLabel}
-          </Badge>
+          ingredient.categoryLabel,
+          categoryIcon
         )}
-      </td>
-      <td className="px-4 py-3 first:pl-5 last:pr-5">
+      </div>
+      <div className="hidden min-w-0 lg:block">
         {selectCell(
           'state',
           catalog.states,
           `Modifier l'état : ${ingredient.stateLabel}`,
           <>
-            {ingredient.state === 'frozen' && <SnowflakeIcon className="size-3 text-accent" />}
-            <span className="text-muted-foreground">{ingredient.stateLabel}</span>
-          </>
+            {frozen && <SnowflakeIcon className="size-3.5 text-primary" />}
+            {ingredient.stateLabel}
+          </>,
+          stateIcon
         )}
-      </td>
-      <td className="px-4 py-3 first:pl-5 last:pr-5">
-        <BatchesDialog
-          ingredient={ingredient}
-          catalog={catalog}
-          trigger={
-            <button
-              type="button"
-              aria-label={`Gérer les lots : ${ingredient.name}`}
-              className="flex cursor-pointer flex-col items-start gap-0.5 text-xs underline-offset-2 hover:underline"
-            >
-              {badge?.variant ? (
-                <Badge variant={badge.variant} className="text-xs">
-                  {badge.label}
-                </Badge>
-              ) : (
-                <span className="text-muted-foreground">{badge?.label ?? 'Sans date'}</span>
-              )}
-              {ingredient.batches.length > 1 && (
-                <span className="text-muted-foreground">
-                  {plural(ingredient.batches.length, 'lot')}
-                </span>
-              )}
-            </button>
-          }
-        />
-      </td>
-      <td className="px-4 py-3 first:pl-5 last:pr-5">
-        <div className="flex flex-wrap gap-1">
-          {ingredient.perishable && (
-            <Badge variant="warning" className="text-xs">
-              Périssable
-            </Badge>
-          )}
-          {ingredient.lowStock && (
-            <Badge variant="destructive" className="text-xs">
-              Stock bas
-            </Badge>
-          )}
-        </div>
-      </td>
-      <td className="px-4 py-3 first:pl-5 last:pr-5">
-        <ConfirmDeleteDialog
-          title="Supprimer cet ingrédient ?"
-          description={`${ingredient.name} disparaît définitivement du garde-manger.`}
-          onConfirm={() =>
-            router.visit(
-              { route: 'inventory.destroy', routeParams: { id: ingredient.id } },
-              VISIT_OPTIONS
-            )
-          }
-          trigger={
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Supprimer ${ingredient.name}`}
-              className="transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
-            >
-              <Trash2Icon className="text-muted-foreground" />
-            </Button>
-          }
-        />
-      </td>
-    </tr>
+      </div>
+      <button
+        type="button"
+        onClick={() => setDialogOpen(true)}
+        aria-label={`Gérer les lots : ${ingredient.name}`}
+        className="hidden h-9 cursor-pointer items-center gap-2 lg:flex"
+      >
+        {expiry}
+      </button>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={`Modifier ${ingredient.name}`}
+        onClick={() => setDialogOpen(true)}
+        className="hidden lg:inline-flex"
+      >
+        <SlidersHorizontalIcon className="text-muted-foreground" />
+      </Button>
+
+      <IngredientDialog
+        ingredient={ingredient}
+        catalog={catalog}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+    </li>
   )
 }

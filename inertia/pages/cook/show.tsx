@@ -60,7 +60,7 @@ export default function CookingSession({ session: initial, user }: PageProps) {
       <Dialog open={showQr} onOpenChange={setShowQr}>
         <DialogContent className="text-center">
           <DialogHeader>
-            <DialogTitle className="kraft-title text-lg">Scanner pour rejoindre</DialogTitle>
+            <DialogTitle className="text-xl font-extrabold">Scanner pour rejoindre</DialogTitle>
             <DialogDescription>
               Scanne le QR code ou saisis le code sur un autre appareil
             </DialogDescription>
@@ -68,7 +68,7 @@ export default function CookingSession({ session: initial, user }: PageProps) {
           <div className="flex justify-center rounded-lg bg-white p-4">
             <QRCodeSVG value={shareUrl} size={200} level="M" />
           </div>
-          <p className="font-mono text-2xl font-bold tracking-[0.3em]">{initial.code}</p>
+          <p className="text-3xl font-bold tracking-[0.3em] tabular-nums">{initial.code}</p>
           <p className="text-xs break-all text-muted-foreground">{shareUrl}</p>
         </DialogContent>
       </Dialog>

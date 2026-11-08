@@ -1,32 +1,22 @@
-import { cn } from 'cn'
 import { type ReactNode } from 'react'
 
-export const CONTAINER = 'w-full px-5 sm:px-8 lg:px-12 2xl:px-16'
-
-interface PageProps {
-  children: ReactNode
-  width?: 'wide' | 'narrow'
-}
-
-export function Page({ children, width = 'wide' }: PageProps) {
-  return (
-    <main
-      className={cn(CONTAINER, 'flex-1 py-8 lg:py-12', width === 'narrow' && 'mx-auto max-w-5xl')}
-    >
-      {children}
-    </main>
-  )
+export function Page({ children }: { children: ReactNode }) {
+  return <main className="page-width flex-1 pt-6 pb-28 sm:pt-8 md:pb-12">{children}</main>
 }
 
 interface PageHeaderProps {
   title: string
+  meta?: ReactNode
   actions?: ReactNode
 }
 
-export function PageHeader({ title, actions }: PageHeaderProps) {
+export function PageHeader({ title, meta, actions }: PageHeaderProps) {
   return (
-    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:mb-10">
-      <h1 className="kraft-title text-3xl font-bold text-primary sm:text-4xl">{title}</h1>
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-4 sm:mb-8">
+      <div className="flex min-w-0 items-baseline gap-3">
+        <h1 className="text-4xl leading-none sm:text-[44px]">{title}</h1>
+        {meta && <span className="text-sm text-muted-foreground tabular-nums">{meta}</span>}
+      </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
   )

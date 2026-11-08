@@ -14,7 +14,7 @@ export default function JoinCookingSession() {
       <main className="flex flex-1 flex-col items-center justify-center gap-6 p-4">
         <div className="flex items-center gap-2">
           <CookingPotIcon className="size-8" />
-          <h1 className="kraft-title text-2xl font-bold">Rejoindre une session</h1>
+          <h1 className="text-2xl">Rejoindre une session</h1>
         </div>
 
         <Form route="cooking.join.store" className="flex flex-col items-center gap-4">
@@ -30,7 +30,7 @@ export default function JoinCookingSession() {
                 onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))}
                 placeholder="000000"
                 aria-label="Code de la session"
-                className="h-auto w-48 rounded-lg p-3 text-center font-mono text-3xl font-bold tracking-[0.3em] md:text-3xl"
+                className="h-auto w-48 rounded-lg p-3 text-center text-3xl font-bold tracking-[0.3em] tabular-nums md:text-3xl"
               />
               <Button type="submit" size="lg" disabled={code.length !== 6 || processing}>
                 Rejoindre

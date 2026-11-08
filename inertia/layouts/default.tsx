@@ -1,29 +1,47 @@
-import { Form, Link } from '@adonisjs/inertia/react'
+import { Link } from '@adonisjs/inertia/react'
 import { usePage } from '@inertiajs/react'
 import { cn } from 'cn'
-import { ClipboardListIcon, CookingPotIcon, LogOutIcon, UserRoundIcon } from 'lucide-react'
-import { type ReactElement, type ReactNode, useEffect } from 'react'
+import { BookOpenIcon, CircleUserRoundIcon, type LucideIcon, ShelvingUnitIcon } from 'lucide-react'
+import { type ReactElement, useEffect } from 'react'
 import { toast } from 'sonner'
-import { CONTAINER } from '~/components/page'
 import { Button } from '~/components/ui/button'
 import { Toaster } from '~/components/ui/sonner'
+import { type Swatch } from '~/swatch'
 
 type Route = 'inventory.index' | 'recipes.index' | 'account.show'
 
-function NavLink({ route, path, children }: { route: Route; path: string; children: ReactNode }) {
-  const { url } = usePage()
-  const active = path === '/' ? url === '/' : url.startsWith(path)
+const SECTIONS: {
+  route: Route
+  path: string
+  label: string
+  icon: LucideIcon
+  swatch: Swatch
+}[] = [
+  {
+    route: 'inventory.index',
+    path: '/',
+    label: 'Inventaire',
+    icon: ShelvingUnitIcon,
+    swatch: 'mustard',
+  },
+  {
+    route: 'recipes.index',
+    path: '/recipes',
+    label: 'Recettes',
+    icon: BookOpenIcon,
+    swatch: 'tomato',
+  },
+  {
+    route: 'account.show',
+    path: '/account',
+    label: 'Compte',
+    icon: CircleUserRoundIcon,
+    swatch: 'sage',
+  },
+]
 
-  return (
-    <Button
-      variant="ghost"
-      nativeButton={false}
-      className={cn('gap-1.5 px-2 sm:px-3', active && 'bg-paper-light text-foreground')}
-      render={<Link route={route} aria-current={active ? 'page' : undefined} />}
-    >
-      {children}
-    </Button>
-  )
+function isActive(url: string, path: string) {
+  return path === '/' ? url === '/' : url.startsWith(path)
 }
 
 export default function Layout({ children }: { children: ReactElement }) {
@@ -45,61 +63,86 @@ export default function Layout({ children }: { children: ReactElement }) {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="border-b border-border/60 bg-paper/80 backdrop-blur">
-        <div className={cn(CONTAINER, 'flex h-16 items-center justify-between gap-6')}>
+      <header className="border-b bg-card pt-[env(safe-area-inset-top)]">
+        <div className="page-width flex h-14 items-center justify-between gap-6 md:h-15">
           <Link
             route="inventory.index"
-            className="kraft-title flex shrink-0 items-center gap-2.5 text-2xl font-bold whitespace-nowrap text-primary"
+            className="flex shrink-0 items-center gap-2.5 text-lg font-extrabold tracking-tight font-stretch-[88%]"
           >
-            <img src="/logo.svg" alt="" className="size-9" />
-            <span className="hidden sm:inline">Mon Garde-Manger</span>
+            <img src="/logo.svg" alt="" className="size-8" />
+            Mon Garde-Manger
           </Link>
 
-          <nav className="flex items-center gap-1" aria-label="Navigation">
-            {props.user ? (
-              <>
-                <NavLink route="inventory.index" path="/">
-                  <ClipboardListIcon data-icon="inline-start" />
-                  <span className="hidden sm:inline">Inventaire</span>
-                </NavLink>
-                <NavLink route="recipes.index" path="/recipes">
-                  <CookingPotIcon data-icon="inline-start" />
-                  <span className="hidden sm:inline">Recettes</span>
-                </NavLink>
-                <NavLink route="account.show" path="/account">
-                  <UserRoundIcon data-icon="inline-start" />
-                  <span className="hidden sm:inline">Mon compte</span>
-                </NavLink>
-                <Form route="session.destroy" className="ml-2 border-l border-border/60 pl-3">
-                  <Button type="submit" variant="ghost" className="gap-1.5 px-2 sm:px-3">
-                    <LogOutIcon data-icon="inline-start" />
-                    <span className="hidden sm:inline">Se déconnecter</span>
-                  </Button>
-                </Form>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  nativeButton={false}
-                  className="px-3"
-                  render={<Link route="session.create" />}
-                >
-                  Se connecter
-                </Button>
-                <Button
-                  nativeButton={false}
-                  className="px-3"
-                  render={<Link route="new_account.create" />}
-                >
-                  Créer un compte
-                </Button>
-              </>
-            )}
-          </nav>
+          {props.user ? (
+            <nav aria-label="Navigation" className="hidden gap-1 self-end md:flex">
+              {SECTIONS.map(({ route, path, label, swatch }) => {
+                const active = isActive(url, path)
+
+                return (
+                  <Link
+                    key={route}
+                    route={route}
+                    aria-current={active ? 'page' : undefined}
+                    data-swatch={swatch}
+                    className={cn(
+                      'relative -mb-px flex h-10.5 items-center rounded-t-lg px-4.5 text-sm font-semibold text-muted-foreground transition-colors before:absolute before:inset-x-2 before:top-0 before:h-1 before:rounded-b-sm before:bg-(--swatch) hover:text-foreground',
+                      active &&
+                        'bg-(--swatch) text-foreground shadow-[inset_0_-1px_0_rgb(41_35_30/0.15)] before:hidden'
+                    )}
+                  >
+                    {label}
+                  </Link>
+                )
+              })}
+            </nav>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                nativeButton={false}
+                className="max-sm:hidden"
+                render={<Link route="session.create" />}
+              >
+                Se connecter
+              </Button>
+              <Button nativeButton={false} render={<Link route="new_account.create" />}>
+                Créer un compte
+              </Button>
+            </div>
+          )}
         </div>
       </header>
+
       <div className="flex flex-1 flex-col">{children}</div>
+
+      {props.user && (
+        <nav
+          aria-label="Navigation"
+          className="fixed inset-x-0 bottom-0 isolate z-40 grid grid-cols-3 border-t bg-card pb-[env(safe-area-inset-bottom)] md:hidden"
+        >
+          {SECTIONS.map(({ route, path, label, icon: Icon, swatch }) => {
+            const active = isActive(url, path)
+
+            return (
+              <Link
+                key={route}
+                route={route}
+                aria-current={active ? 'page' : undefined}
+                data-swatch={swatch}
+                className={cn(
+                  'relative flex h-16 flex-col items-center justify-center gap-1 text-xs font-semibold text-muted-foreground before:absolute before:top-0 before:left-1/2 before:h-1 before:w-8 before:-translate-x-1/2 before:rounded-b-sm before:bg-(--swatch)',
+                  active &&
+                    'text-foreground before:hidden after:absolute after:inset-x-3 after:-top-2 after:bottom-1.5 after:-z-10 after:rounded-t-xl after:rounded-b-md after:bg-(--swatch) after:shadow-[0_-2px_6px_-3px_rgb(41_35_30/0.3)]'
+                )}
+              >
+                <Icon className="size-5" strokeWidth={active ? 2.25 : 1.75} />
+                {label}
+              </Link>
+            )
+          })}
+        </nav>
+      )}
+
       <Toaster position="top-center" />
     </div>
   )

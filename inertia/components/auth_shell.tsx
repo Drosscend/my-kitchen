@@ -3,19 +3,18 @@ import { type ReactNode } from 'react'
 interface AuthShellProps {
   title: string
   children: ReactNode
-  footer: ReactNode
+  footer?: ReactNode
 }
 
 export function AuthShell({ title, children, footer }: AuthShellProps) {
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-12 sm:px-8">
-      <img src="/logo.svg" alt="" className="mb-6 size-16" />
-      <section className="kraft-card rounded-lg p-6 sm:p-8">
-        <h1 className="kraft-title mb-6 text-3xl font-bold text-primary">{title}</h1>
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-10 sm:px-6">
+      <section className="rounded-xl border bg-card p-6 shadow-xs sm:p-8">
+        <h1 className="mb-6 text-2xl">{title}</h1>
         {children}
-        <p className="mt-6 border-t border-border/60 pt-5 text-center text-xs text-muted-foreground">
-          {footer}
-        </p>
+        {footer && (
+          <p className="mt-6 border-t pt-5 text-center text-sm text-muted-foreground">{footer}</p>
+        )}
       </section>
     </main>
   )

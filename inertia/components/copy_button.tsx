@@ -36,7 +36,7 @@ export function CopyButton({
   return (
     <Button variant={variant} onClick={copy} aria-label={copied ? COPIED_LABEL : label} {...props}>
       {copied ? (
-        <CheckIcon data-icon={iconSlot} className="text-accent" />
+        <CheckIcon data-icon={iconSlot} className="text-primary" />
       ) : (
         <CopyIcon data-icon={iconSlot} />
       )}
