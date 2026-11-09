@@ -13,6 +13,7 @@ function view(overrides: Partial<IngredientView>): IngredientView {
     categoryLabel: 'Légumes',
     state: 'fresh',
     stateLabel: 'Frais',
+    lowStockThreshold: 0,
     lowStock: false,
     perishable: true,
     batches: [],

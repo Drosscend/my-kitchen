@@ -15,6 +15,7 @@ const ingredientColumns = [
   'unit',
   'category',
   'state',
+  'low_stock_threshold',
   'created_at',
   'updated_at',
 ] as const
@@ -59,6 +60,7 @@ export class IngredientRepository {
         unit: ingredient.unit,
         category: ingredient.category,
         state: ingredient.state,
+        low_stock_threshold: ingredient.lowStockThreshold,
         created_at: ingredient.createdAt,
         updated_at: ingredient.updatedAt,
       })
@@ -101,6 +103,7 @@ export class IngredientRepository {
         unit: ingredient.unit,
         category: ingredient.category,
         state: ingredient.state,
+        low_stock_threshold: ingredient.lowStockThreshold,
         updated_at: ingredient.updatedAt,
       })
       .where('id', '=', ingredient.id)
@@ -149,6 +152,7 @@ export class IngredientRepository {
       userId: UserIdentifier.fromString(record.user_id),
       name: record.name,
       ...parseCatalogValues(record),
+      lowStockThreshold: record.low_stock_threshold,
       batches: batches.map((batch) => ({
         id: batch.id,
         quantity: batch.quantity,

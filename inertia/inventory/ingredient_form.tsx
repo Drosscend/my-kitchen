@@ -79,6 +79,21 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
             </Field>
           </div>
 
+          <Field data-invalid={Boolean(errors.lowStockThreshold)}>
+            <FieldLabel htmlFor="new-low-stock-threshold">Seuil de stock bas</FieldLabel>
+            <Input
+              id="new-low-stock-threshold"
+              name="lowStockThreshold"
+              type="number"
+              min={0}
+              step="any"
+              defaultValue={0}
+              required
+              aria-invalid={Boolean(errors.lowStockThreshold)}
+            />
+            {errors.lowStockThreshold && <FieldError>{errors.lowStockThreshold}</FieldError>}
+          </Field>
+
           <Field>
             <FieldLabel htmlFor="new-category">Catégorie</FieldLabel>
             <CatalogSelect

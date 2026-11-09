@@ -25,6 +25,7 @@ export interface AddIngredientParams {
   unit: IngredientUnit
   category: IngredientCategory
   state: IngredientState
+  lowStockThreshold: number
   expiresOn?: string | null
   expiryKind?: ExpiryKind
 }
@@ -55,6 +56,12 @@ export class AddIngredient {
       return err(quantity.error)
     }
 
+    const lowStockThreshold = validateQuantity(params.lowStockThreshold)
+
+    if (!lowStockThreshold.ok) {
+      return err(lowStockThreshold.error)
+    }
+
     const expiresOn = params.expiresOn ? validateExpiryDate(params.expiresOn) : ok(null)
 
     if (!expiresOn.ok) {
@@ -69,6 +76,7 @@ export class AddIngredient {
       unit: params.unit,
       category: params.category,
       state: params.state,
+      lowStockThreshold: lowStockThreshold.value,
       batches: [],
       createdAt: now,
       updatedAt: now,

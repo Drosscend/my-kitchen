@@ -137,6 +137,7 @@ test.group('MCP', (group) => {
         unit: 'piece',
         category: 'other',
         state: 'fresh',
+        lowStockThreshold: 0,
       })
       .redirects(0)
 

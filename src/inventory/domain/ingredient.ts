@@ -34,13 +34,18 @@ interface IngredientProperties {
   unit: IngredientUnit
   category: IngredientCategory
   state: IngredientState
+  /**
+   * In the unit of the ingredient: a smaller quantity is a low stock, and
+   * zero never alerts.
+   */
+  lowStockThreshold: number
   batches: IngredientBatchProperties[]
   createdAt: Date
   updatedAt: Date
 }
 
 export type IngredientChanges = Partial<
-  Pick<IngredientProperties, 'name' | 'unit' | 'category' | 'state'>
+  Pick<IngredientProperties, 'name' | 'unit' | 'category' | 'state' | 'lowStockThreshold'>
 >
 
 /**
@@ -155,6 +160,10 @@ export class Ingredient extends Entity<IngredientProperties> {
 
   get state() {
     return this.props.state
+  }
+
+  get lowStockThreshold() {
+    return this.props.lowStockThreshold
   }
 
   /**

@@ -14,6 +14,7 @@ interface SeedIngredient {
   category: IngredientCategory
   unit: IngredientUnit
   state: IngredientState
+  lowStockThreshold: number
   batches: SeedBatch[]
 }
 
@@ -22,13 +23,15 @@ function ingredient(
   category: IngredientCategory,
   unit: IngredientUnit,
   batches: [quantity: number, inDays: number | null][],
-  state: IngredientState = 'fresh'
+  options: Partial<Pick<SeedIngredient, 'state' | 'lowStockThreshold'>> = {}
 ): SeedIngredient {
   return {
     name,
     category,
     unit,
-    state,
+    state: 'fresh',
+    lowStockThreshold: 0,
+    ...options,
     batches: batches.map(([quantity, inDays]) => ({ quantity, inDays })),
   }
 }
@@ -53,13 +56,13 @@ export const SEED_INGREDIENTS: SeedIngredient[] = [
   ingredient('Salade batavia', 'vegetables', 'g', [[300, 2]]),
   ingredient('Concombre', 'vegetables', 'g', [[350, 5]]),
   ingredient('Céleri branche', 'vegetables', 'g', [[400, 8]]),
-  ingredient('Haricots verts', 'vegetables', 'g', [[600, 180]], 'frozen'),
-  ingredient('Petits pois', 'vegetables', 'g', [[450, 200]], 'frozen'),
+  ingredient('Haricots verts', 'vegetables', 'g', [[600, 180]], { state: 'frozen' }),
+  ingredient('Petits pois', 'vegetables', 'g', [[450, 200]], { state: 'frozen' }),
   ingredient('Butternut', 'vegetables', 'kg', [[1.2, 45]]),
-  ingredient('Radis', 'vegetables', 'g', []),
+  ingredient('Radis', 'vegetables', 'g', [], { lowStockThreshold: 200 }),
   ingredient('Chou-fleur', 'vegetables', 'g', [[800, 7]]),
   ingredient('Patate douce', 'vegetables', 'g', [[700, 18]]),
-  ingredient('Persil plat', 'vegetables', 'g', [[40, 3]]),
+  ingredient('Persil plat', 'vegetables', 'g', [[40, 3]], { lowStockThreshold: 50 }),
   ingredient('Menthe fraîche', 'vegetables', 'g', [[25, 2]]),
 
   ingredient('Pommes', 'fruits', 'kg', [[1.5, 20]]),
@@ -70,12 +73,12 @@ export const SEED_INGREDIENTS: SeedIngredient[] = [
   ingredient('Fraises', 'fruits', 'g', [[250, -2]]),
   ingredient('Avocats', 'fruits', 'g', [[400, 1]]),
   ingredient('Poires', 'fruits', 'g', [[500, 6]]),
-  ingredient('Framboises', 'fruits', 'g', [[300, 240]], 'frozen'),
+  ingredient('Framboises', 'fruits', 'g', [[300, 240]], { state: 'frozen' }),
   ingredient('Raisins secs', 'fruits', 'g', [[120, 150]]),
   ingredient('Kiwis', 'fruits', 'g', [[450, 10]]),
-  ingredient('Mangue', 'fruits', 'g', []),
+  ingredient('Mangue', 'fruits', 'g', [], { lowStockThreshold: 200 }),
 
-  ingredient('Cuisses de poulet', 'meat', 'g', [[1200, 90]], 'frozen'),
+  ingredient('Cuisses de poulet', 'meat', 'g', [[1200, 90]], { state: 'frozen' }),
   ingredient('Blancs de poulet', 'meat', 'g', [[500, 2]]),
   ingredient(
     'Bœuf haché',
@@ -85,18 +88,18 @@ export const SEED_INGREDIENTS: SeedIngredient[] = [
       [500, 60],
       [500, 75],
     ],
-    'frozen'
+    { state: 'frozen' }
   ),
   ingredient('Lardons fumés', 'meat', 'g', [[200, 4]]),
-  ingredient('Jambon blanc', 'meat', 'g', [[160, 3]]),
-  ingredient('Saucisses de Toulouse', 'meat', 'g', [[600, 120]], 'frozen'),
+  ingredient('Jambon blanc', 'meat', 'g', [[160, 3]], { lowStockThreshold: 200 }),
+  ingredient('Saucisses de Toulouse', 'meat', 'g', [[600, 120]], { state: 'frozen' }),
   ingredient('Côtes de porc', 'meat', 'g', [[600, -1]]),
   ingredient('Chorizo', 'meat', 'g', [[150, 25]]),
-  ingredient('Paleron de bœuf', 'meat', 'g', [[800, 150]], 'frozen'),
+  ingredient('Paleron de bœuf', 'meat', 'g', [[800, 150]], { state: 'frozen' }),
 
-  ingredient('Filets de cabillaud', 'fish', 'g', [[400, 150]], 'frozen'),
+  ingredient('Filets de cabillaud', 'fish', 'g', [[400, 150]], { state: 'frozen' }),
   ingredient('Pavés de saumon', 'fish', 'g', [[300, 1]]),
-  ingredient('Crevettes décortiquées', 'fish', 'g', [[250, 100]], 'frozen'),
+  ingredient('Crevettes décortiquées', 'fish', 'g', [[250, 100]], { state: 'frozen' }),
   ingredient('Thon au naturel', 'fish', 'g', [[420, 600]]),
   ingredient('Sardines à l’huile', 'fish', 'g', [[135, 500]]),
 
@@ -108,7 +111,7 @@ export const SEED_INGREDIENTS: SeedIngredient[] = [
     [250, 20],
     [250, 35],
   ]),
-  ingredient('Crème fraîche épaisse', 'dairy', 'mL', [[200, 3]]),
+  ingredient('Crème fraîche épaisse', 'dairy', 'mL', [[200, 3]], { lowStockThreshold: 250 }),
   ingredient('Yaourts nature', 'dairy', 'g', [[500, 6]]),
   ingredient('Comté', 'dairy', 'g', [[350, 25]]),
   ingredient('Parmesan', 'dairy', 'g', [[180, 40]]),
@@ -133,7 +136,7 @@ export const SEED_INGREDIENTS: SeedIngredient[] = [
   ingredient('Gingembre frais', 'spices', 'g', [[100, 12]]),
   ingredient('Noix de muscade', 'spices', 'g', [[60, 500]]),
   ingredient('Laurier', 'spices', 'g', [[15, 365]]),
-  ingredient('Graines de coriandre', 'spices', 'g', []),
+  ingredient('Graines de coriandre', 'spices', 'g', [], { lowStockThreshold: 30 }),
   ingredient('Garam masala', 'spices', 'g', [[55, 150]]),
 
   ingredient('Riz basmati', 'starches', 'kg', [[2, 300]]),
@@ -151,7 +154,7 @@ export const SEED_INGREDIENTS: SeedIngredient[] = [
   ingredient('Flocons d’avoine', 'starches', 'g', [[750, 150]]),
   ingredient('Riz arborio', 'starches', 'kg', [[1, 280]]),
   ingredient('Tagliatelles fraîches', 'starches', 'g', [[250, 2]]),
-  ingredient('Polenta', 'starches', 'g', []),
+  ingredient('Polenta', 'starches', 'g', [], { lowStockThreshold: 250 }),
   ingredient('Chapelure', 'starches', 'g', [[200, 90]]),
   ingredient('Pâte brisée', 'starches', 'g', [[230, 6]]),
 
@@ -163,16 +166,22 @@ export const SEED_INGREDIENTS: SeedIngredient[] = [
   ingredient('Sucre roux', 'other', 'g', [[500, null]]),
   ingredient('Miel', 'other', 'g', [[350, null]]),
   ingredient('Chocolat noir 70 %', 'other', 'g', [[200, 120]]),
-  ingredient('Levure chimique', 'other', 'g', [[40, 200]]),
+  ingredient('Levure chimique', 'other', 'g', [[40, 200]], { lowStockThreshold: 50 }),
   ingredient('Bouillon de volaille', 'other', 'g', [[80, 180]]),
   ingredient('Concentré de tomates', 'other', 'g', [[140, 5]]),
   ingredient('Tomates pelées', 'other', 'g', [[800, 500]]),
   ingredient('Lait de coco', 'other', 'mL', [[400, 365]]),
   ingredient('Sauce soja', 'other', 'mL', [[150, 250]]),
-  ingredient('Œufs', 'other', 'piece', [
-    [6, 9],
-    [6, 20],
-  ]),
+  ingredient(
+    'Œufs',
+    'other',
+    'piece',
+    [
+      [6, 9],
+      [6, 20],
+    ],
+    { lowStockThreshold: 6 }
+  ),
   ingredient('Confiture d’abricots', 'other', 'g', [[370, 200]]),
   ingredient('Café moulu', 'other', 'g', [[250, 90]]),
   ingredient('Thé noir', 'other', 'g', [[60, 300]]),

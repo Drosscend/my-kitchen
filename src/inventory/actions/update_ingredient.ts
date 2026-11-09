@@ -41,6 +41,14 @@ export class UpdateIngredient {
       changes.name = name.value
     }
 
+    if (changes.lowStockThreshold !== undefined) {
+      const lowStockThreshold = validateQuantity(changes.lowStockThreshold)
+
+      if (!lowStockThreshold.ok) {
+        return err(lowStockThreshold.error)
+      }
+    }
+
     const quantity = requestedQuantity === undefined ? null : validateQuantity(requestedQuantity)
 
     if (quantity && !quantity.ok) {

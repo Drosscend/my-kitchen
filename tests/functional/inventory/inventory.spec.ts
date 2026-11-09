@@ -13,6 +13,7 @@ const TOMATOES = {
   unit: 'g',
   category: 'vegetables',
   state: 'fresh',
+  lowStockThreshold: 0,
 }
 
 const YOGURTS = {
@@ -21,6 +22,7 @@ const YOGURTS = {
   unit: 'piece',
   category: 'dairy',
   state: 'fresh',
+  lowStockThreshold: 0,
 }
 
 async function storedIngredients(user: User) {
@@ -131,7 +133,14 @@ test.group('Inventory', (group) => {
       .post('/inventory')
       .loginAs(user)
       .withCsrfToken()
-      .form({ name: 'Boulettes', quantity: 4, unit: 'piece', category: 'meat', state: 'frozen' })
+      .form({
+        name: 'Boulettes',
+        quantity: 4,
+        unit: 'piece',
+        category: 'meat',
+        state: 'frozen',
+        lowStockThreshold: 6,
+      })
       .redirects(0)
 
     const page = await client.get('/').loginAs(user).withInertia()
@@ -143,6 +152,38 @@ test.group('Inventory', (group) => {
         { name: 'Tomates cerises', unitLabel: 'g', lowStock: false, perishable: true },
       ],
     })
+  })
+
+  test('flags an ingredient under its own threshold, never without one', async ({ client }) => {
+    const user = await createUser('ada@example.com')
+    await client.post('/inventory').loginAs(user).withCsrfToken().form(TOMATOES).redirects(0)
+    const [ingredient] = await storedIngredients(user)
+    const withoutThreshold = await client.get('/').loginAs(user).withInertia()
+
+    await client
+      .patch(`/inventory/${ingredient.id}`)
+      .loginAs(user)
+      .withCsrfToken()
+      .json({ lowStockThreshold: 300 })
+      .redirects(0)
+    const under = await client.get('/').loginAs(user).withInertia()
+    const negative = await client
+      .patch(`/inventory/${ingredient.id}`)
+      .loginAs(user)
+      .header('referer', '/')
+      .withCsrfToken()
+      .json({ lowStockThreshold: -1 })
+      .redirects(0)
+    const unchanged = await client.get('/').loginAs(user).withInertia()
+
+    withoutThreshold.assertInertiaPropsContains({
+      ingredients: [{ lowStockThreshold: 0, lowStock: false }],
+    })
+    under.assertInertiaPropsContains({ ingredients: [{ lowStockThreshold: 300, lowStock: true }] })
+    negative.assertFlashMessage('inputErrorsBag', {
+      lowStockThreshold: ['Ce champ doit valoir au moins 0'],
+    })
+    unchanged.assertInertiaPropsContains({ ingredients: [{ lowStockThreshold: 300 }] })
   })
 
   test('tracks batches with their own expiry date and consumes the earliest first', async ({

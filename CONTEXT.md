@@ -34,10 +34,10 @@ The date printed on a batch, of one of two kinds: a use by date (DLC) is a safet
 A fresh batch whose use by date is past (expired), whose best before date is past (to check), or whose date falls within the warning days of its category. An ingredient takes the status of its most urgent batch. Freezing suspends expiry.
 
 **Catalog**:
-The fixed lists of categories, units, states and expiry kinds, with the low stock threshold, the perishability, the expiry warning days and the default expiry kind of each category. Constants of the code, never edited by users.
+The fixed lists of categories, units, states and expiry kinds, with the perishability, the expiry warning days and the default expiry kind of each category. Constants of the code, never edited by users.
 
 **Low stock**:
-An ingredient whose quantity, converted to grams or millilitres, is under the threshold of its category.
+An ingredient whose quantity is under its low stock threshold, a quantity in its unit set by the user on each ingredient. Without a threshold (zero), an ingredient is never low.
 
 **Perishable**:
 A fresh ingredient of a perishable category. Freezing suspends perishability.

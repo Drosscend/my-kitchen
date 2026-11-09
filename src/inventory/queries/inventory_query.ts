@@ -4,7 +4,6 @@ import {
   EXPIRY_KINDS,
   INGREDIENT_CATEGORIES,
   INGREDIENT_STATES,
-  isLowStock,
   isPerishable,
   parseCatalogValues,
   unitLabel,
@@ -48,6 +47,7 @@ export interface IngredientView {
   categoryLabel: string
   state: IngredientState
   stateLabel: string
+  lowStockThreshold: number
   lowStock: boolean
   perishable: boolean
   batches: BatchView[]
@@ -103,7 +103,7 @@ export class InventoryQuery {
     const { expiringWithinDays } = filters
     let query = database
       .selectFrom('ingredients')
-      .select(['id', 'name', 'unit', 'category', 'state', 'updated_at'])
+      .select(['id', 'name', 'unit', 'category', 'state', 'low_stock_threshold', 'updated_at'])
       .where('user_id', '=', userId.toString())
 
     if (search) {
@@ -167,7 +167,8 @@ export class InventoryQuery {
           categoryLabel: INGREDIENT_CATEGORIES[category].label,
           state,
           stateLabel: INGREDIENT_STATES[state].label,
-          lowStock: isLowStock({ quantity, unit, category }),
+          lowStockThreshold: record.low_stock_threshold,
+          lowStock: quantity < record.low_stock_threshold,
           perishable: isPerishable(state, category),
           batches,
           expiryStatus: urgent?.expiryStatus ?? 'none',

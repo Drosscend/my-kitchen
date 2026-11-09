@@ -13,6 +13,7 @@ export default class UpdateIngredientController {
     unit: ingredientFields.unit.optional(),
     category: ingredientFields.category.optional(),
     state: ingredientFields.state.optional(),
+    lowStockThreshold: ingredientFields.lowStockThreshold.optional(),
   })
 
   constructor(private readonly updateIngredient: UpdateIngredient) {}

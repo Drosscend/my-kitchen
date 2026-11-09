@@ -12,6 +12,7 @@ export const ingredientFields = {
   unit: vine.enum(INGREDIENT_UNIT_VALUES),
   category: vine.enum(INGREDIENT_CATEGORY_VALUES),
   state: vine.enum(INGREDIENT_STATE_VALUES),
+  lowStockThreshold: vine.number().min(0),
 }
 
 export const expiryFields = {

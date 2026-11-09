@@ -1,62 +1,54 @@
 /**
- * Fixed catalog of the pantry: labels, low stock thresholds (in grams or
- * millilitres), perishability, the days before an expiry date that make a
- * batch urgent, and the expiry kind a new date starts with, per category.
+ * Fixed catalog of the pantry: labels, perishability, the days before an
+ * expiry date that make a batch urgent, and the expiry kind a new date
+ * starts with, per category.
  * The only source for these values, the client receives them as page props.
  */
 export const INGREDIENT_CATEGORIES = {
   vegetables: {
     label: 'Légumes',
-    lowStockThreshold: 200,
     perishable: true,
     expiryWarningDays: 2,
     defaultExpiryKind: 'use_by',
   },
   fruits: {
     label: 'Fruits',
-    lowStockThreshold: 200,
     perishable: true,
     expiryWarningDays: 2,
     defaultExpiryKind: 'use_by',
   },
   meat: {
     label: 'Viandes',
-    lowStockThreshold: 300,
     perishable: true,
     expiryWarningDays: 2,
     defaultExpiryKind: 'use_by',
   },
   fish: {
     label: 'Poissons',
-    lowStockThreshold: 200,
     perishable: true,
     expiryWarningDays: 1,
     defaultExpiryKind: 'use_by',
   },
   dairy: {
     label: 'Produits laitiers',
-    lowStockThreshold: 500,
     perishable: true,
     expiryWarningDays: 3,
     defaultExpiryKind: 'use_by',
   },
   spices: {
     label: 'Épices',
-    lowStockThreshold: 50,
     perishable: false,
     expiryWarningDays: 30,
     defaultExpiryKind: 'best_before',
   },
   starches: {
     label: 'Féculents',
-    lowStockThreshold: 500,
     perishable: false,
     expiryWarningDays: 14,
     defaultExpiryKind: 'best_before',
   },
   other: {
     label: 'Autres',
-    lowStockThreshold: 100,
     perishable: false,
     expiryWarningDays: 7,
     defaultExpiryKind: 'best_before',
@@ -64,12 +56,12 @@ export const INGREDIENT_CATEGORIES = {
 } as const
 
 export const INGREDIENT_UNITS = {
-  g: { label: 'g', plural: 'g', toBase: 1 },
-  kg: { label: 'kg', plural: 'kg', toBase: 1000 },
-  mL: { label: 'mL', plural: 'mL', toBase: 1 },
-  L: { label: 'L', plural: 'L', toBase: 1000 },
-  unit: { label: 'unité', plural: 'unités', toBase: 1 },
-  piece: { label: 'pièce', plural: 'pièces', toBase: 1 },
+  g: { label: 'g', plural: 'g' },
+  kg: { label: 'kg', plural: 'kg' },
+  mL: { label: 'mL', plural: 'mL' },
+  L: { label: 'L', plural: 'L' },
+  unit: { label: 'unité', plural: 'unités' },
+  piece: { label: 'pièce', plural: 'pièces' },
 } as const
 
 export const INGREDIENT_STATES = {
@@ -136,18 +128,6 @@ export function parseCatalogValues(record: CatalogRecord) {
   }
 
   return { unit, category, state }
-}
-
-interface StockLevel {
-  quantity: number
-  unit: IngredientUnit
-  category: IngredientCategory
-}
-
-export function isLowStock({ quantity, unit, category }: StockLevel) {
-  return (
-    quantity * INGREDIENT_UNITS[unit].toBase < INGREDIENT_CATEGORIES[category].lowStockThreshold
-  )
 }
 
 export function isPerishable(state: IngredientState, category: IngredientCategory) {

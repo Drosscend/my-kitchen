@@ -50,6 +50,7 @@ const ingredientOutput = z.object({
   unit,
   category,
   state,
+  lowStockThreshold: z.number(),
   batches: z.array(batchOutput),
 })
 
@@ -75,6 +76,7 @@ function toOutput(ingredient: Ingredient) {
     unit: ingredient.unit,
     category: ingredient.category,
     state: ingredient.state,
+    lowStockThreshold: ingredient.lowStockThreshold,
     batches: ingredient.batches.map((batch) => ({
       id: batch.id,
       quantity: batch.quantity,
@@ -143,6 +145,7 @@ export async function registerInventoryTools(server: McpServer, userId: UserIden
           unit: item.unit,
           category: item.category,
           state: item.state,
+          lowStockThreshold: item.lowStockThreshold,
           lowStock: item.lowStock,
           perishable: item.perishable,
           expiryStatus: item.expiryStatus,
@@ -174,6 +177,11 @@ export async function registerInventoryTools(server: McpServer, userId: UserIden
         unit,
         category,
         state: state.default('fresh'),
+        lowStockThreshold: z
+          .number()
+          .min(0)
+          .default(0)
+          .describe("Stock bas sous cette quantité, dans l'unité de l'ingrédient ; 0 : jamais"),
         expiresOn: expiresOn.optional(),
         expiryKind: expiryKind.optional(),
       }),
@@ -194,7 +202,7 @@ export async function registerInventoryTools(server: McpServer, userId: UserIden
     {
       title: 'Modifier un ingrédient',
       description:
-        "Modifie un ingrédient : quantité absolue, unité, catégorie, état ou nom. Une baisse vide d'abord les lots qui périment le plus tôt, une hausse rejoint le dernier lot ajouté. Pour retirer ce qui a été consommé, préférer consume_ingredients.",
+        "Modifie un ingrédient : quantité absolue, unité, catégorie, état, seuil de stock bas ou nom. Une baisse vide d'abord les lots qui périment le plus tôt, une hausse rejoint le dernier lot ajouté. Pour retirer ce qui a été consommé, préférer consume_ingredients.",
       inputSchema: z.object({
         id: z.string(),
         name: z.string().min(1).max(100).optional(),
@@ -202,6 +210,11 @@ export async function registerInventoryTools(server: McpServer, userId: UserIden
         unit: unit.optional(),
         category: category.optional(),
         state: state.optional(),
+        lowStockThreshold: z
+          .number()
+          .min(0)
+          .optional()
+          .describe("Stock bas sous cette quantité, dans l'unité de l'ingrédient ; 0 : jamais"),
       }),
       outputSchema: z.object({ ingredient: ingredientOutput }),
       annotations: {

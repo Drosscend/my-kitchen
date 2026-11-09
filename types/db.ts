@@ -54,6 +54,7 @@ export interface Ingredients {
   category: string;
   created_at: Generated<Timestamp>;
   id: string;
+  low_stock_threshold: Generated<number>;
   name: string;
   state: string;
   unit: string;

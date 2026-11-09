@@ -13,6 +13,7 @@ export default class IngredientTransformer extends BaseTransformer<IngredientVie
       'categoryLabel',
       'state',
       'stateLabel',
+      'lowStockThreshold',
       'lowStock',
       'perishable',
       'batches',

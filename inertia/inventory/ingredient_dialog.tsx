@@ -220,6 +220,28 @@ export function IngredientDialog({
               onValueChange={(category) => updateField('category', category)}
             />
           </Field>
+          <Field className="col-span-2">
+            <FieldLabel htmlFor={`low-stock-threshold-${ingredient.id}`}>
+              Seuil de stock bas, en {ingredient.unitLabel}
+            </FieldLabel>
+            <Input
+              id={`low-stock-threshold-${ingredient.id}`}
+              key={ingredient.lowStockThreshold}
+              type="number"
+              min={0}
+              step="any"
+              defaultValue={ingredient.lowStockThreshold}
+              onKeyDown={commitOnEnter}
+              onBlur={(event) => {
+                const lowStockThreshold = Number(event.target.value)
+
+                if (lowStockThreshold >= 0 && lowStockThreshold !== ingredient.lowStockThreshold) {
+                  update({ lowStockThreshold })
+                }
+              }}
+              className="tabular-nums"
+            />
+          </Field>
         </div>
 
         <section className="flex flex-col gap-4 border-t pt-5 [--batch-columns:4.5rem_minmax(0,1fr)_5rem_auto]">

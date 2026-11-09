@@ -3,7 +3,7 @@ import { type Ingredient } from '~/inventory/catalog'
 
 export const VISIT_OPTIONS = { preserveScroll: true, preserveState: true } as const
 
-type IngredientChanges = Partial<Pick<Ingredient, 'name' | 'quantity'>>
+type IngredientChanges = Partial<Pick<Ingredient, 'name' | 'quantity' | 'lowStockThreshold'>>
 
 export function useIngredientActions(ingredient: Ingredient) {
   const router = useRouter()

@@ -28,6 +28,7 @@ function makeIngredient(batches: IngredientBatchProperties[]) {
     unit: 'piece',
     category: 'dairy',
     state: 'fresh',
+    lowStockThreshold: 0,
     batches,
     createdAt: CREATED_AT,
     updatedAt: CREATED_AT,
