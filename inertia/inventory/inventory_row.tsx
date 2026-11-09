@@ -58,11 +58,11 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
     setEditing(null)
   }
 
-  function onKeyDown(event: KeyboardEvent, commit: () => void) {
+  function onKeyDown(event: KeyboardEvent, commit: () => void, cancel: () => void) {
     if (event.key === 'Enter') {
       commit()
     } else if (event.key === 'Escape') {
-      setEditing(null)
+      cancel()
     }
   }
 
@@ -90,6 +90,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
       <CatalogSelect
         options={options}
         value={ingredient[field]}
+        ariaLabel={editLabel}
         icon={icon}
         open
         onOpenChange={(open) => !open && setEditing(null)}
@@ -149,7 +150,7 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
               aria-label="Nom"
               onChange={(event) => setDraftName(event.target.value)}
               onBlur={commitName}
-              onKeyDown={(event) => onKeyDown(event, commitName)}
+              onKeyDown={(event) => onKeyDown(event, commitName, () => setEditing(null))}
             />
           ) : (
             <button
@@ -187,7 +188,9 @@ export function InventoryRow({ ingredient, catalog }: InventoryRowProps) {
             onFocus={() => startEditing('quantity')}
             onChange={(event) => setDraftQuantity(event.target.value)}
             onBlur={commitQuantity}
-            onKeyDown={(event) => onKeyDown(event, commitQuantity)}
+            onKeyDown={(event) =>
+              onKeyDown(event, commitQuantity, () => setDraftQuantity(String(ingredient.quantity)))
+            }
             className="text-center font-semibold tabular-nums"
           />
           <InputGroupAddon align="inline-end">

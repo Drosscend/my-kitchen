@@ -74,6 +74,7 @@ function BatchRow({
           <CatalogSelect
             options={catalog.expiryKinds}
             value={batch.expiryKind}
+            ariaLabel="Type de date"
             onValueChange={(expiryKind) =>
               expiryKind !== batch.expiryKind && update({ expiryKind })
             }

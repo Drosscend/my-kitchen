@@ -224,6 +224,33 @@ test.group('MCP', (group) => {
     assert.containsSubset(structured(listed), { ingredients: [{ id, quantity: 500 }] })
   })
 
+  test('adds up the consumptions of an ingredient listed twice', async ({ client, assert }) => {
+    const ada = await createUser('ada@example.com')
+    const token = await issueToken(client, ada)
+    const added = await rpc(client, token, 'tools/call', {
+      name: 'add_ingredient',
+      arguments: FLOUR,
+    })
+    const id = structured<{ ingredient: { id: string } }>(added).ingredient.id
+
+    const consumed = await rpc(client, token, 'tools/call', {
+      name: 'consume_ingredients',
+      arguments: {
+        items: [
+          { id, quantity: 100 },
+          { id, quantity: 150 },
+        ],
+      },
+    })
+
+    assert.deepEqual(
+      structured<{ ingredients: { quantity: number }[] }>(consumed).ingredients.map(
+        (item) => item.quantity
+      ),
+      [250]
+    )
+  })
+
   test('restocks with dated batches and lists what expires soon', async ({ client, assert }) => {
     const ada = await createUser('ada@example.com')
     const token = await issueToken(client, ada)

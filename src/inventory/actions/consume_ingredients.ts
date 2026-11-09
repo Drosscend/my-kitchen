@@ -26,24 +26,25 @@ export class ConsumeIngredients {
 
   async execute(params: ConsumeIngredientsParams): Promise<ConsumeIngredientsResult> {
     const now = new Date()
-    const consumed: Ingredient[] = []
+    const consumed = new Map<string, Ingredient>()
 
     for (const item of params.items) {
-      const ingredient = await this.ingredients.findForUser(params.userId, item.id)
+      const ingredient =
+        consumed.get(item.id) ?? (await this.ingredients.findForUser(params.userId, item.id))
 
       if (!ingredient) {
         return err({ type: 'ingredient_not_found', id: item.id })
       }
 
-      consumed.push(ingredient.adjustedBy(-Math.abs(item.quantity), now))
+      consumed.set(item.id, ingredient.adjustedBy(-Math.abs(item.quantity), now))
     }
 
     await this.transactions.run(async () => {
-      for (const ingredient of consumed) {
+      for (const ingredient of consumed.values()) {
         await this.ingredients.update(ingredient)
       }
     })
 
-    return ok(consumed)
+    return ok([...consumed.values()])
   }
 }

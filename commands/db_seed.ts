@@ -74,11 +74,15 @@ export default class DbSeed extends BaseCommand {
       }
 
       for (const batch of others) {
-        await addBatch.execute({
+        const batched = await addBatch.execute({
           userId,
           id: added.value.id,
           batch: { quantity: batch.quantity, expiresOn: expiresOn(batch, from) },
         })
+
+        if (!batched.ok) {
+          throw new Error(`Invalid seed batch for ${ingredient.name}`)
+        }
       }
     }
 
