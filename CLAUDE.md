@@ -4,6 +4,8 @@ Mon Garde-Manger : inventaire de cuisine, recettes et mode cuisine partagé, ave
 
 Les règles du dépôt sont dans [AGENTS.md](AGENTS.md), l'architecture dans [docs/architecture/application.md](docs/architecture/application.md), le vocabulaire dans [CONTEXT.md](CONTEXT.md), les décisions dans `docs/adr/`. Ce fichier ne liste que les écarts avec les règles globales.
 
+@AGENTS.md
+
 ## Écarts
 
 - Gestionnaire de paquets : npm, imposé par l'alignement avec kevin-dev.com.

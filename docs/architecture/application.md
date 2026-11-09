@@ -142,6 +142,7 @@ Kysely repositories map Postgres rows to command-side domain objects. Queries ma
 - Database constraints remain the final defense for uniqueness and relational invariants.
 - Persistence errors that represent expected business outcomes are translated into typed `Result` errors.
 - Unexpected database failures propagate.
+- A failed statement aborts the transaction it runs in: catching the error to carry on, or to return a `Result`, makes the commit raise `AbortedTransactionError` (Kysely's Postgres driver, which kysely-postgres-js extends).
 
 ## Example paths
 
