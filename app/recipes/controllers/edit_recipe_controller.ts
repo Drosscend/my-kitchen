@@ -11,7 +11,8 @@ export default class EditRecipeController {
     const recipe = await this.recipe.execute(auth.getUserOrFail().getIdentifier(), params.id)
 
     if (!recipe) {
-      return response.notFound()
+      response.status(404)
+      return inertia.render('errors/not_found', {})
     }
 
     return inertia.render('recipes/edit', { recipe: RecipeTransformer.transform(recipe) })

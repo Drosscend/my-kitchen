@@ -11,7 +11,8 @@ export default class CookingSessionController {
     const session = await this.sessions.execute(params.code)
 
     if (!session) {
-      return response.notFound()
+      response.status(404)
+      return inertia.render('errors/not_found', {})
     }
 
     return inertia.render('cook/show', {

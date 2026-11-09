@@ -105,6 +105,7 @@ test.group('Cooking sessions', (group) => {
     assertRedirectedTo(unknown, '/cook/join')
     unknown.assertFlashMessage('error', 'Session introuvable ou expirée')
     expired.assertStatus(404)
+    expired.assertInertiaComponent('errors/not_found')
   })
 
   test('stops an address guessing codes, never one polling its session', async ({ client }) => {
