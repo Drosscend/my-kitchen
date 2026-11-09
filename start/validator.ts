@@ -8,5 +8,8 @@ vine.messagesProvider = new SimpleMessagesProvider({
   'minLength': 'Ce champ doit contenir au moins {{ min }} caractères',
   'maxLength': 'Ce champ doit contenir au plus {{ max }} caractères',
   'min': 'Ce champ doit valoir au moins {{ min }}',
+  'max': 'Ce champ doit valoir au plus {{ max }}',
+  'positive': 'Ce champ doit être un nombre positif',
+  'withoutDecimals': 'Ce champ doit être un nombre entier',
   'passwordConfirmation.confirmed': 'Les deux mots de passe ne correspondent pas',
 })

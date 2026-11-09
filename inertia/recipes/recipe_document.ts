@@ -81,7 +81,7 @@ function slugify(value: string) {
 }
 
 function uniqueRef(name: string, taken: string[]) {
-  const base = slugify(name) || 'ingredient'
+  const base = slugify(name).slice(0, 80) || 'ingredient'
   let ref = base
 
   for (let suffix = 2; taken.includes(ref); suffix++) {
@@ -101,12 +101,18 @@ export function newStep(): RecipeStep {
 }
 
 /**
- * Reads "200 g farine", "2 gousses d'ail" or "sel" into an ingredient.
+ * Reads "200 g farine", "1/2 citron", "1 1/2 kg de farine", "2 gousses
+ * d'ail" or "sel" into an ingredient.
  */
 export function parseIngredient(text: string, taken: string[]): RecipeIngredient | null {
-  const match = /^(\d+(?:[.,]\d+)?)?\s*(.*)$/.exec(text.trim())
-  const amount = match?.[1] ? Number(match[1].replace(',', '.')) : null
-  let rest = match?.[2] ?? ''
+  const fraction = /^(?:(\d+)\s+)?(\d+)\s*\/\s*([1-9]\d*)\s*(.*)$/.exec(text.trim())
+  const decimal = /^(\d+(?:[.,]\d+)?)?\s*(.*)$/.exec(text.trim())
+  const amount = fraction
+    ? Number(fraction[1] ?? 0) + Number(fraction[2]) / Number(fraction[3])
+    : decimal?.[1]
+      ? Number(decimal[1].replace(',', '.'))
+      : null
+  let rest = fraction?.[4] ?? decimal?.[2] ?? ''
   let unit: string | null = null
 
   if (amount !== null) {

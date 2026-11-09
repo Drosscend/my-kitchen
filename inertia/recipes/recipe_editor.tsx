@@ -53,6 +53,7 @@ export function RecipeEditor({ recipe }: { recipe?: Recipe }) {
   const [addedStep, setAddedStep] = useState<string | null>(null)
   const [titleMissing, setTitleMissing] = useState(false)
   const [processing, setProcessing] = useState(false)
+  const [refusals, setRefusals] = useState<Record<string, string>>({})
   const payload = toPayload(draft)
   const dirty = JSON.stringify(payload) !== saved
   const empty = payload.ingredients.length === 0 && payload.steps.length === 0
@@ -119,10 +120,39 @@ export function RecipeEditor({ recipe }: { recipe?: Recipe }) {
       {
         data: payload,
         preserveState: true,
-        onStart: () => setProcessing(true),
+        onStart: () => {
+          setProcessing(true)
+          setRefusals({})
+        },
+        onError: (errors) =>
+          setRefusals(
+            Object.fromEntries(
+              Object.entries(errors).map(([field, message]) => [refusedPart(field), message])
+            )
+          ),
         onFinish: () => setProcessing(false),
       }
     )
+  }
+
+  /**
+   * Names the part of the recipe a refused field such as
+   * `steps.1.content` belongs to. Blank steps are not sent, so a step
+   * is found back by its ref.
+   */
+  function refusedPart(field: string) {
+    const [section, index] = field.split('.')
+
+    if (section === 'steps') {
+      const ref = payload.steps[Number(index)]?.ref
+      return `Étape ${draft.steps.findIndex((step) => step.ref === ref) + 1}`
+    }
+
+    if (section === 'ingredients') {
+      return draft.ingredients[Number(index)]?.name || 'Ingrédient'
+    }
+
+    return { title: 'Titre', description: 'Description', notes: 'Notes' }[section] ?? 'Portions'
   }
 
   const backLink = recipe ? (
@@ -190,6 +220,19 @@ export function RecipeEditor({ recipe }: { recipe?: Recipe }) {
           </div>
           <div className="hidden shrink-0 gap-2 md:flex">{actions}</div>
         </header>
+
+        {Object.keys(refusals).length > 0 && (
+          <ul
+            role="alert"
+            className="mb-8 flex flex-col gap-1 rounded-lg border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+          >
+            {Object.entries(refusals).map(([part, message]) => (
+              <li key={part} className="wrap-anywhere">
+                <strong>{part}</strong> : {message}
+              </li>
+            ))}
+          </ul>
+        )}
 
         <EditorGuide open={!recipe} />
 
