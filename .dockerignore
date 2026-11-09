@@ -8,6 +8,11 @@ tmp
 !.env.example
 docs
 data
+tests
+bin/test.ts
+tools
+oxlint.config.ts
+oxfmt.config.ts
 compose.yaml
 Dockerfile
 .dockerignore
