@@ -9,7 +9,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class RequestEmailChangeController {
   static readonly validator = vine.create({
     email: emailField,
-    password: vine.string(),
+    password: vine.string().optional(),
   })
 
   constructor(private readonly requestEmailChange: RequestEmailChange) {}

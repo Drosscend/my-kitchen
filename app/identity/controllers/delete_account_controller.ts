@@ -7,7 +7,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class DeleteAccountController {
   static readonly validator = vine.create({
-    password: vine.string(),
+    password: vine.string().optional(),
+    email: vine.string().optional(),
   })
 
   constructor(private readonly deleteAccount: DeleteAccount) {}

@@ -1,11 +1,17 @@
 import { Form, Link } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
 import { AuthShell } from '~/components/auth_shell'
+import { GoogleSignIn } from '~/components/google_sign_in'
 import { Button } from '~/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
+import { type InertiaProps } from '~/types'
 
-export default function Signup() {
+type PageProps = InertiaProps<{
+  googleSignIn: boolean
+}>
+
+export default function Signup({ googleSignIn }: PageProps) {
   return (
     <>
       <Head title="Créer un compte" />
@@ -20,6 +26,7 @@ export default function Signup() {
           </>
         }
       >
+        {googleSignIn && <GoogleSignIn />}
         <Form route="new_account.store">
           {({ errors, processing }) => (
             <FieldGroup>

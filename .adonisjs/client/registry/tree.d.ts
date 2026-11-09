@@ -2,13 +2,6 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
-  mcp: typeof routes['mcp'] & {
-    protectedResource: typeof routes['mcp.protected_resource'] & {
-      root: typeof routes['mcp.protected_resource.root']
-    }
-  }
-  up: typeof routes['up']
-  health: typeof routes['health']
   inventory: {
     index: typeof routes['inventory.index']
     store: typeof routes['inventory.store']
@@ -31,6 +24,11 @@ export interface ApiDefinition {
     update: typeof routes['recipes.update']
     destroy: typeof routes['recipes.destroy']
   }
+  mcp: typeof routes['mcp'] & {
+    protectedResource: typeof routes['mcp.protected_resource'] & {
+      root: typeof routes['mcp.protected_resource.root']
+    }
+  }
   oauth: {
     authorization: {
       show: typeof routes['oauth.authorization.show']
@@ -38,6 +36,8 @@ export interface ApiDefinition {
       deny: typeof routes['oauth.authorization.deny']
     }
   }
+  up: typeof routes['up']
+  health: typeof routes['health']
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']
@@ -52,6 +52,10 @@ export interface ApiDefinition {
     email: typeof routes['password.email']
     reset: typeof routes['password.reset']
     update: typeof routes['password.update']
+  }
+  google: {
+    redirect: typeof routes['google.redirect']
+    callback: typeof routes['google.callback']
   }
   verification: {
     verify: typeof routes['verification.verify']

@@ -47,6 +47,7 @@ export class RegisterUser {
       name: normalizeName(params.name),
       email: email.value,
       passwordHash: await hash.make(password.value),
+      googleId: null,
       emailVerifiedAt: params.emailVerified ? new Date() : null,
     })
   }

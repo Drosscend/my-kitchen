@@ -2,8 +2,8 @@ import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
 import { err, ok, type Result } from '#core/result'
 import {
+  confirmCurrentPassword,
   validatePassword,
-  verifyPassword,
   type InvalidCredentialsError,
   type InvalidPasswordError,
 } from '#identity/domain/password'
@@ -14,7 +14,11 @@ import type { User } from '#identity/domain/user'
 
 export interface ChangePasswordParams {
   user: User
-  currentPassword: string
+  /**
+   * Required once the account has a password. An account created through
+   * Google sets its first one without it.
+   */
+  currentPassword?: string
   password: string
 }
 
@@ -30,7 +34,7 @@ export class ChangePassword {
   ) {}
 
   async execute(params: ChangePasswordParams): Promise<ChangePasswordResult> {
-    const credentials = await verifyPassword(params.user.passwordHash, params.currentPassword)
+    const credentials = await confirmCurrentPassword(params.user, params.currentPassword)
 
     if (!credentials.ok) {
       return err(credentials.error)

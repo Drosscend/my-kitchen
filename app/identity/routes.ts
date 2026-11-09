@@ -20,6 +20,10 @@ const VerifyEmailController = () => import('#app/identity/controllers/verify_ema
 const ForgotPasswordController = () =>
   import('#app/identity/controllers/forgot_password_controller')
 const ResetPasswordController = () => import('#app/identity/controllers/reset_password_controller')
+const GoogleRedirectController = () =>
+  import('#app/identity/controllers/google_redirect_controller')
+const GoogleCallbackController = () =>
+  import('#app/identity/controllers/google_callback_controller')
 
 router
   .group(() => {
@@ -37,6 +41,11 @@ router
       .use(mailThrottle)
     router.get('reset-password/:token', [ResetPasswordController, 'render']).as('password.reset')
     router.post('reset-password', [ResetPasswordController, 'execute']).as('password.update')
+    router.get('auth/google/redirect', [GoogleRedirectController, 'execute']).as('google.redirect')
+    router
+      .get('auth/google/callback', [GoogleCallbackController, 'execute'])
+      .as('google.callback')
+      .use(loginThrottle)
   })
   .use(middleware.guest())
 

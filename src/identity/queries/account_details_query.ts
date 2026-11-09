@@ -5,6 +5,11 @@ import type { UserIdentifier } from '#identity/domain/user_identifier'
 export interface AccountDetails {
   name: string | null
   email: string
+  /**
+   * False for an account created through Google that never set one.
+   */
+  hasPassword: boolean
+  googleLinked: boolean
 }
 
 @inject()
@@ -15,7 +20,12 @@ export class AccountDetailsQuery {
     return this.transactions
       .currentDatabase()
       .selectFrom('users')
-      .select(['name', 'email'])
+      .select((eb) => [
+        'name',
+        'email',
+        eb('password', 'is not', null).$castTo<boolean>().as('hasPassword'),
+        eb('google_id', 'is not', null).$castTo<boolean>().as('googleLinked'),
+      ])
       .where('id', '=', userId.toString())
       .executeTakeFirstOrThrow()
   }

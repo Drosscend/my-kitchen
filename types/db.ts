@@ -118,9 +118,10 @@ export interface Users {
   created_at: Generated<Timestamp>;
   email: string;
   email_verified_at: Timestamp | null;
+  google_id: string | null;
   id: string;
   name: string | null;
-  password: string;
+  password: string | null;
   updated_at: Timestamp | null;
 }
 

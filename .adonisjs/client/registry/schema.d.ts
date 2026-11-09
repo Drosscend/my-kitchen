@@ -8,71 +8,6 @@ import type { routes } from './index.ts'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
-  'mcp': {
-    methods: ["POST","GET","DELETE"]
-    pattern: '/mcp'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
-      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
-    }
-  }
-  'mcp.protected_resource': {
-    methods: ["GET","HEAD"]
-    pattern: '/.well-known/oauth-protected-resource/mcp'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
-      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
-    }
-  }
-  'mcp.protected_resource.root': {
-    methods: ["GET","HEAD"]
-    pattern: '/.well-known/oauth-protected-resource'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
-      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
-    }
-  }
-  'up': {
-    methods: ["GET","HEAD"]
-    pattern: '/up'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
-      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
-    }
-  }
-  'health': {
-    methods: ["GET","HEAD"]
-    pattern: '/health'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
-      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
-    }
-  }
   'inventory.index': {
     methods: ["GET","HEAD"]
     pattern: '/'
@@ -281,6 +216,45 @@ export interface Registry {
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/recipes/controllers/delete_recipe_controller').default['execute']>>>
     }
   }
+  'mcp': {
+    methods: ["POST","GET","DELETE"]
+    pattern: '/mcp'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/mcp/controllers/mcp_controller').default['execute']>>>
+    }
+  }
+  'mcp.protected_resource': {
+    methods: ["GET","HEAD"]
+    pattern: '/.well-known/oauth-protected-resource/mcp'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
+    }
+  }
+  'mcp.protected_resource.root': {
+    methods: ["GET","HEAD"]
+    pattern: '/.well-known/oauth-protected-resource'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/mcp/controllers/protected_resource_controller').default['execute']>>>
+    }
+  }
   'oauth.authorization.show': {
     methods: ["GET","HEAD"]
     pattern: '/oauth/interaction/:uid'
@@ -318,6 +292,32 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#app/oauth/controllers/deny_client_controller').default['execute']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/oauth/controllers/deny_client_controller').default['execute']>>>
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/oauth/controllers/deny_client_controller').default['execute']>>>
+    }
+  }
+  'up': {
+    methods: ["GET","HEAD"]
+    pattern: '/up'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/shared/controllers/liveness_controller').default['execute']>>>
+    }
+  }
+  'health': {
+    methods: ["GET","HEAD"]
+    pattern: '/health'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/shared/controllers/health_checks_controller').default['execute']>>>
     }
   }
   'new_account.create': {
@@ -422,6 +422,32 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/reset_password_controller').default['execute']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/reset_password_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/identity/controllers/reset_password_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'google.redirect': {
+    methods: ["GET","HEAD"]
+    pattern: '/auth/google/redirect'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/google_redirect_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/google_redirect_controller').default['execute']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/identity/controllers/google_redirect_controller').default['execute']>>>
+    }
+  }
+  'google.callback': {
+    methods: ["GET","HEAD"]
+    pattern: '/auth/google/callback'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/identity/controllers/google_callback_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/identity/controllers/google_callback_controller').default['execute']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/identity/controllers/google_callback_controller').default['execute']>>>
     }
   }
   'verification.verify': {

@@ -42,6 +42,10 @@ const env = await Env.create(new URL('../', import.meta.url), {
 
   // Guards the detailed /health report
   MONITORING_SECRET: Env.schema.string.optional(),
+
+  // Google sign-in, off until both are set (OAuth client of Google Cloud)
+  GOOGLE_CLIENT_ID: Env.schema.string.optional(),
+  GOOGLE_CLIENT_SECRET: Env.schema.secret.optional(),
 })
 
 try {

@@ -8,14 +8,15 @@ import { TransactionManager } from '#shared/services/transaction_manager'
 import type { Users } from '#types/db'
 import type { Selectable } from 'kysely'
 
-const userColumns = ['id', 'name', 'email', 'password', 'email_verified_at'] as const
+const userColumns = ['id', 'name', 'email', 'password', 'google_id', 'email_verified_at'] as const
 type UserRecord = Pick<Selectable<Users>, (typeof userColumns)[number]>
 
 interface CreateUserPayload {
   id: UserIdentifier
   name: string | null
   email: EmailAddress
-  passwordHash: string
+  passwordHash: string | null
+  googleId: string | null
   emailVerifiedAt: Date | null
 }
 
@@ -37,6 +38,7 @@ export class UserRepository {
           name: payload.name,
           email: payload.email.toString(),
           password: payload.passwordHash,
+          google_id: payload.googleId,
           email_verified_at: payload.emailVerifiedAt,
         })
         .returning(userColumns)
@@ -57,6 +59,17 @@ export class UserRepository {
       .selectFrom('users')
       .select(userColumns)
       .where('email', '=', email.toString())
+      .executeTakeFirst()
+
+    return record ? this.#toDomain(record) : null
+  }
+
+  async findUserByGoogleId(googleId: string) {
+    const record = await this.transactions
+      .currentDatabase()
+      .selectFrom('users')
+      .select(userColumns)
+      .where('google_id', '=', googleId)
       .executeTakeFirst()
 
     return record ? this.#toDomain(record) : null
@@ -110,6 +123,18 @@ export class UserRepository {
     return this.#toDomain(record)
   }
 
+  async linkGoogleAccount(id: UserIdentifier, googleId: string) {
+    const record = await this.transactions
+      .currentDatabase()
+      .updateTable('users')
+      .set({ google_id: googleId, updated_at: new Date() })
+      .where('id', '=', id.toString())
+      .returning(userColumns)
+      .executeTakeFirstOrThrow()
+
+    return this.#toDomain(record)
+  }
+
   async deleteUser(id: UserIdentifier) {
     await this.transactions
       .currentDatabase()
@@ -138,6 +163,7 @@ export class UserRepository {
       name: record.name,
       email: email.value,
       passwordHash: record.password,
+      googleId: record.google_id,
       emailVerifiedAt: record.email_verified_at,
     })
   }

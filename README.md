@@ -7,7 +7,7 @@ Kitchen inventory, recipe library, shared cooking mode and an MCP server for ass
 - Pantry with categories, units, fresh or frozen state, batches with their own expiry date, low stock and expiry alerts, Markdown copy for assistants.
 - Recipe library written in the app or by assistants through MCP, with ingredient mentions in the steps, timers and a unit converter.
 - Cooking mode step by step with synced timers, shared with any phone through a QR code or a six digit code.
-- Accounts with confirmed e-mail addresses and password reset by mail.
+- Accounts with confirmed e-mail addresses and password reset by mail, or sign-in with Google.
 - MCP endpoint at `/mcp` exposing the pantry and the recipes as tools, authorized through the embedded OAuth server.
 
 ## Requirements
@@ -60,6 +60,14 @@ Then replace its pantry and recipes with about a hundred sample ingredients and 
 ```bash
 npm run db:seed -- --email=ada@example.com
 ```
+
+## Google sign-in
+
+Optional, off while `GOOGLE_CLIENT_ID` or `GOOGLE_CLIENT_SECRET` is empty. In the Google Cloud console:
+
+1. configure the OAuth consent screen, audience "External", with the `openid`, `email` and `profile` scopes, then publish it to production;
+2. create an OAuth client ID of type "Web application" with `<APP_URL>/auth/google/callback` as authorized redirect URI, one per environment (`http://localhost:3333/auth/google/callback` locally);
+3. copy the client ID and secret into `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
 
 ## MCP
 

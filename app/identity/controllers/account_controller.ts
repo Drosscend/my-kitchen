@@ -2,6 +2,7 @@ import { inject } from '@adonisjs/core'
 import AccountDetailsTransformer from '#app/identity/transformers/account_details_transformer'
 import OAuthConnectionTransformer from '#app/identity/transformers/oauth_connection_transformer'
 import { mcpResourceUrl } from '#app/oauth/provider'
+import { googleSignInEnabled } from '#config/ally'
 import { AccountDetailsQuery } from '#identity/queries/account_details_query'
 import { OAuthConnectionsQuery } from '#identity/queries/oauth_connections_query'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -24,6 +25,7 @@ export default class AccountController {
       account: AccountDetailsTransformer.transform(account),
       oauthConnections: OAuthConnectionTransformer.transform(connections),
       mcpUrl: mcpResourceUrl,
+      googleSignIn: googleSignInEnabled,
     })
   }
 }

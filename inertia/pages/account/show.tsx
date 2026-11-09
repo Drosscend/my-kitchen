@@ -16,6 +16,7 @@ type PageProps = InertiaProps<{
   account: Data.Identity.AccountDetails
   oauthConnections: Data.Identity.OauthConnection[]
   mcpUrl: string
+  googleSignIn: boolean
 }>
 
 function formatDate(value: string) {
@@ -70,7 +71,12 @@ function RevokeConnectionDialog({ connection }: { connection: Data.Identity.Oaut
   )
 }
 
-export default function ShowAccount({ account, oauthConnections, mcpUrl }: PageProps) {
+export default function ShowAccount({
+  account,
+  oauthConnections,
+  mcpUrl,
+  googleSignIn,
+}: PageProps) {
   return (
     <>
       <Head title="Mon compte" />
@@ -128,18 +134,20 @@ export default function ShowAccount({ account, oauthConnections, mcpUrl }: PageP
                     />
                     {errors.email && <FieldError>{errors.email}</FieldError>}
                   </Field>
-                  <Field data-invalid={Boolean(errors.password)}>
-                    <FieldLabel htmlFor="email-password">Mot de passe actuel</FieldLabel>
-                    <Input
-                      id="email-password"
-                      type="password"
-                      name="password"
-                      autoComplete="current-password"
-                      required
-                      aria-invalid={Boolean(errors.password)}
-                    />
-                    {errors.password && <FieldError>{errors.password}</FieldError>}
-                  </Field>
+                  {account.hasPassword && (
+                    <Field data-invalid={Boolean(errors.password)}>
+                      <FieldLabel htmlFor="email-password">Mot de passe actuel</FieldLabel>
+                      <Input
+                        id="email-password"
+                        type="password"
+                        name="password"
+                        autoComplete="current-password"
+                        required
+                        aria-invalid={Boolean(errors.password)}
+                      />
+                      {errors.password && <FieldError>{errors.password}</FieldError>}
+                    </Field>
+                  )}
                   <Button type="submit" disabled={processing} className="w-fit">
                     Envoyer le lien de confirmation
                   </Button>
@@ -148,22 +156,40 @@ export default function ShowAccount({ account, oauthConnections, mcpUrl }: PageP
             </Form>
           </Section>
 
+          {(googleSignIn || account.googleLinked) && (
+            <Section title="Connexion Google">
+              <p className="text-sm">
+                {account.googleLinked
+                  ? 'Ton compte est lié à Google : « Continuer avec Google » te connecte directement.'
+                  : 'Pour lier ton compte, déconnecte-toi puis choisis « Continuer avec Google » avec un compte Google qui utilise la même adresse.'}
+              </p>
+            </Section>
+          )}
+
           <Section title="Mot de passe">
+            {!account.hasPassword && (
+              <p className="mb-6 text-sm text-muted-foreground">
+                Ton compte n'a pas encore de mot de passe. Définis-en un pour pouvoir aussi te
+                connecter avec ton adresse e-mail.
+              </p>
+            )}
             <Form route="account.password.update" errorBag="password">
               {({ errors, processing }) => (
                 <FieldGroup className="max-w-md">
-                  <Field data-invalid={Boolean(errors.currentPassword)}>
-                    <FieldLabel htmlFor="current-password">Mot de passe actuel</FieldLabel>
-                    <Input
-                      id="current-password"
-                      type="password"
-                      name="currentPassword"
-                      autoComplete="current-password"
-                      required
-                      aria-invalid={Boolean(errors.currentPassword)}
-                    />
-                    {errors.currentPassword && <FieldError>{errors.currentPassword}</FieldError>}
-                  </Field>
+                  {account.hasPassword && (
+                    <Field data-invalid={Boolean(errors.currentPassword)}>
+                      <FieldLabel htmlFor="current-password">Mot de passe actuel</FieldLabel>
+                      <Input
+                        id="current-password"
+                        type="password"
+                        name="currentPassword"
+                        autoComplete="current-password"
+                        required
+                        aria-invalid={Boolean(errors.currentPassword)}
+                      />
+                      {errors.currentPassword && <FieldError>{errors.currentPassword}</FieldError>}
+                    </Field>
+                  )}
                   <Field data-invalid={Boolean(errors.password)}>
                     <FieldLabel htmlFor="new-password">
                       Nouveau mot de passe (8 caractères minimum)
@@ -192,7 +218,7 @@ export default function ShowAccount({ account, oauthConnections, mcpUrl }: PageP
                     />
                   </Field>
                   <Button type="submit" disabled={processing} className="w-fit">
-                    Modifier le mot de passe
+                    {account.hasPassword ? 'Modifier le mot de passe' : 'Définir le mot de passe'}
                   </Button>
                 </FieldGroup>
               )}
@@ -253,18 +279,35 @@ export default function ShowAccount({ account, oauthConnections, mcpUrl }: PageP
             <Form route="account.destroy" errorBag="delete">
               {({ errors, processing }) => (
                 <FieldGroup className="max-w-md">
-                  <Field data-invalid={Boolean(errors.password)}>
-                    <FieldLabel htmlFor="delete-password">Mot de passe</FieldLabel>
-                    <Input
-                      id="delete-password"
-                      type="password"
-                      name="password"
-                      autoComplete="current-password"
-                      required
-                      aria-invalid={Boolean(errors.password)}
-                    />
-                    {errors.password && <FieldError>{errors.password}</FieldError>}
-                  </Field>
+                  {account.hasPassword ? (
+                    <Field data-invalid={Boolean(errors.password)}>
+                      <FieldLabel htmlFor="delete-password">Mot de passe</FieldLabel>
+                      <Input
+                        id="delete-password"
+                        type="password"
+                        name="password"
+                        autoComplete="current-password"
+                        required
+                        aria-invalid={Boolean(errors.password)}
+                      />
+                      {errors.password && <FieldError>{errors.password}</FieldError>}
+                    </Field>
+                  ) : (
+                    <Field data-invalid={Boolean(errors.email)}>
+                      <FieldLabel htmlFor="delete-email">
+                        Tape l'adresse e-mail du compte pour confirmer
+                      </FieldLabel>
+                      <Input
+                        id="delete-email"
+                        type="email"
+                        name="email"
+                        autoComplete="off"
+                        required
+                        aria-invalid={Boolean(errors.email)}
+                      />
+                      {errors.email && <FieldError>{errors.email}</FieldError>}
+                    </Field>
+                  )}
                   <Button
                     type="submit"
                     variant="destructive"

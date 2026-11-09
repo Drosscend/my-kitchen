@@ -3,7 +3,7 @@ import { test } from '@japa/runner'
 import { assertRedirectedTo } from '#tests/helpers/http'
 import { queuedLink, queuedMessage } from '#tests/helpers/mail'
 import { resetState } from '#tests/helpers/state'
-import { createUser, storedUser, TEST_PASSWORD } from '#tests/helpers/users'
+import { createGoogleUser, createUser, storedUser, TEST_PASSWORD } from '#tests/helpers/users'
 
 test.group('Account', (group) => {
   group.each.setup(async () => {
@@ -18,7 +18,22 @@ test.group('Account', (group) => {
 
     response.assertStatus(200)
     response.assertInertiaPropsContains({
-      account: { email: 'ada@example.com', name: 'Ada Lovelace' },
+      account: {
+        email: 'ada@example.com',
+        name: 'Ada Lovelace',
+        hasPassword: true,
+        googleLinked: false,
+      },
+    })
+  })
+
+  test('tells a Google account it has no password yet', async ({ client }) => {
+    const user = await createGoogleUser('ada@example.com')
+
+    const response = await client.get('/account').loginAs(user).withInertia()
+
+    response.assertInertiaPropsContains({
+      account: { hasPassword: false, googleLinked: true },
     })
   })
 
@@ -155,6 +170,61 @@ test.group('Account', (group) => {
     refused.assertFlashMessage('error', 'Mot de passe incorrect')
     assertRedirectedTo(deleted, '/login')
     deleted.assertFlashMessage('success', 'Compte supprimé')
+    assert.isUndefined(await storedUser('ada@example.com'))
+  })
+
+  test('lets a Google account set its first password without a current one', async ({ client }) => {
+    const user = await createGoogleUser('ada@example.com')
+
+    const response = await client
+      .post('/account/password')
+      .loginAs(user)
+      .withCsrfToken()
+      .form({ password: 'a-new-password', passwordConfirmation: 'a-new-password' })
+      .redirects(0)
+    const login = await client
+      .post('/login')
+      .withCsrfToken()
+      .form({ email: 'ada@example.com', password: 'a-new-password' })
+      .redirects(0)
+
+    response.assertFlashMessage('success', 'Mot de passe défini')
+    assertRedirectedTo(login, '/')
+  })
+
+  test('lets a Google account change its address without a password', async ({ client }) => {
+    const mailer = mail.fake()
+    const user = await createGoogleUser('ada@example.com')
+
+    const response = await client
+      .post('/account/email')
+      .loginAs(user)
+      .withCsrfToken()
+      .form({ email: 'new@example.com' })
+      .redirects(0)
+
+    assertRedirectedTo(response, '/account')
+    ;(await queuedMessage(mailer)).assertTo('new@example.com')
+  })
+
+  test('deletes a Google account once its address is typed', async ({ client, assert }) => {
+    const user = await createGoogleUser('ada@example.com')
+
+    const refused = await client
+      .delete('/account')
+      .loginAs(user)
+      .withCsrfToken()
+      .form({ email: 'other@example.com' })
+      .redirects(0)
+    const deleted = await client
+      .delete('/account')
+      .loginAs(user)
+      .withCsrfToken()
+      .form({ email: 'ADA@example.com' })
+      .redirects(0)
+
+    refused.assertFlashMessage('error', "L'adresse saisie n'est pas celle du compte")
+    assertRedirectedTo(deleted, '/login')
     assert.isUndefined(await storedUser('ada@example.com'))
   })
 })

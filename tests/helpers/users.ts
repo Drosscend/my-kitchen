@@ -1,5 +1,6 @@
 import app from '@adonisjs/core/services/app'
 import { RegisterUser } from '#identity/actions/register_user'
+import { SignInWithGoogle } from '#identity/actions/sign_in_with_google'
 import { EmailAddress } from '#identity/domain/email_address'
 import { User } from '#identity/domain/user'
 import { UserIdentifier } from '#identity/domain/user_identifier'
@@ -22,6 +23,7 @@ export function makeUser(overrides: Partial<{ id: UserIdentifier; email: string 
     name: 'Ada Lovelace',
     email: email.value,
     passwordHash: 'hashed',
+    googleId: null,
     emailVerifiedAt: new Date('2026-01-01T00:00:00Z'),
   })
 }
@@ -45,10 +47,29 @@ export async function createUser(email: string, emailVerified = true) {
   return result.value
 }
 
+/**
+ * A persisted account created through Google, without a password.
+ */
+export async function createGoogleUser(email: string, googleId = 'google-ada') {
+  const signInWithGoogle = await app.container.make(SignInWithGoogle)
+  const result = await signInWithGoogle.execute({
+    googleId,
+    email,
+    emailVerified: true,
+    name: 'Ada',
+  })
+
+  if (!result.ok) {
+    throw new Error(`Cannot create the Google test user: ${result.error.type}`)
+  }
+
+  return result.value
+}
+
 export function storedUser(email: string) {
   return db
     .selectFrom('users')
-    .select(['id', 'name', 'email', 'email_verified_at'])
+    .select(['id', 'name', 'email', 'email_verified_at', 'password', 'google_id'])
     .where('email', '=', email)
     .executeTakeFirst()
 }

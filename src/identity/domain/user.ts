@@ -8,7 +8,14 @@ interface UserProperties {
   id: UserIdentifier
   name: string | null
   email: EmailAddress
-  passwordHash: string
+  /**
+   * Null for an account created through Google that never set a password.
+   */
+  passwordHash: string | null
+  /**
+   * The Google subject of the linked Google account, if any.
+   */
+  googleId: string | null
   emailVerifiedAt: Date | null
 }
 
@@ -35,6 +42,14 @@ export class User extends Entity<UserProperties> {
 
   get passwordHash() {
     return this.props.passwordHash
+  }
+
+  get hasPassword() {
+    return this.props.passwordHash !== null
+  }
+
+  get googleId() {
+    return this.props.googleId
   }
 
   get isEmailVerified() {

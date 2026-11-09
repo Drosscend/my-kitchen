@@ -2,6 +2,7 @@ import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
 import { identityErrorMessages } from '#app/identity/error_messages'
 import { confirmedPasswordField, emailField, nameField } from '#app/identity/validators'
+import { googleSignInEnabled } from '#config/ally'
 import { RegisterUser } from '#identity/actions/register_user'
 import { SendEmailVerification } from '#identity/actions/send_email_verification'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -20,7 +21,7 @@ export default class RegisterUserController {
   ) {}
 
   render({ inertia }: HttpContext) {
-    return inertia.render('auth/signup', {})
+    return inertia.render('auth/signup', { googleSignIn: googleSignInEnabled })
   }
 
   async execute({ request, response, auth, session }: HttpContext) {

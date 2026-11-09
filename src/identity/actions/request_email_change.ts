@@ -2,14 +2,17 @@ import { inject } from '@adonisjs/core'
 import { err, ok, type Result } from '#core/result'
 import { SendEmailVerification } from '#identity/actions/send_email_verification'
 import { EmailAddress, type InvalidEmailAddressError } from '#identity/domain/email_address'
-import { verifyPassword, type InvalidCredentialsError } from '#identity/domain/password'
+import { confirmCurrentPassword, type InvalidCredentialsError } from '#identity/domain/password'
 import { UserRepository, type EmailAlreadyTakenError } from '#identity/repositories/user_repository'
 import type { User } from '#identity/domain/user'
 
 export interface RequestEmailChangeParams {
   user: User
   email: string
-  password: string
+  /**
+   * Required once the account has a password.
+   */
+  password?: string
 }
 
 export interface SameEmailError {
@@ -33,7 +36,7 @@ export class RequestEmailChange {
   ) {}
 
   async execute(params: RequestEmailChangeParams): Promise<RequestEmailChangeResult> {
-    const credentials = await verifyPassword(params.user.passwordHash, params.password)
+    const credentials = await confirmCurrentPassword(params.user, params.password)
 
     if (!credentials.ok) {
       return err(credentials.error)

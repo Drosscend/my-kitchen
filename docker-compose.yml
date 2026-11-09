@@ -50,6 +50,10 @@ services:
       # Guards the detailed /health report
       - MONITORING_SECRET=${MONITORING_SECRET}
 
+      # Google sign-in, hidden while either value is empty
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+
   db:
     image: postgres:17-alpine
     restart: always

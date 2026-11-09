@@ -10,7 +10,8 @@ interface CreateUserPayload {
   id: UserIdentifier
   name: string | null
   email: EmailAddress
-  passwordHash: string
+  passwordHash: string | null
+  googleId: string | null
   emailVerifiedAt: Date | null
 }
 

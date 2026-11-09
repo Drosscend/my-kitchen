@@ -165,6 +165,11 @@ POST   /account/profile  -> UpdateProfileController.execute      -> UpdateProfil
 POST   /account/email    -> RequestEmailChangeController.execute -> RequestEmailChange.execute
 POST   /account/password -> ChangePasswordController.execute     -> ChangePassword.execute
 DELETE /account          -> DeleteAccountController.execute      -> DeleteAccount.execute
+
+Google sign-in has no page: two endpoints, each a controller with `execute`.
+
+GET /auth/google/redirect -> GoogleRedirectController.execute -> Ally redirect
+GET /auth/google/callback -> GoogleCallbackController.execute -> SignInWithGoogle.execute
 ```
 
 ## Completion checklist

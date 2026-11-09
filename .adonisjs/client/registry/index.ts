@@ -8,36 +8,6 @@ export type { Route, Path } from './schema.d.ts'
 const placeholder: any = {}
 
 const routes = {
-  'mcp': {
-    methods: ["POST","GET","DELETE"],
-    pattern: '/mcp',
-    tokens: [[0,"mcp"]],
-    types: placeholder as Registry['mcp']['types'],
-  },
-  'mcp.protected_resource': {
-    methods: ["GET","HEAD"],
-    pattern: '/.well-known/oauth-protected-resource/mcp',
-    tokens: [[0,".well-known"],[0,"oauth-protected-resource"],[0,"mcp"]],
-    types: placeholder as Registry['mcp.protected_resource']['types'],
-  },
-  'mcp.protected_resource.root': {
-    methods: ["GET","HEAD"],
-    pattern: '/.well-known/oauth-protected-resource',
-    tokens: [[0,".well-known"],[0,"oauth-protected-resource"]],
-    types: placeholder as Registry['mcp.protected_resource.root']['types'],
-  },
-  'up': {
-    methods: ["GET","HEAD"],
-    pattern: '/up',
-    tokens: [[0,"up"]],
-    types: placeholder as Registry['up']['types'],
-  },
-  'health': {
-    methods: ["GET","HEAD"],
-    pattern: '/health',
-    tokens: [[0,"health"]],
-    types: placeholder as Registry['health']['types'],
-  },
   'inventory.index': {
     methods: ["GET","HEAD"],
     pattern: '/',
@@ -134,6 +104,24 @@ const routes = {
     tokens: [[0,"recipes"],[1,"id"]],
     types: placeholder as Registry['recipes.destroy']['types'],
   },
+  'mcp': {
+    methods: ["POST","GET","DELETE"],
+    pattern: '/mcp',
+    tokens: [[0,"mcp"]],
+    types: placeholder as Registry['mcp']['types'],
+  },
+  'mcp.protected_resource': {
+    methods: ["GET","HEAD"],
+    pattern: '/.well-known/oauth-protected-resource/mcp',
+    tokens: [[0,".well-known"],[0,"oauth-protected-resource"],[0,"mcp"]],
+    types: placeholder as Registry['mcp.protected_resource']['types'],
+  },
+  'mcp.protected_resource.root': {
+    methods: ["GET","HEAD"],
+    pattern: '/.well-known/oauth-protected-resource',
+    tokens: [[0,".well-known"],[0,"oauth-protected-resource"]],
+    types: placeholder as Registry['mcp.protected_resource.root']['types'],
+  },
   'oauth.authorization.show': {
     methods: ["GET","HEAD"],
     pattern: '/oauth/interaction/:uid',
@@ -151,6 +139,18 @@ const routes = {
     pattern: '/oauth/interaction/:uid/deny',
     tokens: [[0,"oauth"],[0,"interaction"],[1,"uid"],[0,"deny"]],
     types: placeholder as Registry['oauth.authorization.deny']['types'],
+  },
+  'up': {
+    methods: ["GET","HEAD"],
+    pattern: '/up',
+    tokens: [[0,"up"]],
+    types: placeholder as Registry['up']['types'],
+  },
+  'health': {
+    methods: ["GET","HEAD"],
+    pattern: '/health',
+    tokens: [[0,"health"]],
+    types: placeholder as Registry['health']['types'],
   },
   'new_account.create': {
     methods: ["GET","HEAD"],
@@ -199,6 +199,18 @@ const routes = {
     pattern: '/reset-password',
     tokens: [[0,"reset-password"]],
     types: placeholder as Registry['password.update']['types'],
+  },
+  'google.redirect': {
+    methods: ["GET","HEAD"],
+    pattern: '/auth/google/redirect',
+    tokens: [[0,"auth"],[0,"google"],[0,"redirect"]],
+    types: placeholder as Registry['google.redirect']['types'],
+  },
+  'google.callback': {
+    methods: ["GET","HEAD"],
+    pattern: '/auth/google/callback',
+    tokens: [[0,"auth"],[0,"google"],[0,"callback"]],
+    types: placeholder as Registry['google.callback']['types'],
   },
   'verification.verify': {
     methods: ["GET","HEAD"],

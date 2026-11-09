@@ -1,7 +1,8 @@
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
+import { redirectAfterLogin } from '#app/identity/redirect_after_login'
 import { emailField, passwordField } from '#app/identity/validators'
-import { INTENDED_URL_KEY } from '#app/middleware/auth_middleware'
+import { googleSignInEnabled } from '#config/ally'
 import { VerifyUserCredentials } from '#identity/actions/verify_user_credentials'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -15,10 +16,11 @@ export default class LoginController {
   constructor(private readonly verifyUserCredentials: VerifyUserCredentials) {}
 
   render({ inertia }: HttpContext) {
-    return inertia.render('auth/login', {})
+    return inertia.render('auth/login', { googleSignIn: googleSignInEnabled })
   }
 
-  async execute({ request, response, auth, session }: HttpContext) {
+  async execute(ctx: HttpContext) {
+    const { request, response, auth, session } = ctx
     const params = await request.validateUsing(LoginController.validator)
     const result = await this.verifyUserCredentials.execute(params)
 
@@ -28,12 +30,6 @@ export default class LoginController {
     }
 
     await auth.use('web').login(result.value)
-    const intendedUrl = String(session.pull(INTENDED_URL_KEY, ''))
-
-    if (intendedUrl.startsWith('/') && !intendedUrl.startsWith('//')) {
-      return response.redirect(intendedUrl)
-    }
-
-    return response.redirect().toRoute('inventory.index')
+    return redirectAfterLogin(ctx)
   }
 }

@@ -4,11 +4,6 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
-    'mcp': { paramsTuple?: []; params?: {} }
-    'mcp.protected_resource': { paramsTuple?: []; params?: {} }
-    'mcp.protected_resource.root': { paramsTuple?: []; params?: {} }
-    'up': { paramsTuple?: []; params?: {} }
-    'health': { paramsTuple?: []; params?: {} }
     'inventory.index': { paramsTuple?: []; params?: {} }
     'inventory.store': { paramsTuple?: []; params?: {} }
     'inventory.markdown': { paramsTuple?: []; params?: {} }
@@ -25,9 +20,14 @@ export type ScannedRoutes = {
     'recipes.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'mcp': { paramsTuple?: []; params?: {} }
+    'mcp.protected_resource': { paramsTuple?: []; params?: {} }
+    'mcp.protected_resource.root': { paramsTuple?: []; params?: {} }
     'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'oauth.authorization.approve': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'oauth.authorization.deny': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
+    'up': { paramsTuple?: []; params?: {} }
+    'health': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -36,6 +36,8 @@ export type ScannedRoutes = {
     'password.email': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'password.update': { paramsTuple?: []; params?: {} }
+    'google.redirect': { paramsTuple?: []; params?: {} }
+    'google.callback': { paramsTuple?: []; params?: {} }
     'verification.verify': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'verification.notice': { paramsTuple?: []; params?: {} }
     'verification.resend': { paramsTuple?: []; params?: {} }
@@ -53,12 +55,63 @@ export type ScannedRoutes = {
     'cooking.state': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'cooking.state.update': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
   }
-  POST: {
+  GET: {
+    'inventory.index': { paramsTuple?: []; params?: {} }
+    'inventory.markdown': { paramsTuple?: []; params?: {} }
+    'recipes.index': { paramsTuple?: []; params?: {} }
+    'recipes.create': { paramsTuple?: []; params?: {} }
+    'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recipes.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'mcp': { paramsTuple?: []; params?: {} }
+    'mcp.protected_resource': { paramsTuple?: []; params?: {} }
+    'mcp.protected_resource.root': { paramsTuple?: []; params?: {} }
+    'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
+    'up': { paramsTuple?: []; params?: {} }
+    'health': { paramsTuple?: []; params?: {} }
+    'new_account.create': { paramsTuple?: []; params?: {} }
+    'session.create': { paramsTuple?: []; params?: {} }
+    'password.forgot': { paramsTuple?: []; params?: {} }
+    'password.reset': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'google.redirect': { paramsTuple?: []; params?: {} }
+    'google.callback': { paramsTuple?: []; params?: {} }
+    'verification.verify': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'verification.notice': { paramsTuple?: []; params?: {} }
+    'account.show': { paramsTuple?: []; params?: {} }
+    'cooking.join': { paramsTuple?: []; params?: {} }
+    'cooking.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+    'cooking.state': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+  }
+  HEAD: {
+    'inventory.index': { paramsTuple?: []; params?: {} }
+    'inventory.markdown': { paramsTuple?: []; params?: {} }
+    'recipes.index': { paramsTuple?: []; params?: {} }
+    'recipes.create': { paramsTuple?: []; params?: {} }
+    'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recipes.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'mcp.protected_resource': { paramsTuple?: []; params?: {} }
+    'mcp.protected_resource.root': { paramsTuple?: []; params?: {} }
+    'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
+    'up': { paramsTuple?: []; params?: {} }
+    'health': { paramsTuple?: []; params?: {} }
+    'new_account.create': { paramsTuple?: []; params?: {} }
+    'session.create': { paramsTuple?: []; params?: {} }
+    'password.forgot': { paramsTuple?: []; params?: {} }
+    'password.reset': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'google.redirect': { paramsTuple?: []; params?: {} }
+    'google.callback': { paramsTuple?: []; params?: {} }
+    'verification.verify': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'verification.notice': { paramsTuple?: []; params?: {} }
+    'account.show': { paramsTuple?: []; params?: {} }
+    'cooking.join': { paramsTuple?: []; params?: {} }
+    'cooking.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+    'cooking.state': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+  }
+  POST: {
     'inventory.store': { paramsTuple?: []; params?: {} }
     'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.batches.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.store': { paramsTuple?: []; params?: {} }
+    'mcp': { paramsTuple?: []; params?: {} }
     'oauth.authorization.approve': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'oauth.authorization.deny': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'new_account.store': { paramsTuple?: []; params?: {} }
@@ -72,66 +125,19 @@ export type ScannedRoutes = {
     'account.password.update': { paramsTuple?: []; params?: {} }
     'cooking.start': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'cooking.join.store': { paramsTuple?: []; params?: {} }
-  }
-  GET: {
-    'mcp': { paramsTuple?: []; params?: {} }
-    'mcp.protected_resource': { paramsTuple?: []; params?: {} }
-    'mcp.protected_resource.root': { paramsTuple?: []; params?: {} }
-    'up': { paramsTuple?: []; params?: {} }
-    'health': { paramsTuple?: []; params?: {} }
-    'inventory.index': { paramsTuple?: []; params?: {} }
-    'inventory.markdown': { paramsTuple?: []; params?: {} }
-    'recipes.index': { paramsTuple?: []; params?: {} }
-    'recipes.create': { paramsTuple?: []; params?: {} }
-    'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'recipes.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
-    'new_account.create': { paramsTuple?: []; params?: {} }
-    'session.create': { paramsTuple?: []; params?: {} }
-    'password.forgot': { paramsTuple?: []; params?: {} }
-    'password.reset': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
-    'verification.verify': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
-    'verification.notice': { paramsTuple?: []; params?: {} }
-    'account.show': { paramsTuple?: []; params?: {} }
-    'cooking.join': { paramsTuple?: []; params?: {} }
-    'cooking.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
-    'cooking.state': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
-  }
-  DELETE: {
-    'mcp': { paramsTuple?: []; params?: {} }
-    'inventory.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'inventory.batches.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'batchId': ParamValue} }
-    'recipes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'account.destroy': { paramsTuple?: []; params?: {} }
-    'account.oauth_connections.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-  }
-  HEAD: {
-    'mcp.protected_resource': { paramsTuple?: []; params?: {} }
-    'mcp.protected_resource.root': { paramsTuple?: []; params?: {} }
-    'up': { paramsTuple?: []; params?: {} }
-    'health': { paramsTuple?: []; params?: {} }
-    'inventory.index': { paramsTuple?: []; params?: {} }
-    'inventory.markdown': { paramsTuple?: []; params?: {} }
-    'recipes.index': { paramsTuple?: []; params?: {} }
-    'recipes.create': { paramsTuple?: []; params?: {} }
-    'recipes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'recipes.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
-    'new_account.create': { paramsTuple?: []; params?: {} }
-    'session.create': { paramsTuple?: []; params?: {} }
-    'password.forgot': { paramsTuple?: []; params?: {} }
-    'password.reset': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
-    'verification.verify': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
-    'verification.notice': { paramsTuple?: []; params?: {} }
-    'account.show': { paramsTuple?: []; params?: {} }
-    'cooking.join': { paramsTuple?: []; params?: {} }
-    'cooking.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
-    'cooking.state': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
   }
   PATCH: {
     'inventory.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.batches.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'batchId': ParamValue} }
     'cooking.state.update': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
+  }
+  DELETE: {
+    'inventory.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'inventory.batches.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'batchId': ParamValue} }
+    'recipes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'mcp': { paramsTuple?: []; params?: {} }
+    'account.destroy': { paramsTuple?: []; params?: {} }
+    'account.oauth_connections.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'recipes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

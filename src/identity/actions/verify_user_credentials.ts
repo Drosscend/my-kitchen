@@ -21,7 +21,11 @@ export class VerifyUserCredentials {
     const email = EmailAddress.create(params.email)
     const user = email.ok ? await this.users.findUserByEmail(email.value) : null
 
-    if (!user) {
+    /**
+     * An account created through Google has no password to match: it
+     * answers like an unknown address, after the same hashing work.
+     */
+    if (!user?.passwordHash) {
       await hash.make('invalid-password')
       return err({ type: 'invalid_credentials' })
     }

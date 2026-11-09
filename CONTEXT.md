@@ -13,6 +13,9 @@ A single use, hashed token mailed as a link to the address a user must confirm, 
 **Password reset token**:
 A single use, hashed token mailed as a link to a user who forgot their password. Changing the password revokes it.
 
+**Google sign-in**:
+Logging in with a Google account instead of a password. A user is linked to at most one Google account, identified by its Google subject rather than its address. The first Google sign-in with an address that belongs to a confirmed account links that account; with an unknown address it creates an account, confirmed and without a password, which can set one later from the account page.
+
 **Connected application**:
 An assistant a user authorized on the consent page to call the MCP endpoint in their name, an OAuth grant in the code. It holds rotating tokens, stored hashed, until it expires or the user revokes it from the account page.
 

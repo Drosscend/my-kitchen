@@ -13,7 +13,7 @@ const errorMessages = {
 @inject()
 export default class ChangePasswordController {
   static readonly validator = vine.create({
-    currentPassword: vine.string(),
+    currentPassword: vine.string().optional(),
     password: confirmedPasswordField,
   })
 
@@ -21,14 +21,15 @@ export default class ChangePasswordController {
 
   async execute({ request, response, auth, session }: HttpContext) {
     const params = await request.validateUsing(ChangePasswordController.validator)
-    const result = await this.changePassword.execute({ user: auth.getUserOrFail(), ...params })
+    const user = auth.getUserOrFail()
+    const result = await this.changePassword.execute({ user, ...params })
 
     if (!result.ok) {
       session.flash('error', errorMessages[result.error.type])
       return response.redirect().toRoute('account.show')
     }
 
-    session.flash('success', 'Mot de passe modifié')
+    session.flash('success', user.hasPassword ? 'Mot de passe modifié' : 'Mot de passe défini')
     return response.redirect().toRoute('account.show')
   }
 }
