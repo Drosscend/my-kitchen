@@ -56,6 +56,19 @@ export class EmailVerificationTokenRepository {
     return record ? { userId: record.user_id, email: record.email } : null
   }
 
+  /**
+   * A link issued for another address than the current one is a pending
+   * address change.
+   */
+  async deleteAddressChangesForUser(userId: UserIdentifier, currentEmail: EmailAddress) {
+    await this.transactions
+      .currentDatabase()
+      .deleteFrom('email_verification_tokens')
+      .where('user_id', '=', userId.toString())
+      .where('email', '!=', currentEmail.toString())
+      .execute()
+  }
+
   async deleteForUser(userId: UserIdentifier) {
     await this.transactions
       .currentDatabase()

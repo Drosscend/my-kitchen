@@ -7,6 +7,7 @@ import {
   type InvalidCredentialsError,
   type InvalidPasswordError,
 } from '#identity/domain/password'
+import { EmailVerificationTokenRepository } from '#identity/repositories/email_verification_token_repository'
 import { PasswordResetTokenRepository } from '#identity/repositories/password_reset_token_repository'
 import { UserRepository } from '#identity/repositories/user_repository'
 import { TransactionManager } from '#shared/services/transaction_manager'
@@ -30,6 +31,7 @@ export class ChangePassword {
   constructor(
     private readonly users: UserRepository,
     private readonly resetTokens: PasswordResetTokenRepository,
+    private readonly verificationTokens: EmailVerificationTokenRepository,
     private readonly transactions: TransactionManager
   ) {}
 
@@ -53,9 +55,11 @@ export class ChangePassword {
       const user = await this.users.updatePassword(userId, passwordHash)
 
       /**
-       * A reset link requested before the change must not undo it.
+       * A reset link or an address change requested before the change
+       * must not undo it.
        */
       await this.resetTokens.deleteForUser(userId)
+      await this.verificationTokens.deleteAddressChangesForUser(userId, user.emailAddress)
       return ok(user)
     })
   }

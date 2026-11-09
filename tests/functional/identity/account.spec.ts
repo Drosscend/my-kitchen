@@ -128,6 +128,33 @@ test.group('Account', (group) => {
     assertRedirectedTo(login, '/')
   })
 
+  test('a password change cancels a pending address change', async ({ client, assert }) => {
+    const mailer = mail.fake()
+    const user = await createUser('ada@example.com')
+    await client
+      .post('/account/email')
+      .loginAs(user)
+      .withCsrfToken()
+      .form({ email: 'new@example.com', password: TEST_PASSWORD })
+      .redirects(0)
+    const token = await queuedLink(mailer, /\/verify-email\/(\S+)/)
+
+    await client
+      .post('/account/password')
+      .loginAs(user)
+      .withCsrfToken()
+      .form({
+        currentPassword: TEST_PASSWORD,
+        password: 'a-new-password',
+        passwordConfirmation: 'a-new-password',
+      })
+      .redirects(0)
+    const stale = await client.get(`/verify-email/${token}`).loginAs(user).redirects(0)
+
+    stale.assertFlashMessage('error', 'Ce lien est invalide ou a expiré')
+    assert.isUndefined(await storedUser('new@example.com'))
+  })
+
   test('refuses a password change without the current password', async ({ client }) => {
     const user = await createUser('ada@example.com')
 

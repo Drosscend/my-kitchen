@@ -78,7 +78,11 @@ router
     router
       .post('account/password', [ChangePasswordController, 'execute'])
       .as('account.password.update')
-    router.delete('account', [DeleteAccountController, 'execute']).as('account.destroy')
+      .use(loginThrottle)
+    router
+      .delete('account', [DeleteAccountController, 'execute'])
+      .as('account.destroy')
+      .use(loginThrottle)
     router
       .delete('account/oauth-connections/:id', [RevokeOAuthConnectionController, 'execute'])
       .as('account.oauth_connections.destroy')

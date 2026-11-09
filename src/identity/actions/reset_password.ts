@@ -4,6 +4,7 @@ import { err, ok, type Result } from '#core/result'
 import { validatePassword, type InvalidPasswordError } from '#identity/domain/password'
 import { hashSecureToken, type InvalidTokenError } from '#identity/domain/secure_token'
 import { UserIdentifier } from '#identity/domain/user_identifier'
+import { EmailVerificationTokenRepository } from '#identity/repositories/email_verification_token_repository'
 import { PasswordResetTokenRepository } from '#identity/repositories/password_reset_token_repository'
 import { UserRepository } from '#identity/repositories/user_repository'
 import { TransactionManager } from '#shared/services/transaction_manager'
@@ -22,6 +23,7 @@ export class ResetPassword {
   constructor(
     private readonly users: UserRepository,
     private readonly tokens: PasswordResetTokenRepository,
+    private readonly verificationTokens: EmailVerificationTokenRepository,
     private readonly transactions: TransactionManager
   ) {}
 
@@ -44,6 +46,7 @@ export class ResetPassword {
       const userId = UserIdentifier.fromString(token.userId)
       const user = await this.users.updatePassword(userId, await hash.make(password.value))
       await this.tokens.deleteForUser(userId)
+      await this.verificationTokens.deleteAddressChangesForUser(userId, user.emailAddress)
       return ok(user)
     })
   }
