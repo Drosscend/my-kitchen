@@ -1,5 +1,6 @@
 import { Form, Link } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
+import { client } from '~/client'
 import { AuthShell } from '~/components/auth_shell'
 import { GoogleSignIn } from '~/components/google_sign_in'
 import { Button } from '~/components/ui/button'
@@ -83,6 +84,24 @@ export default function Signup({ googleSignIn }: PageProps) {
               <Button type="submit" size="lg" disabled={processing} className="w-full">
                 Créer mon compte
               </Button>
+
+              <p className="text-center text-xs text-muted-foreground">
+                En créant un compte, tu acceptes les{' '}
+                <a
+                  href={`${client.urlFor('legal.show')}#conditions`}
+                  className="underline hover:text-primary"
+                >
+                  conditions d'utilisation
+                </a>{' '}
+                et la{' '}
+                <a
+                  href={`${client.urlFor('legal.show')}#confidentialite`}
+                  className="underline hover:text-primary"
+                >
+                  politique de confidentialité
+                </a>
+                .
+              </p>
             </FieldGroup>
           )}
         </Form>

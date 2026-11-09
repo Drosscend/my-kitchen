@@ -1,6 +1,6 @@
 import { Link } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
-import { type ReactNode } from 'react'
+import { type ReactNode, useEffect } from 'react'
 import { Page, PageHeader } from '~/components/page'
 
 const CONTACT_EMAIL = 'contact@kevin-dev.com'
@@ -45,6 +45,18 @@ function Contact() {
 }
 
 export default function Legal() {
+  /**
+   * The page renders after the browser looked for the anchor: links such as
+   * /legal#conditions scroll once the sections exist.
+   */
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1))
+
+    if (id) {
+      document.getElementById(id)?.scrollIntoView()
+    }
+  }, [])
+
   return (
     <>
       <Head title="Mentions légales" />
@@ -79,6 +91,78 @@ export default function Legal() {
               L'inventaire et les recettes que tu saisis restent les tiens : ils ne servent qu'à te
               rendre le service.
             </p>
+          </Section>
+
+          <Section id="conditions" title="Conditions d'utilisation">
+            <p>
+              Mon Garde-Manger est un service gratuit. Créer un compte, y compris avec Google, vaut
+              acceptation des conditions ci-dessous.
+            </p>
+
+            <Subsection title="Service">
+              <p>
+                Le service est fourni tel quel, sans garantie de disponibilité ni d'absence
+                d'erreur. L'éditeur peut le faire évoluer, l'interrompre pour maintenance ou y
+                mettre fin. En cas d'arrêt définitif, il préviendra par e-mail dans la mesure du
+                possible, pour te laisser le temps de récupérer tes données.
+              </p>
+            </Subsection>
+
+            <Subsection title="Compte">
+              <p>
+                Un compte demande une adresse e-mail valide dont tu es titulaire. Tu es responsable
+                de la confidentialité de ton mot de passe et de ce qui est fait avec ton compte, y
+                compris par les assistants que tu autorises à y accéder.
+              </p>
+            </Subsection>
+
+            <Subsection title="Usage acceptable">
+              <p>Le service est destiné à un usage personnel. Il est interdit :</p>
+              <ul className="list-disc space-y-1.5 pl-5">
+                <li>de tenter d'accéder aux données d'un autre compte ;</li>
+                <li>
+                  de perturber le service, de contourner ses protections ou de l'interroger de
+                  manière automatisée et abusive ;
+                </li>
+                <li>d'y enregistrer des contenus illicites.</li>
+              </ul>
+              <p>
+                Une session de cuisine partagée est visible par toute personne qui connaît son code
+                : n'y mets rien de confidentiel.
+              </p>
+            </Subsection>
+
+            <Subsection title="Dates de péremption et recettes">
+              <p>
+                Les alertes de péremption, les seuils de stock et les conversions d'unités sont
+                indicatifs : ils sont calculés à partir de ce que tu saisis et ne remplacent ni
+                l'emballage ni ton propre jugement. Il en va de même des recettes, y compris celles
+                écrites par un assistant. Vérifie toujours l'état d'un aliment avant de le
+                consommer.
+              </p>
+            </Subsection>
+
+            <Subsection title="Responsabilité">
+              <p>
+                L'éditeur ne saurait être tenu responsable d'une indisponibilité du service, d'une
+                perte de données ou des conséquences d'une information erronée. Pense à copier ton
+                inventaire si tu y tiens.
+              </p>
+            </Subsection>
+
+            <Subsection title="Suspension et suppression">
+              <p>
+                L'éditeur peut suspendre ou supprimer un compte qui ne respecte pas ces conditions.
+                Tu peux supprimer le tien à tout moment depuis la page compte.
+              </p>
+            </Subsection>
+
+            <Subsection title="Modifications et droit applicable">
+              <p>
+                Ces conditions peuvent évoluer : la date de mise à jour figure en haut de la page.
+                Elles sont soumises au droit français.
+              </p>
+            </Subsection>
           </Section>
 
           <Section id="confidentialite" title="Données personnelles">
