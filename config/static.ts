@@ -27,6 +27,14 @@ const staticServerConfig = defineConfig({
    * Policy for files starting with a dot.
    */
   dotFiles: 'ignore',
+
+  /**
+   * Vite names its files after their content: a new build gets new
+   * URLs, so browsers keep these for good. The other public files
+   * (service worker, manifest, icons) keep being revalidated.
+   */
+  headers: (path) =>
+    /[\\/]assets[\\/]/.test(path) ? { 'Cache-Control': 'public, max-age=31536000, immutable' } : {},
 })
 
 export default staticServerConfig
