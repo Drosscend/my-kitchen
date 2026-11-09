@@ -89,7 +89,7 @@ An Action may call another Action when both are independently valid commands. Us
 controller or adapter -> Action -> repository -> entity or aggregate -> repository
 ```
 
-The `commands/` directory at the Adonis root is reserved for thin Ace adapters. An Ace command invokes Actions or Queries; it does not become a second home for business commands.
+The `commands/` directory at the Adonis root is reserved for thin Ace adapters. An Ace command invokes Actions or Queries; it does not become a second home for business commands. The one exception is `db:seed`, a development tool: it adds its sample data through the Actions, but empties the pantry and the recipes of the account and backdates the sample recipes with direct queries, which no use case does.
 
 For example, the `create:user` command resolves each missing flag through an interactive question and invokes `RegisterUser`, the same Action used by the registration controller. `RegisterUser` constructs the `EmailAddress` Value Object and enforces the password policy; the command does not duplicate validation, normalize values, hash passwords, or write to Postgres itself.
 

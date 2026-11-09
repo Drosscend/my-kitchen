@@ -1,9 +1,9 @@
 <critical>
 - Use npm and keep `package-lock.json` synchronized with dependency changes.
 - Use Oxlint and Oxfmt as the only linting and formatting tools; their root config files own code style.
-- Treat `.adonisjs/` and `types/db.ts` as generated code. Regenerate them with `node ace codegen` and `npm run db:codegen`.
+- Treat `.adonisjs/`, `types/db.ts` and `inertia/cn_tables.ts` as generated code. Regenerate them with `node ace codegen` and `npm run db:codegen`; the `cn` Vite plugin rewrites the last one.
 - Keep delivery dependencies pointing from `app` to `src`; application modules never import from `app` or `inertia`.
-- `inertia/components/ui/` holds shadcn components copied from the registry: never reformat, lint or clean them, only adapt an import path.
+- `inertia/components/ui/` holds shadcn components copied from the registry: never reformat, lint or clean them, only adapt an import path. The Toaster, pinned to the light theme, is the one local change.
 - Identifiers, file names, URL segments and comments are in English; every text a user sees is in French.
 </critical>
 

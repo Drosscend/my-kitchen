@@ -8,7 +8,7 @@ This glossary defines the domain language of the application.
 A person who owns an account, identified by a confirmed e-mail address. Everything else in the application belongs to one user.
 
 **E-mail verification token**:
-A single use, hashed token mailed as a link to the address a user must confirm, either at signup or when changing address. The address becomes the account address once the link is opened.
+A single use, hashed token mailed as a link to the address a user must confirm, either at signup or when changing address. The address becomes the account address once the link is opened. Changing or resetting the password revokes a link mailed for a new address.
 
 **Password reset token**:
 A single use, hashed token mailed as a link to a user who forgot their password. Changing the password revokes it.
@@ -17,12 +17,12 @@ A single use, hashed token mailed as a link to a user who forgot their password.
 Logging in with a Google account instead of a password. A user is linked to at most one Google account, identified by its Google subject rather than its address. The first Google sign-in with an address that belongs to a confirmed account links that account; with an unknown address it creates an account, confirmed and without a password, which can set one later from the account page.
 
 **Connected application**:
-An assistant a user authorized on the consent page to call the MCP endpoint in their name, an OAuth grant in the code. It holds rotating tokens, stored hashed, until it expires or the user revokes it from the account page.
+An assistant a user authorized on the consent page to call the MCP endpoint in their name, an OAuth connection in the code. It holds rotating tokens, stored hashed, until it expires or the user revokes it from the account page.
 
 ## Inventory
 
 **Ingredient**:
-An item of the pantry: a name, one of six units, one of eight categories, a state, fresh or frozen, and its batches. Its quantity is the sum of its batches.
+An item of the pantry: a name, one of six units, one of eight categories, a state, fresh or frozen, a low stock threshold and its batches. Its quantity is the sum of its batches.
 
 **Batch**:
 A part of the stock of an ingredient sharing one expiry date, or none. Taking from an ingredient empties the batches that expire first, undated ones last; adding to it grows the latest batch. An empty batch disappears. "Lot" in the interface.
@@ -56,7 +56,7 @@ The JSON shape assistants send to the MCP tools: snake_case keys, `id` as the re
 ## Cooking
 
 **Cooking session**:
-A frozen copy of a recipe under a six digit code, valid six hours after its last change. Whoever holds the code follows the steps and drives the timers, no account needed.
+A frozen copy of a recipe under a six digit code, valid six hours after its last change. Whoever holds the code follows the steps and drives the timers, no account needed. An address that keeps asking for unknown codes is turned away for a minute.
 
 **Synced timer**:
 A running timer stores when it started in server time; a paused one stores what is left. Every device derives the remaining time from the server clock.
