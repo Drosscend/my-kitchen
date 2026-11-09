@@ -1,5 +1,6 @@
 import { defineConfig } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
+import proxyAddr from 'proxy-addr'
 import env from '#start/env'
 
 /**
@@ -18,6 +19,14 @@ export const http = defineConfig({
    * Useful to correlate logs and debug a request flow.
    */
   generateRequestId: true,
+
+  /**
+   * Honor X-Forwarded-* headers only when the direct peer is the
+   * local reverse proxy (on the Docker network in production,
+   * loopback in development). request.ip() then returns
+   * the real client address, which the per-IP rate limiters rely on.
+   */
+  trustProxy: proxyAddr.compile(['loopback', 'linklocal', 'uniquelocal']),
 
   /**
    * Allow HTTP method spoofing via the "_method" form/query parameter.
