@@ -15,6 +15,8 @@ import {
 } from '~/cooking/types'
 
 const POLL_INTERVAL_MS = 500
+// A hidden tab still has to hear about a timer started on another device.
+const HIDDEN_POLL_INTERVAL_MS = 5000
 const MAX_RETRY_DELAY_MS = 30_000
 
 function computeTimers(synced: Record<string, SyncedTimer>, now: number): ActiveTimers {
@@ -73,11 +75,14 @@ export function useCookingSession(initial: CookingSessionPayload) {
 
     let delay = POLL_INTERVAL_MS
     let stopped = false
+    let polling = false
 
     async function poll() {
       if (latest.current.state.closed) {
         return
       }
+
+      polling = true
 
       if (pending.current === 0) {
         try {
@@ -105,16 +110,30 @@ export function useCookingSession(initial: CookingSessionPayload) {
         }
       }
 
+      polling = false
+
       if (!stopped) {
-        timeout = setTimeout(poll, delay)
+        timeout = setTimeout(
+          poll,
+          document.visibilityState === 'hidden' ? Math.max(delay, HIDDEN_POLL_INTERVAL_MS) : delay
+        )
+      }
+    }
+
+    function catchUp() {
+      if (document.visibilityState === 'visible' && !polling) {
+        clearTimeout(timeout)
+        void poll()
       }
     }
 
     let timeout = setTimeout(poll, delay)
+    document.addEventListener('visibilitychange', catchUp)
 
     return () => {
       stopped = true
       clearTimeout(timeout)
+      document.removeEventListener('visibilitychange', catchUp)
     }
   }, [stateUrl, initial.serverNow])
 
