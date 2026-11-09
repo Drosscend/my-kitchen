@@ -3,13 +3,8 @@ import { Head } from '@inertiajs/react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useState } from 'react'
 import { client } from '~/client'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '~/components/ui/dialog'
+import { DialogSheet } from '~/components/dialog_sheet'
+import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '~/components/ui/dialog'
 import { CookingMode } from '~/cooking/cooking_mode'
 import { type CookingSessionPayload } from '~/cooking/types'
 import { useCookingSession } from '~/cooking/use_cooking_session'
@@ -57,7 +52,7 @@ export default function CookingSession({ session: initial, user }: PageProps) {
       )}
 
       <Dialog open={showQr} onOpenChange={setShowQr}>
-        <DialogContent className="text-center">
+        <DialogSheet className="text-center">
           <DialogHeader>
             <DialogTitle className="text-xl font-extrabold">Scanner pour rejoindre</DialogTitle>
             <DialogDescription>
@@ -69,7 +64,7 @@ export default function CookingSession({ session: initial, user }: PageProps) {
           </div>
           <p className="text-3xl font-bold tracking-[0.3em] tabular-nums">{initial.code}</p>
           <p className="text-xs break-all text-muted-foreground">{shareUrl}</p>
-        </DialogContent>
+        </DialogSheet>
       </Dialog>
     </>
   )
