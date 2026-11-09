@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { type Ingredient } from '~/inventory/catalog'
 import { isExpiringSoon } from '~/inventory/expiry'
+import { normalizeText } from '~/recipes/format'
 
 export interface InventoryFilters {
   search: string
@@ -45,10 +46,10 @@ function compare(a: Ingredient, b: Ingredient, field: SortField) {
 export function useInventoryFilter(ingredients: Ingredient[]) {
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [sort, setSort] = useState<SortField>('name')
-  const search = filters.search.trim().toLowerCase()
+  const search = normalizeText(filters.search.trim())
 
   const filtered = ingredients
-    .filter((ingredient) => !search || ingredient.name.toLowerCase().includes(search))
+    .filter((ingredient) => !search || normalizeText(ingredient.name).includes(search))
     .filter((ingredient) => filters.category === 'all' || ingredient.category === filters.category)
     .filter((ingredient) => filters.state === 'all' || ingredient.state === filters.state)
     .filter((ingredient) => !filters.lowStockOnly || ingredient.lowStock)
