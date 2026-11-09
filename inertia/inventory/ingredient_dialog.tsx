@@ -82,16 +82,18 @@ function BatchRow({
         ) : (
           <span />
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Supprimer le lot"
-          onClick={() =>
+        <ConfirmDeleteDialog
+          title="Supprimer ce lot ?"
+          description={`Ce lot de ${batch.quantity} ${ingredient.unitLabel} disparaît définitivement du garde-manger.`}
+          onConfirm={() =>
             router.visit({ route: 'inventory.batches.destroy', routeParams }, VISIT_OPTIONS)
           }
-        >
-          <Trash2Icon className="text-muted-foreground" />
-        </Button>
+          trigger={
+            <Button variant="ghost" size="icon" aria-label="Supprimer le lot">
+              <Trash2Icon className="text-muted-foreground" />
+            </Button>
+          }
+        />
       </div>
       {batch.expiresOn && <ExpiryStamp {...batch} className="self-start" />}
     </li>
