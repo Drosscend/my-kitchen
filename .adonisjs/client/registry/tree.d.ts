@@ -38,6 +38,9 @@ export interface ApiDefinition {
   }
   up: typeof routes['up']
   health: typeof routes['health']
+  legal: {
+    show: typeof routes['legal.show']
+  }
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']

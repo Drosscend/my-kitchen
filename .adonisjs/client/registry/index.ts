@@ -152,6 +152,12 @@ const routes = {
     tokens: [[0,"health"]],
     types: placeholder as Registry['health']['types'],
   },
+  'legal.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/legal',
+    tokens: [[0,"legal"]],
+    types: placeholder as Registry['legal.show']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

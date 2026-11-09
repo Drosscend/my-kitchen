@@ -40,6 +40,11 @@ const SECTIONS: {
   },
 ]
 
+/**
+ * Read once when the bundle loads, which is enough for a copyright line.
+ */
+const CURRENT_YEAR = new Date().getFullYear()
+
 function isActive(url: string, path: string) {
   return path === '/' ? url === '/' : url.startsWith(path)
 }
@@ -114,6 +119,24 @@ export default function Layout({ children }: { children: ReactElement }) {
       </header>
 
       <div className="flex flex-1 flex-col">{children}</div>
+
+      {/* Signed-in phones keep the footer clear of the fixed tab bar. */}
+      <footer
+        data-tabs={props.user ? '' : undefined}
+        className="border-t py-5 data-tabs:max-md:pb-[calc(5.25rem+env(safe-area-inset-bottom))]"
+      >
+        <div className="page-width flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <span>
+            © {CURRENT_YEAR}{' '}
+            <a href="https://kevin-dev.com" className="hover:text-foreground hover:underline">
+              Kévin Véronési
+            </a>
+          </span>
+          <Link route="legal.show" className="hover:text-foreground hover:underline">
+            Mentions légales
+          </Link>
+        </div>
+      </footer>
 
       {props.user && (
         <nav

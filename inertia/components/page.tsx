@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
 
 export function Page({ children }: { children: ReactNode }) {
-  return <main className="page-width flex-1 pt-6 pb-28 sm:pt-8 md:pb-12">{children}</main>
+  return <main className="page-width flex-1 pt-6 pb-12 sm:pt-8">{children}</main>
 }
 
 interface PageHeaderProps {

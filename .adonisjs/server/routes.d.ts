@@ -28,6 +28,7 @@ export type ScannedRoutes = {
     'oauth.authorization.deny': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'up': { paramsTuple?: []; params?: {} }
     'health': { paramsTuple?: []; params?: {} }
+    'legal.show': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -68,6 +69,7 @@ export type ScannedRoutes = {
     'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'up': { paramsTuple?: []; params?: {} }
     'health': { paramsTuple?: []; params?: {} }
+    'legal.show': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
@@ -93,6 +95,7 @@ export type ScannedRoutes = {
     'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'up': { paramsTuple?: []; params?: {} }
     'health': { paramsTuple?: []; params?: {} }
+    'legal.show': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
