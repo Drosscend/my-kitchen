@@ -204,7 +204,7 @@ export default function ShowAccount({
                     />
                     {errors.password && <FieldError>{errors.password}</FieldError>}
                   </Field>
-                  <Field data-invalid={Boolean(errors.password)}>
+                  <Field data-invalid={Boolean(errors.passwordConfirmation)}>
                     <FieldLabel htmlFor="new-password-confirmation">
                       Confirmer le nouveau mot de passe
                     </FieldLabel>
@@ -214,8 +214,11 @@ export default function ShowAccount({
                       name="passwordConfirmation"
                       autoComplete="new-password"
                       required
-                      aria-invalid={Boolean(errors.password)}
+                      aria-invalid={Boolean(errors.passwordConfirmation)}
                     />
+                    {errors.passwordConfirmation && (
+                      <FieldError>{errors.passwordConfirmation}</FieldError>
+                    )}
                   </Field>
                   <Button type="submit" disabled={processing} className="w-fit">
                     {account.hasPassword ? 'Modifier le mot de passe' : 'Définir le mot de passe'}

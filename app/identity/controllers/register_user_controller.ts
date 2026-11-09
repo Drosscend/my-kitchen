@@ -13,6 +13,7 @@ export default class RegisterUserController {
     name: nameField.nullable(),
     email: emailField,
     password: confirmedPasswordField,
+    passwordConfirmation: vine.string(),
   })
 
   constructor(

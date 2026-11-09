@@ -10,6 +10,7 @@ export default class ResetPasswordController {
   static readonly validator = vine.create({
     token: vine.string().trim().minLength(1),
     password: confirmedPasswordField,
+    passwordConfirmation: vine.string(),
   })
 
   constructor(private readonly resetPassword: ResetPassword) {}

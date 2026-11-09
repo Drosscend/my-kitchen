@@ -7,6 +7,6 @@ vine.messagesProvider = new SimpleMessagesProvider({
   'email': "L'adresse e-mail n'est pas valide",
   'minLength': 'Ce champ doit contenir au moins {{ min }} caractères',
   'maxLength': 'Ce champ doit contenir au plus {{ max }} caractères',
-  'confirmed': 'La confirmation ne correspond pas',
-  'password.confirmed': 'Les deux mots de passe ne correspondent pas',
+  'min': 'Ce champ doit valoir au moins {{ min }}',
+  'passwordConfirmation.confirmed': 'Les deux mots de passe ne correspondent pas',
 })

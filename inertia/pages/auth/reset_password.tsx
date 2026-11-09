@@ -40,7 +40,7 @@ export default function ResetPassword({ token }: PageProps) {
                 {errors.password && <FieldError>{errors.password}</FieldError>}
               </Field>
 
-              <Field data-invalid={Boolean(errors.password)}>
+              <Field data-invalid={Boolean(errors.passwordConfirmation)}>
                 <FieldLabel htmlFor="passwordConfirmation">Confirmer le mot de passe</FieldLabel>
                 <Input
                   id="passwordConfirmation"
@@ -48,8 +48,11 @@ export default function ResetPassword({ token }: PageProps) {
                   name="passwordConfirmation"
                   autoComplete="new-password"
                   required
-                  aria-invalid={Boolean(errors.password)}
+                  aria-invalid={Boolean(errors.passwordConfirmation)}
                 />
+                {errors.passwordConfirmation && (
+                  <FieldError>{errors.passwordConfirmation}</FieldError>
+                )}
               </Field>
 
               <Button type="submit" size="lg" disabled={processing} className="w-full">

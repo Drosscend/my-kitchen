@@ -4,7 +4,6 @@ import { EmailAddress, type InvalidEmailAddressError } from '#identity/domain/em
 import { normalizeName, type User } from '#identity/domain/user'
 import { UserIdentifier } from '#identity/domain/user_identifier'
 import { UserRepository, type EmailAlreadyTakenError } from '#identity/repositories/user_repository'
-import { TransactionManager } from '#shared/services/transaction_manager'
 
 /**
  * The profile Google returns once the user consented.
@@ -43,55 +42,50 @@ export type SignInWithGoogleResult = Result<User, SignInWithGoogleError>
  */
 @inject()
 export class SignInWithGoogle {
-  constructor(
-    private readonly users: UserRepository,
-    private readonly transactions: TransactionManager
-  ) {}
+  constructor(private readonly users: UserRepository) {}
 
   async execute(params: SignInWithGoogleParams): Promise<SignInWithGoogleResult> {
-    return this.transactions.run(async () => {
-      const linked = await this.users.findUserByGoogleId(params.googleId)
+    const linked = await this.users.findUserByGoogleId(params.googleId)
 
-      if (linked) {
-        return ok(linked)
-      }
+    if (linked) {
+      return ok(linked)
+    }
 
-      if (!params.emailVerified) {
-        return err({ type: 'google_email_unverified' })
-      }
+    if (!params.emailVerified) {
+      return err({ type: 'google_email_unverified' })
+    }
 
-      const email = EmailAddress.create(params.email)
+    const email = EmailAddress.create(params.email)
 
-      if (!email.ok) {
-        return err(email.error)
-      }
+    if (!email.ok) {
+      return err(email.error)
+    }
 
-      const existing = await this.users.findUserByEmail(email.value)
+    const existing = await this.users.findUserByEmail(email.value)
 
-      if (!existing) {
-        return this.users.createUser({
-          id: UserIdentifier.generate(),
-          name: normalizeName(params.name),
-          email: email.value,
-          passwordHash: null,
-          googleId: params.googleId,
-          emailVerifiedAt: new Date(),
-        })
-      }
+    if (!existing) {
+      return this.users.createUser({
+        id: UserIdentifier.generate(),
+        name: normalizeName(params.name),
+        email: email.value,
+        passwordHash: null,
+        googleId: params.googleId,
+        emailVerifiedAt: new Date(),
+      })
+    }
 
-      if (!existing.isEmailVerified) {
-        return err({ type: 'account_email_unverified' })
-      }
+    if (!existing.isEmailVerified) {
+      return err({ type: 'account_email_unverified' })
+    }
 
-      /**
-       * The account already belongs to another Google account, one that
-       * used to carry this address.
-       */
-      if (existing.googleId !== null) {
-        return err({ type: 'email_already_taken' })
-      }
+    /**
+     * The account already belongs to another Google account, one that
+     * used to carry this address.
+     */
+    if (existing.googleId !== null) {
+      return err({ type: 'email_already_taken' })
+    }
 
-      return ok(await this.users.linkGoogleAccount(existing.getIdentifier(), params.googleId))
-    })
+    return ok(await this.users.linkGoogleAccount(existing.getIdentifier(), params.googleId))
   }
 }

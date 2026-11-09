@@ -47,6 +47,21 @@ test.group('Registration', (group) => {
     response.assertFlashMessage('error', 'Un compte existe déjà pour cette adresse')
   })
 
+  test('reports a confirmation that differs from the password', async ({ client, assert }) => {
+    const response = await client
+      .post('/signup')
+      .header('referer', '/signup')
+      .withCsrfToken()
+      .form({ ...SIGNUP_FORM, passwordConfirmation: 'another-password' })
+      .redirects(0)
+
+    assertRedirectedTo(response, '/signup')
+    response.assertFlashMessage('inputErrorsBag', {
+      passwordConfirmation: ['Les deux mots de passe ne correspondent pas'],
+    })
+    assert.isUndefined(await storedUser('ada@example.com'))
+  })
+
   test('the confirmation link verifies the address once', async ({ client, assert }) => {
     const mailer = mail.fake()
     await client.post('/signup').withCsrfToken().form(SIGNUP_FORM).redirects(0)

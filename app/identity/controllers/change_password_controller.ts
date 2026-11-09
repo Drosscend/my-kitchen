@@ -15,6 +15,7 @@ export default class ChangePasswordController {
   static readonly validator = vine.create({
     currentPassword: vine.string().optional(),
     password: confirmedPasswordField,
+    passwordConfirmation: vine.string(),
   })
 
   constructor(private readonly changePassword: ChangePassword) {}
