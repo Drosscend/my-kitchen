@@ -78,7 +78,7 @@ Add `https://<domain>/mcp` as a server in the client, without any header: it dis
 
 The account page lists the connected assistants and revokes their access. The authorization server lives under `/oauth`: discovery at `/.well-known/oauth-authorization-server`, protected resource metadata at `/.well-known/oauth-protected-resource/mcp`, clients identified by a metadata document or registered dynamically, PKCE required, rotating refresh tokens.
 
-Tools: `list_ingredients`, `add_ingredient`, `update_ingredient`, `consume_ingredients`, `remove_ingredient`, `list_recipes`, `get_recipe`, `add_recipe`, `update_recipe`, `delete_recipe`. Recipes are JSON documents with `title`, `description`, `base_servings`, `ingredients` with `id`, `name`, `amount`, `unit`, `steps` with `id`, `title`, `content` mentioning ingredients as `{id}` and the step timer as `{timer}`, `timer_seconds`, and `notes`.
+Tools: `list_ingredients`, `add_ingredient`, `update_ingredient`, `add_ingredient_batch`, `update_ingredient_batch`, `consume_ingredients`, `remove_ingredient`, `list_recipes`, `get_recipe`, `add_recipe`, `update_recipe`, `delete_recipe`. Recipes are JSON documents with `title`, `description`, `base_servings`, `ingredients` with `id`, `name`, `amount`, `unit`, `steps` with `id`, `title`, `content` mentioning ingredients as `{id}` and the step timer as `{timer}`, `timer_seconds`, and `notes`.
 
 ## Deployment
 

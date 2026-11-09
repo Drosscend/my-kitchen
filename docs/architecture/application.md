@@ -15,7 +15,7 @@ inertia/          ──┘
 - `src/**` owns Actions, Queries, domain objects, repositories, and application services.
 - `src/**` never imports from `app/**` or `inertia/**`.
 - `app/shared` contains shared delivery concerns. `src/shared` contains application foundations needed by multiple capabilities.
-- `providers`, `config`, `start`, `commands`, and `database` retain their AdonisJS roles.
+- `config`, `start`, `commands`, and `database` retain their AdonisJS roles.
 
 Organize by business capability before technical layer:
 
