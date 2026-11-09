@@ -17,7 +17,6 @@ export interface SyncedTimer {
 
 export interface CookingSessionState {
   currentStepIndex: number
-  completedSteps: string[]
   activeTimers: Record<string, SyncedTimer>
   closed: boolean
 }
@@ -33,25 +32,30 @@ export interface CookingSession {
 
 export const INITIAL_STATE: CookingSessionState = {
   currentStepIndex: -1,
-  completedSteps: [],
   activeTimers: {},
   closed: false,
 }
 
 /**
  * Steps live between the ingredient screen (-1) and the last step, a
- * closed session stays closed.
+ * timer belongs to a step of the recipe, a closed session stays closed.
  */
 export function applyUpdate(
   state: CookingSessionState,
   update: CookingSessionUpdate,
-  stepCount: number
+  steps: RecipeView['steps']
 ): CookingSessionState {
   const next = { ...state, ...update }
 
   return {
     ...next,
-    currentStepIndex: Math.max(-1, Math.min(stepCount - 1, next.currentStepIndex)),
+    currentStepIndex: Math.max(-1, Math.min(steps.length - 1, next.currentStepIndex)),
+    activeTimers: Object.fromEntries(
+      steps.flatMap((step) => {
+        const timer = next.activeTimers[step.ref]
+        return timer ? [[step.ref, timer]] : []
+      })
+    ),
     closed: state.closed || next.closed,
   }
 }

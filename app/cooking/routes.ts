@@ -1,7 +1,7 @@
 import router from '@adonisjs/core/services/router'
 import { SESSION_CODE_PATTERN } from '#cooking/domain/cooking_session'
 import { middleware } from '#start/kernel'
-import { joinThrottle } from '#start/limiter'
+import { joinThrottle, sessionGuessThrottle } from '#start/limiter'
 
 const StartCookingSessionController = () =>
   import('#app/cooking/controllers/start_cooking_session_controller')
@@ -38,3 +38,4 @@ router
       .as('cooking.state.update')
   })
   .where('code', SESSION_CODE_PATTERN)
+  .use(sessionGuessThrottle)

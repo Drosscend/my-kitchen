@@ -13,7 +13,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class UpdateCookingSessionStateController {
   static readonly validator = vine.create({
     currentStepIndex: vine.number().withoutDecimals().optional(),
-    completedSteps: vine.array(vine.string()).optional(),
     activeTimers: vine
       .record(
         vine.object({

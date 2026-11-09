@@ -41,7 +41,7 @@ export class UpdateCookingSession {
         return err({ type: 'session_not_found' })
       }
 
-      const state = applyUpdate(session.state, params.update, session.recipe.steps.length)
+      const state = applyUpdate(session.state, params.update, session.recipe.steps)
       await this.sessions.update({
         code: params.code,
         state,

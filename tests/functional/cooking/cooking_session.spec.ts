@@ -107,6 +107,26 @@ test.group('Cooking sessions', (group) => {
     expired.assertStatus(404)
   })
 
+  test('stops an address guessing codes, never one polling its session', async ({ client }) => {
+    const user = await createUser('ada@example.com')
+    const { code } = await startSession(client, user)
+
+    for (let poll = 0; poll < 25; poll++) {
+      await client.get(`/cook/${code}/state`)
+    }
+
+    const polling = await client.get(`/cook/${code}/state`)
+
+    for (let guess = 0; guess < 20; guess++) {
+      await client.get('/cook/000000/state')
+    }
+
+    const blocked = await client.get(`/cook/${code}/state`).header('accept', 'application/json')
+
+    polling.assertStatus(200)
+    blocked.assertStatus(429)
+  })
+
   test('answers 404 to devices polling an unknown or expired session', async ({ client }) => {
     const user = await createUser('ada@example.com')
     const { code } = await startSession(client, user)
