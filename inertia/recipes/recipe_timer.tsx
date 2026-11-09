@@ -26,14 +26,14 @@ export function RecipeTimer({ id, duration, timer, onStart, onStop, onReset }: R
         ? { label: 'Reprendre', icon: PlayIcon, action: () => onStart(id, duration) }
         : { label: 'Démarrer', icon: PlayIcon, action: () => onStart(id, duration) }
   const MainIcon = main.icon
-  const accent = done ? '' : 'border-primary/40 text-primary hover:bg-primary/10 hover:text-primary'
 
   return (
     <div className="flex items-center justify-center gap-3 border-t px-4 py-3">
       <Button
         size="lg"
         variant={done ? 'secondary' : 'outline'}
-        className={`h-16 w-full max-w-72 gap-4 rounded-xl border-2 ${accent}`}
+        data-done={done}
+        className="h-16 w-full max-w-72 gap-4 rounded-xl border-2 data-[done=false]:border-primary/40 data-[done=false]:text-primary data-[done=false]:hover:bg-primary/10 data-[done=false]:hover:text-primary"
         onClick={main.action}
       >
         <span className="text-4xl font-bold tabular-nums font-stretch-80% sm:text-5xl">
