@@ -35,11 +35,14 @@ export function formatAmount(value: number) {
     }
   }
 
-  if (smallestGap < 0.05) {
+  if (smallestGap < 0.01) {
     return whole > 0 ? `${whole}${closest}` : closest
   }
 
-  return value < 10 ? value.toFixed(1).replace(/\.0$/, '') : String(Math.round(value))
+  return value.toLocaleString('fr-FR', {
+    maximumFractionDigits: value < 10 ? 1 : 0,
+    useGrouping: false,
+  })
 }
 
 export function formatDuration(seconds: number) {

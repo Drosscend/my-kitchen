@@ -19,11 +19,10 @@ function formatResult(value: number) {
     return String(value)
   }
 
-  if (Math.abs(value) >= 100) {
-    return value.toFixed(1)
-  }
-
-  return Math.abs(value) >= 1 ? value.toFixed(2) : value.toFixed(3)
+  return value.toLocaleString('fr-FR', {
+    maximumFractionDigits: Math.abs(value) >= 100 ? 1 : Math.abs(value) >= 1 ? 2 : 3,
+    useGrouping: false,
+  })
 }
 
 const UNIT_OPTIONS = CONVERSION_UNIT_VALUES.map((unit) => ({

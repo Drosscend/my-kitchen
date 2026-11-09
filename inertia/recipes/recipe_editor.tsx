@@ -118,6 +118,7 @@ export function RecipeEditor({ recipe }: { recipe?: Recipe }) {
         : { route: 'recipes.store' },
       {
         data: payload,
+        preserveState: true,
         onStart: () => setProcessing(true),
         onFinish: () => setProcessing(false),
       }

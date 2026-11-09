@@ -67,7 +67,7 @@ function MentionMenu({
 
   useImperativeHandle(ref, () => ({
     onKeyDown: ({ event }) => {
-      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      if (items.length > 0 && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
         const offset = event.key === 'ArrowDown' ? 1 : -1
         setSelected((active + offset + items.length) % items.length)
         return true
