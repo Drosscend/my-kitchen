@@ -22,7 +22,7 @@ export const INGREDIENT_CATEGORIES = {
   meat: {
     label: 'Viandes',
     lowStockThreshold: 300,
-    perishable: false,
+    perishable: true,
     expiryWarningDays: 2,
     defaultExpiryKind: 'use_by',
   },
