@@ -57,7 +57,6 @@ test.group('Cooking sessions', (group) => {
       .post(`/recipes/${recipe.id}/cook`)
       .loginAs(bob)
       .withCsrfToken()
-      .form({ scale: 1 })
       .redirects(0)
 
     assertRedirectedTo(foreign, '/recipes')

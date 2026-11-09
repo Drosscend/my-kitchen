@@ -83,7 +83,7 @@ export function useCookingSession(initial: CookingSessionPayload) {
         try {
           const response = await fetch(stateUrl, { headers: { accept: 'application/json' } })
 
-          if (response.status === 404 || response.status === 410) {
+          if (response.status === 404) {
             setExpired(true)
             return
           }
