@@ -284,6 +284,40 @@ test.group('MCP', (group) => {
     assert.lengthOf(structured<{ ingredients: object[] }>(expiring).ingredients, 1)
   })
 
+  test('updates an ingredient and one of its batches', async ({ client, assert }) => {
+    const ada = await createUser('ada@example.com')
+    const token = await issueToken(client, ada)
+    const tomorrow = new Date(Date.parse(today()) + 86_400_000).toISOString().slice(0, 10)
+    const added = await rpc(client, token, 'tools/call', {
+      name: 'add_ingredient',
+      arguments: FLOUR,
+    })
+    const { id, batches } = structured<{
+      ingredient: { id: string; batches: { id: string }[] }
+    }>(added).ingredient
+
+    const updated = await rpc(client, token, 'tools/call', {
+      name: 'update_ingredient',
+      arguments: { id, name: 'Farine T65', lowStockThreshold: 800 },
+    })
+    const batch = await rpc(client, token, 'tools/call', {
+      name: 'update_ingredient_batch',
+      arguments: { id, batchId: batches[0].id, quantity: 300, expiresOn: tomorrow },
+    })
+    const low = await rpc(client, token, 'tools/call', {
+      name: 'list_ingredients',
+      arguments: { lowStockOnly: true },
+    })
+
+    assert.containsSubset(structured(updated), {
+      ingredient: { name: 'Farine T65', lowStockThreshold: 800 },
+    })
+    assert.containsSubset(structured(batch), {
+      ingredient: { quantity: 300, batches: [{ quantity: 300, expiresOn: tomorrow }] },
+    })
+    assert.containsSubset(structured(low), { ingredients: [{ id, lowStock: true }] })
+  })
+
   test('adds, reads, replaces and deletes recipes as documents', async ({ client, assert }) => {
     const ada = await createUser('ada@example.com')
     const token = await issueToken(client, ada)
