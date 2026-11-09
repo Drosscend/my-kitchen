@@ -33,7 +33,7 @@ export default class HttpExceptionHandler extends ExceptionHandler {
      */
     if (error instanceof authErrors.E_UNAUTHORIZED_ACCESS && ctx.session) {
       ctx.session.flash('error', 'Connecte-toi pour continuer')
-      return ctx.response.redirect().withIntendedUrl().toRoute('session.create')
+      return ctx.response.redirect().toRoute('session.create')
     }
 
     /**
