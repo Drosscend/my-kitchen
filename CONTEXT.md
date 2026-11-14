@@ -56,7 +56,7 @@ The JSON shape assistants send to the MCP tools: snake_case keys, `id` as the re
 ## Cooking
 
 **Cooking session**:
-A frozen copy of a recipe under a six digit code, valid six hours after its last change. Whoever holds the code follows the steps and drives the timers, no account needed. An address that keeps asking for unknown codes is turned away for a minute.
+A frozen copy of a recipe under a six digit code, valid six hours after its last change. Whoever holds the code follows the steps and drives the timers, no account needed. An address that keeps asking for unknown codes is turned away for a minute. Sharing the cooking demo of the home page opens one that belongs to no account.
 
 **Synced timer**:
 A running timer stores when it started in server time; a paused one stores what is left. Every device derives the remaining time from the server clock.

@@ -5,6 +5,7 @@
 
 export const controllers = {
   cooking: {
+    CookingDemo: () => import('#app/cooking/controllers/cooking_demo_controller'),
     CookingSession: () => import('#app/cooking/controllers/cooking_session_controller'),
     CookingSessionState: () => import('#app/cooking/controllers/cooking_session_state_controller'),
     JoinCookingSession: () => import('#app/cooking/controllers/join_cooking_session_controller'),
@@ -58,6 +59,7 @@ export const controllers = {
   },
   shared: {
     HealthChecks: () => import('#app/shared/controllers/health_checks_controller'),
+    Home: () => import('#app/shared/controllers/home_controller'),
     Legal: () => import('#app/shared/controllers/legal_controller'),
     Liveness: () => import('#app/shared/controllers/liveness_controller'),
   },

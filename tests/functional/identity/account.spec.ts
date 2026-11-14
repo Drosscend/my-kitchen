@@ -68,7 +68,7 @@ test.group('Account', (group) => {
     const token = await queuedLink(mailer, /\/verify-email\/(\S+)/)
     const verified = await client.get(`/verify-email/${token}`).loginAs(user).redirects(0)
 
-    assertRedirectedTo(verified, '/')
+    assertRedirectedTo(verified, '/inventory')
     assert.isUndefined(await storedUser('ada@example.com'))
     assert.equal((await storedUser('new@example.com'))?.id, user.id)
   })
@@ -125,7 +125,7 @@ test.group('Account', (group) => {
 
     change.assertFlashMessage('success', 'Mot de passe modifié')
     assertRedirectedTo(staleReset, '/forgot-password')
-    assertRedirectedTo(login, '/')
+    assertRedirectedTo(login, '/inventory')
   })
 
   test('a password change cancels a pending address change', async ({ client, assert }) => {
@@ -175,7 +175,7 @@ test.group('Account', (group) => {
       .redirects(0)
 
     response.assertFlashMessage('error', 'Mot de passe actuel incorrect')
-    assertRedirectedTo(login, '/')
+    assertRedirectedTo(login, '/inventory')
   })
 
   test('deletes the account with the password and ends the session', async ({ client, assert }) => {
@@ -216,7 +216,7 @@ test.group('Account', (group) => {
       .redirects(0)
 
     response.assertFlashMessage('success', 'Mot de passe défini')
-    assertRedirectedTo(login, '/')
+    assertRedirectedTo(login, '/inventory')
   })
 
   test('lets a Google account change its address without a password', async ({ client }) => {

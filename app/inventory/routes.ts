@@ -20,7 +20,7 @@ const InventoryMarkdownController = () =>
 
 router
   .group(() => {
-    router.get('/', [InventoryController, 'render']).as('inventory.index')
+    router.get('inventory', [InventoryController, 'render']).as('inventory.index')
     router.post('inventory', [AddIngredientController, 'execute']).as('inventory.store')
     router
       .get('inventory/markdown', [InventoryMarkdownController, 'execute'])

@@ -4,6 +4,7 @@ import { cn } from 'cn'
 import { BookOpenIcon, CircleUserRoundIcon, type LucideIcon, ShelvingUnitIcon } from 'lucide-react'
 import { type ReactElement, useEffect } from 'react'
 import { toast } from 'sonner'
+import { client } from '~/client'
 import { Button } from '~/components/ui/button'
 import { Toaster } from '~/components/ui/sonner'
 import { type Swatch } from '~/swatch'
@@ -19,7 +20,7 @@ const SECTIONS: {
 }[] = [
   {
     route: 'inventory.index',
-    path: '/',
+    path: '/inventory',
     label: 'Inventaire',
     icon: ShelvingUnitIcon,
     swatch: 'mustard',
@@ -46,7 +47,7 @@ const SECTIONS: {
 const CURRENT_YEAR = new Date().getFullYear()
 
 function isActive(url: string, path: string) {
-  return path === '/' ? url === '/' : url.startsWith(path)
+  return url.startsWith(path)
 }
 
 export default function Layout({ children }: { children: ReactElement }) {
@@ -69,9 +70,9 @@ export default function Layout({ children }: { children: ReactElement }) {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="border-b bg-card pt-[env(safe-area-inset-top)]">
-        <div className="page-width flex h-14 items-center justify-between gap-6 md:h-15">
+        <div className="page-width flex h-14 items-center justify-between gap-3 sm:gap-6 md:h-15">
           <Link
-            route="inventory.index"
+            route="home"
             className="flex shrink-0 items-center gap-2.5 text-lg font-extrabold tracking-tight font-stretch-[88%]"
           >
             <img src="/logo.svg" alt="" className="size-8" />
@@ -135,6 +136,18 @@ export default function Layout({ children }: { children: ReactElement }) {
           <Link route="legal.show" className="hover:text-foreground hover:underline">
             Mentions légales
           </Link>
+          <a
+            href={`${client.urlFor('legal.show')}#conditions`}
+            className="hover:text-foreground hover:underline"
+          >
+            Conditions d'utilisation
+          </a>
+          <a
+            href={`${client.urlFor('legal.show')}#confidentialite`}
+            className="hover:text-foreground hover:underline"
+          >
+            Données personnelles
+          </a>
         </div>
       </footer>
 

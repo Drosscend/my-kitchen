@@ -71,7 +71,7 @@ test.group('Inventory', (group) => {
       .withCsrfToken()
       .form(TOMATOES)
       .redirects(0)
-    assertRedirectedTo(added, '/')
+    assertRedirectedTo(added, '/inventory')
     const [ingredient] = await storedIngredients(user)
     assert.equal(ingredient.name, 'Tomates cerises')
 
@@ -117,7 +117,7 @@ test.group('Inventory', (group) => {
       .loginAs(bob)
       .withCsrfToken()
       .redirects(0)
-    const page = await client.get('/').loginAs(bob).withInertia()
+    const page = await client.get('/inventory').loginAs(bob).withInertia()
 
     update.assertFlashMessage('error', 'Ingrédient introuvable')
     adjust.assertFlashMessage('error', 'Ingrédient introuvable')
@@ -143,7 +143,7 @@ test.group('Inventory', (group) => {
       })
       .redirects(0)
 
-    const page = await client.get('/').loginAs(user).withInertia()
+    const page = await client.get('/inventory').loginAs(user).withInertia()
 
     page.assertInertiaComponent('inventory/index')
     page.assertInertiaPropsContains({
@@ -158,7 +158,7 @@ test.group('Inventory', (group) => {
     const user = await createUser('ada@example.com')
     await client.post('/inventory').loginAs(user).withCsrfToken().form(TOMATOES).redirects(0)
     const [ingredient] = await storedIngredients(user)
-    const withoutThreshold = await client.get('/').loginAs(user).withInertia()
+    const withoutThreshold = await client.get('/inventory').loginAs(user).withInertia()
 
     await client
       .patch(`/inventory/${ingredient.id}`)
@@ -166,15 +166,15 @@ test.group('Inventory', (group) => {
       .withCsrfToken()
       .json({ lowStockThreshold: 300 })
       .redirects(0)
-    const under = await client.get('/').loginAs(user).withInertia()
+    const under = await client.get('/inventory').loginAs(user).withInertia()
     const negative = await client
       .patch(`/inventory/${ingredient.id}`)
       .loginAs(user)
-      .header('referer', '/')
+      .header('referer', '/inventory')
       .withCsrfToken()
       .json({ lowStockThreshold: -1 })
       .redirects(0)
-    const unchanged = await client.get('/').loginAs(user).withInertia()
+    const unchanged = await client.get('/inventory').loginAs(user).withInertia()
 
     withoutThreshold.assertInertiaPropsContains({
       ingredients: [{ lowStockThreshold: 0, lowStock: false }],
@@ -205,7 +205,7 @@ test.group('Inventory', (group) => {
       .form({ quantity: 4, expiresOn: inDays(10) })
       .redirects(0)
 
-    const page = await client.get('/').loginAs(user).withInertia()
+    const page = await client.get('/inventory').loginAs(user).withInertia()
     page.assertInertiaPropsContains({
       ingredients: [
         { name: 'Yaourts', quantity: 8, expiryStatus: 'soon', expiresOn: inDays(1), daysLeft: 1 },

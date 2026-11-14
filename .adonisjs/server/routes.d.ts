@@ -26,6 +26,7 @@ export type ScannedRoutes = {
     'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'oauth.authorization.approve': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'oauth.authorization.deny': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
+    'home': { paramsTuple?: []; params?: {} }
     'up': { paramsTuple?: []; params?: {} }
     'health': { paramsTuple?: []; params?: {} }
     'legal.show': { paramsTuple?: []; params?: {} }
@@ -51,6 +52,8 @@ export type ScannedRoutes = {
     'account.oauth_connections.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'cooking.start': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'cooking.join': { paramsTuple?: []; params?: {} }
+    'cooking.demo': { paramsTuple?: []; params?: {} }
+    'cooking.demo.store': { paramsTuple?: []; params?: {} }
     'cooking.join.store': { paramsTuple?: []; params?: {} }
     'cooking.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'cooking.state': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
@@ -67,6 +70,7 @@ export type ScannedRoutes = {
     'mcp.protected_resource': { paramsTuple?: []; params?: {} }
     'mcp.protected_resource.root': { paramsTuple?: []; params?: {} }
     'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
+    'home': { paramsTuple?: []; params?: {} }
     'up': { paramsTuple?: []; params?: {} }
     'health': { paramsTuple?: []; params?: {} }
     'legal.show': { paramsTuple?: []; params?: {} }
@@ -80,6 +84,7 @@ export type ScannedRoutes = {
     'verification.notice': { paramsTuple?: []; params?: {} }
     'account.show': { paramsTuple?: []; params?: {} }
     'cooking.join': { paramsTuple?: []; params?: {} }
+    'cooking.demo': { paramsTuple?: []; params?: {} }
     'cooking.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'cooking.state': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
   }
@@ -93,6 +98,7 @@ export type ScannedRoutes = {
     'mcp.protected_resource': { paramsTuple?: []; params?: {} }
     'mcp.protected_resource.root': { paramsTuple?: []; params?: {} }
     'oauth.authorization.show': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
+    'home': { paramsTuple?: []; params?: {} }
     'up': { paramsTuple?: []; params?: {} }
     'health': { paramsTuple?: []; params?: {} }
     'legal.show': { paramsTuple?: []; params?: {} }
@@ -106,6 +112,7 @@ export type ScannedRoutes = {
     'verification.notice': { paramsTuple?: []; params?: {} }
     'account.show': { paramsTuple?: []; params?: {} }
     'cooking.join': { paramsTuple?: []; params?: {} }
+    'cooking.demo': { paramsTuple?: []; params?: {} }
     'cooking.show': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
     'cooking.state': { paramsTuple: [ParamValue]; params: {'code': ParamValue} }
   }
@@ -127,6 +134,7 @@ export type ScannedRoutes = {
     'account.email.update': { paramsTuple?: []; params?: {} }
     'account.password.update': { paramsTuple?: []; params?: {} }
     'cooking.start': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'cooking.demo.store': { paramsTuple?: []; params?: {} }
     'cooking.join.store': { paramsTuple?: []; params?: {} }
   }
   PATCH: {

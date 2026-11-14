@@ -27,6 +27,13 @@ export const joinThrottle = limiter.define('join', ({ request }) => {
 })
 
 /**
+ * Every share of the home page demo stores a session.
+ */
+export const demoThrottle = limiter.define('demo', ({ request }) => {
+  return limiter.allowRequests(10).every('1 hour').usingKey(`demo_${request.ip()}`)
+})
+
+/**
  * The session routes are polled twice a second by every device, so only
  * the unknown codes count: an address collecting them is guessing.
  */

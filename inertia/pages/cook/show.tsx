@@ -1,11 +1,9 @@
 import { useRouter } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
-import { QRCodeSVG } from 'qrcode.react'
 import { useState } from 'react'
 import { client } from '~/client'
-import { DialogSheet } from '~/components/dialog_sheet'
-import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '~/components/ui/dialog'
 import { CookingMode } from '~/cooking/cooking_mode'
+import { ShareSessionDialog } from '~/cooking/share_session_dialog'
 import { type CookingSessionPayload } from '~/cooking/types'
 import { useCookingSession } from '~/cooking/use_cooking_session'
 import { type InertiaProps } from '~/types'
@@ -15,7 +13,9 @@ type PageProps = InertiaProps<{ session: CookingSessionPayload }>
 export default function CookingSession({ session: initial, user }: PageProps) {
   const router = useRouter()
   const session = useCookingSession(initial)
-  const [showQr, setShowQr] = useState(false)
+  const [showQr, setShowQr] = useState(() =>
+    new URLSearchParams(window.location.search).has('share')
+  )
   const shareUrl = `${window.location.origin}${client.urlFor('cooking.show', { code: initial.code })}`
 
   function exit() {
@@ -51,21 +51,12 @@ export default function CookingSession({ session: initial, user }: PageProps) {
         />
       )}
 
-      <Dialog open={showQr} onOpenChange={setShowQr}>
-        <DialogSheet className="text-center">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-extrabold">Scanner pour rejoindre</DialogTitle>
-            <DialogDescription>
-              Scanne le QR code ou saisis le code sur un autre appareil
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center rounded-lg bg-white p-4">
-            <QRCodeSVG value={shareUrl} size={200} level="M" />
-          </div>
-          <p className="text-3xl font-bold tracking-[0.3em] tabular-nums">{initial.code}</p>
-          <p className="text-xs break-all text-muted-foreground">{shareUrl}</p>
-        </DialogSheet>
-      </Dialog>
+      <ShareSessionDialog
+        code={initial.code}
+        url={shareUrl}
+        open={showQr}
+        onOpenChange={setShowQr}
+      />
     </>
   )
 }

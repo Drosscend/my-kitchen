@@ -1,14 +1,17 @@
 import { inject } from '@adonisjs/core'
 import { sql } from 'kysely'
 import { PostgresError } from 'postgres'
+import {
+  type CookingSession,
+  type CookingSessionState,
+  generateSessionCode,
+} from '#cooking/domain/cooking_session'
 import { TransactionManager } from '#shared/services/transaction_manager'
-import type { CookingSession, CookingSessionState } from '#cooking/domain/cooking_session'
 import type { UserIdentifier } from '#identity/domain/user_identifier'
 import type { RecipeView } from '#recipes/queries/recipe_query'
 
 interface CreateSessionPayload {
-  code: string
-  userId: UserIdentifier
+  userId: UserIdentifier | null
   recipe: RecipeView
   state: CookingSessionState
   expiresAt: Date
@@ -21,23 +24,40 @@ interface UpdateSessionPayload {
   expiresAt: Date
 }
 
+const CODE_ATTEMPTS = 10
+
 @inject()
 export class CookingSessionRepository {
   constructor(private readonly transactions: TransactionManager) {}
 
   /**
-   * False when the code is already taken, so the caller draws another.
-   * Objects go to postgres.js as they are: a pre-serialized string would
-   * be stored as a JSON string, not as the document.
+   * Draws six digit codes until one is free, null after ten taken ones.
    */
   async create(payload: CreateSessionPayload) {
+    for (let attempt = 0; attempt < CODE_ATTEMPTS; attempt++) {
+      const code = generateSessionCode()
+
+      if (await this.#insert(code, payload)) {
+        return code
+      }
+    }
+
+    return null
+  }
+
+  /**
+   * False when the code is already taken. Objects go to postgres.js as
+   * they are: a pre-serialized string would be stored as a JSON string,
+   * not as the document.
+   */
+  async #insert(code: string, payload: CreateSessionPayload) {
     try {
       await this.transactions
         .currentDatabase()
         .insertInto('cooking_sessions')
         .values({
-          code: payload.code,
-          user_id: payload.userId.toString(),
+          code,
+          user_id: payload.userId?.toString() ?? null,
           recipe: sql`${payload.recipe}::jsonb`,
           state: sql`${payload.state}::jsonb`,
           expires_at: payload.expiresAt,

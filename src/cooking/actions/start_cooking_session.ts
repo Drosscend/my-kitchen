@@ -1,9 +1,5 @@
 import { inject } from '@adonisjs/core'
-import {
-  COOKING_SESSION_TTL_MS,
-  generateSessionCode,
-  INITIAL_STATE,
-} from '#cooking/domain/cooking_session'
+import { COOKING_SESSION_TTL_MS, INITIAL_STATE } from '#cooking/domain/cooking_session'
 import { CookingSessionRepository } from '#cooking/repositories/cooking_session_repository'
 import { err, ok, type Result } from '#core/result'
 import { RecipeQuery } from '#recipes/queries/recipe_query'
@@ -19,8 +15,6 @@ export interface CodeExhaustedError {
   type: 'code_exhausted'
 }
 export type StartCookingSessionResult = Result<string, RecipeNotFoundError | CodeExhaustedError>
-
-const CODE_ATTEMPTS = 10
 
 /**
  * Freezes the recipe under a fresh six digit code. Expired sessions are
@@ -43,21 +37,13 @@ export class StartCookingSession {
     const now = new Date()
     await this.sessions.deleteExpired(now)
 
-    for (let attempt = 0; attempt < CODE_ATTEMPTS; attempt++) {
-      const code = generateSessionCode()
-      const created = await this.sessions.create({
-        code,
-        userId: params.userId,
-        recipe,
-        state: INITIAL_STATE,
-        expiresAt: new Date(now.getTime() + COOKING_SESSION_TTL_MS),
-      })
+    const code = await this.sessions.create({
+      userId: params.userId,
+      recipe,
+      state: INITIAL_STATE,
+      expiresAt: new Date(now.getTime() + COOKING_SESSION_TTL_MS),
+    })
 
-      if (created) {
-        return ok(code)
-      }
-    }
-
-    return err({ type: 'code_exhausted' })
+    return code ? ok(code) : err({ type: 'code_exhausted' })
   }
 }

@@ -8,31 +8,18 @@ import {
   releaseWakeLock,
 } from '~/cooking/device'
 import {
-  type ActiveTimers,
-  type CookingSessionPayload,
-  type CookingSessionUpdate,
-  type SyncedTimer,
-} from '~/cooking/types'
+  computeTimers,
+  hasRunningTimer,
+  resetTimer as withoutTimer,
+  startTimer as withStartedTimer,
+  stopTimer as withStoppedTimer,
+} from '~/cooking/timers'
+import { type CookingSessionPayload, type CookingSessionUpdate } from '~/cooking/types'
 
 const POLL_INTERVAL_MS = 500
 // A hidden tab still has to hear about a timer started on another device.
 const HIDDEN_POLL_INTERVAL_MS = 5000
 const MAX_RETRY_DELAY_MS = 30_000
-
-function computeTimers(synced: Record<string, SyncedTimer>, now: number): ActiveTimers {
-  const timers: ActiveTimers = {}
-
-  for (const [id, timer] of Object.entries(synced)) {
-    if (timer.pausedRemaining !== undefined) {
-      timers[id] = { remaining: timer.pausedRemaining, total: timer.total, running: false }
-    } else {
-      const remaining = Math.max(0, timer.total - Math.floor((now - timer.startedAt) / 1000))
-      timers[id] = { remaining, total: timer.total, running: remaining > 0 }
-    }
-  }
-
-  return timers
-}
 
 /**
  * Every date of a session (updatedAt, a timer's startedAt) is in server
@@ -140,9 +127,7 @@ export function useCookingSession(initial: CookingSessionPayload) {
   const syncedTimers = session.state.activeTimers
 
   useEffect(() => {
-    const running = Object.values(syncedTimers).some((timer) => timer.pausedRemaining === undefined)
-
-    if (!running) {
+    if (!hasRunningTimer(syncedTimers)) {
       return
     }
 
@@ -220,34 +205,17 @@ export function useCookingSession(initial: CookingSessionPayload) {
 
   function startTimer(id: string, duration: number) {
     ensureAudioContext()
-    const existing = latest.current.state.activeTimers[id]
     update({
-      activeTimers: {
-        ...latest.current.state.activeTimers,
-        [id]: { total: existing?.pausedRemaining ?? duration, startedAt: serverNow() },
-      },
+      activeTimers: withStartedTimer(latest.current.state.activeTimers, id, duration, serverNow()),
     })
   }
 
   function stopTimer(id: string) {
-    const timer = latest.current.state.activeTimers[id]
-
-    if (!timer) {
-      return
-    }
-
-    const remaining = Math.max(0, timer.total - Math.floor((serverNow() - timer.startedAt) / 1000))
-    update({
-      activeTimers: {
-        ...latest.current.state.activeTimers,
-        [id]: { ...timer, pausedRemaining: remaining },
-      },
-    })
+    update({ activeTimers: withStoppedTimer(latest.current.state.activeTimers, id, serverNow()) })
   }
 
   function resetTimer(id: string) {
-    const { [id]: _removed, ...rest } = latest.current.state.activeTimers
-    update({ activeTimers: rest })
+    update({ activeTimers: withoutTimer(latest.current.state.activeTimers, id) })
   }
 
   return {

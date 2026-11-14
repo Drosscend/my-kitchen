@@ -36,6 +36,7 @@ export interface ApiDefinition {
       deny: typeof routes['oauth.authorization.deny']
     }
   }
+  home: typeof routes['home']
   up: typeof routes['up']
   health: typeof routes['health']
   legal: {
@@ -85,6 +86,9 @@ export interface ApiDefinition {
     start: typeof routes['cooking.start']
     join: typeof routes['cooking.join'] & {
       store: typeof routes['cooking.join.store']
+    }
+    demo: typeof routes['cooking.demo'] & {
+      store: typeof routes['cooking.demo.store']
     }
     show: typeof routes['cooking.show']
     state: typeof routes['cooking.state'] & {

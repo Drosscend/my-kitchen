@@ -201,24 +201,61 @@ export const SEED_RECIPES: RecipeContentInput[] = [
       { ref: 'poivrons', name: 'Poivrons rouges', amount: 300, unit: 'g' },
       { ref: 'tomates', name: 'Tomates', amount: 500, unit: 'g' },
       { ref: 'oignon', name: 'Oignons jaunes', amount: 150, unit: 'g' },
-      { ref: 'ail', name: 'Ail', amount: 2, unit: 'gousses' },
-      { ref: 'huile', name: 'Huile d’olive', amount: 4, unit: 'c. à s.' },
+      { ref: 'ail', name: 'Ail', amount: 3, unit: 'gousses' },
+      { ref: 'huile', name: 'Huile d’olive', amount: 5, unit: 'c. à s.' },
       { ref: 'herbes', name: 'Herbes de Provence', amount: 1, unit: 'c. à c.' },
+      { ref: 'basilic', name: 'Basilic', amount: 6, unit: 'feuilles' },
     ],
     steps: [
+      { ref: 'four', title: 'Four', content: 'Préchauffer le four à 200 °C, chaleur tournante.' },
       {
-        ref: 'couper',
-        content: 'Couper {aubergine}, {courgettes} et {poivrons} en cubes de 2 cm.',
-      },
-      {
-        ref: 'melanger',
+        ref: 'aubergine',
+        title: 'Aubergine',
         content:
-          'Émincer {oignon} et {ail}, mélanger avec les légumes et {tomates} dans un plat, arroser de {huile} et parsemer d’{herbes}.',
+          'Couper {aubergine} en cubes de 2 cm, saler et laisser dégorger dans une passoire. {timer}',
+        timerSeconds: 900,
       },
       {
-        ref: 'cuire',
-        content: 'Enfourner à 200 °C en remuant à mi-cuisson. {timer}',
+        ref: 'legumes',
+        title: 'Légumes',
+        content: 'Couper {courgettes} et {poivrons} en cubes de la même taille.',
+      },
+      {
+        ref: 'tomates',
+        title: 'Tomates',
+        content:
+          'Inciser {tomates} en croix, les plonger 30 secondes dans l’eau bouillante, puis les peler et les concasser.',
+      },
+      { ref: 'aromates', title: 'Aromates', content: 'Émincer {oignon} et hacher {ail}.' },
+      {
+        ref: 'revenir',
+        title: 'À la poêle',
+        content:
+          'Faire revenir l’oignon et l’ail dans un filet d’huile, à feu moyen, jusqu’à ce qu’ils soient translucides. {timer}',
+        timerSeconds: 300,
+      },
+      {
+        ref: 'plat',
+        title: 'Dans le plat',
+        content:
+          'Rincer et sécher l’aubergine, puis réunir tous les légumes dans un plat. Arroser de {huile} et parsemer d’{herbes}.',
+      },
+      {
+        ref: 'cuisson',
+        title: 'Cuisson',
+        content: 'Enfourner et remuer à mi-cuisson. {timer}',
         timerSeconds: 2700,
+      },
+      {
+        ref: 'repos',
+        title: 'Repos',
+        content: 'Laisser reposer hors du four : les jus épaississent. {timer}',
+        timerSeconds: 600,
+      },
+      {
+        ref: 'service',
+        title: 'Service',
+        content: 'Parsemer de {basilic} ciselé et servir chaud, ou froid le lendemain.',
       },
     ],
   },

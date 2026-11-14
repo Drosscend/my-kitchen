@@ -63,7 +63,7 @@ test.group('Google sign-in', (group) => {
       .withEncryptedCookie('google_oauth_state', STATE)
       .redirects(0)
 
-    assertRedirectedTo(response, '/')
+    assertRedirectedTo(response, '/inventory')
     response.assertSession('auth_web', (await storedUser('ada@example.com'))?.id)
     assert.equal((await storedUser('ada@example.com'))?.name, 'Ada')
   })
@@ -81,7 +81,7 @@ test.group('Google sign-in', (group) => {
       .withEncryptedCookie('google_oauth_state', STATE)
       .redirects(0)
 
-    assertRedirectedTo(response, '/')
+    assertRedirectedTo(response, '/inventory')
     response.assertSession('auth_web', user.id)
     assert.equal((await storedUser('ada@example.com'))?.google_id, 'google-ada')
   })

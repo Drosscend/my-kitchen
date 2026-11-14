@@ -65,6 +65,6 @@ test.group('Password reset', (group) => {
     reset.assertFlashMessage('success', 'Mot de passe modifié, tu peux te connecter')
     assertRedirectedTo(replay, '/forgot-password')
     oldPassword.assertFlashMessage('error', 'Identifiants incorrects')
-    assertRedirectedTo(newPassword, '/')
+    assertRedirectedTo(newPassword, '/inventory')
   })
 })

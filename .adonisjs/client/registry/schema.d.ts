@@ -10,7 +10,7 @@ export type ParamValue = string | number | bigint | boolean
 export interface Registry {
   'inventory.index': {
     methods: ["GET","HEAD"]
-    pattern: '/'
+    pattern: '/inventory'
     types: {
       body: {}
       paramsTuple: []
@@ -292,6 +292,19 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#app/oauth/controllers/deny_client_controller').default['execute']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/oauth/controllers/deny_client_controller').default['execute']>>>
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/oauth/controllers/deny_client_controller').default['execute']>>>
+    }
+  }
+  'home': {
+    methods: ["GET","HEAD"]
+    pattern: '/'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/shared/controllers/home_controller').default['render']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/shared/controllers/home_controller').default['render']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/shared/controllers/home_controller').default['render']>>>
     }
   }
   'up': {
@@ -617,6 +630,32 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#app/cooking/controllers/join_cooking_session_controller').default['render']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/cooking/controllers/join_cooking_session_controller').default['render']>>>
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/cooking/controllers/join_cooking_session_controller').default['render']>>>
+    }
+  }
+  'cooking.demo': {
+    methods: ["GET","HEAD"]
+    pattern: '/cook/demo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/cooking/controllers/cooking_demo_controller').default['render']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/cooking/controllers/cooking_demo_controller').default['render']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/cooking/controllers/cooking_demo_controller').default['render']>>>
+    }
+  }
+  'cooking.demo.store': {
+    methods: ["POST"]
+    pattern: '/cook/demo'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/cooking/controllers/cooking_demo_controller').default)['validator']>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#app/cooking/controllers/cooking_demo_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/cooking/controllers/cooking_demo_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/cooking/controllers/cooking_demo_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/cooking/controllers/cooking_demo_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'cooking.join.store': {

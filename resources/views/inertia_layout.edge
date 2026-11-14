@@ -19,7 +19,7 @@
     @inertiaHead()
     @stack('dumper')
 
-    @if(umamiScriptUrl && umamiWebsiteId)
+    @if(umamiScriptUrl && umamiWebsiteId && request.url() !== '/cook/demo')
       <script defer src="{{ umamiScriptUrl }}" data-website-id="{{ umamiWebsiteId }}"></script>
     @end
   </head>

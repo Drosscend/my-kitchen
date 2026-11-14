@@ -10,8 +10,8 @@ const placeholder: any = {}
 const routes = {
   'inventory.index': {
     methods: ["GET","HEAD"],
-    pattern: '/',
-    tokens: [[0,"/"]],
+    pattern: '/inventory',
+    tokens: [[0,"inventory"]],
     types: placeholder as Registry['inventory.index']['types'],
   },
   'inventory.store': {
@@ -139,6 +139,12 @@ const routes = {
     pattern: '/oauth/interaction/:uid/deny',
     tokens: [[0,"oauth"],[0,"interaction"],[1,"uid"],[0,"deny"]],
     types: placeholder as Registry['oauth.authorization.deny']['types'],
+  },
+  'home': {
+    methods: ["GET","HEAD"],
+    pattern: '/',
+    tokens: [[0,"/"]],
+    types: placeholder as Registry['home']['types'],
   },
   'up': {
     methods: ["GET","HEAD"],
@@ -289,6 +295,18 @@ const routes = {
     pattern: '/cook/join',
     tokens: [[0,"cook"],[0,"join"]],
     types: placeholder as Registry['cooking.join']['types'],
+  },
+  'cooking.demo': {
+    methods: ["GET","HEAD"],
+    pattern: '/cook/demo',
+    tokens: [[0,"cook"],[0,"demo"]],
+    types: placeholder as Registry['cooking.demo']['types'],
+  },
+  'cooking.demo.store': {
+    methods: ["POST"],
+    pattern: '/cook/demo',
+    tokens: [[0,"cook"],[0,"demo"]],
+    types: placeholder as Registry['cooking.demo.store']['types'],
   },
   'cooking.join.store': {
     methods: ["POST"],

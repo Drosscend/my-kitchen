@@ -1,10 +1,9 @@
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Button } from '~/components/ui/button'
-import { type Batch, CATEGORY_SWATCHES, type Ingredient } from '~/inventory/catalog'
-import { CategoryMark } from '~/inventory/category_mark'
+import { type Batch, type Ingredient } from '~/inventory/catalog'
 import { isExpiringSoon } from '~/inventory/expiry'
-import { ExpiryStamp } from '~/inventory/expiry_stamp'
+import { StickyNote } from '~/inventory/sticky_note'
 
 const URGENCY_RANKS = {
   expired: 0,
@@ -89,32 +88,11 @@ export function UrgentShelf({ ingredients }: { ingredients: Ingredient[] }) {
         className="-mx-4 flex snap-x scroll-px-4 gap-3.5 overflow-x-auto px-4 pt-4 pb-5 [scrollbar-width:none] sm:mx-0 sm:gap-4.5 sm:scroll-px-1 sm:px-1"
       >
         {urgent.map((ingredient) => (
-          <li
+          <StickyNote
             key={ingredient.id}
-            data-status={ingredient.expiryStatus}
-            data-swatch={CATEGORY_SWATCHES[ingredient.category]}
-            className="relative flex min-h-27 w-40 shrink-0 snap-start flex-col gap-2.5 rounded-[3px_3px_10px_3px] px-3 pt-4 pb-3 shadow-[0_1px_0_rgb(41_35_30/0.07),0_10px_18px_-12px_rgb(74_55_40/0.55)] after:absolute after:right-0 after:bottom-0 after:size-4.5 after:rounded-br-[10px] after:bg-linear-135 after:from-transparent after:from-50% after:to-[rgb(74_55_40/0.1)] after:to-50% sm:w-53 sm:px-3.5 sm:pt-4.5 bg-card nth-[4n+1]:-rotate-2 nth-[4n+2]:rotate-[1.5deg] nth-[4n+3]:-rotate-1 nth-[4n]:rotate-2 data-[status=expired]:bg-note-expired data-[status=soon]:bg-note-soon"
-          >
-            <span
-              aria-hidden
-              className="magnet absolute -top-2.25 left-1/2 size-5 -translate-x-1/2"
-            />
-            <span className="flex items-start justify-between gap-2">
-              <span className="line-clamp-2 leading-tight font-bold sm:text-[17px]">
-                {ingredient.name}
-              </span>
-              <CategoryMark category={ingredient.category} size="md" className="-mt-1" />
-            </span>
-            <span className="mt-auto flex items-center justify-between gap-2">
-              <ExpiryStamp
-                {...ingredient}
-                className="-rotate-4 bg-transparent sm:h-6.5 sm:text-sm"
-              />
-              <span className="text-sm text-muted-foreground tabular-nums">
-                {ingredient.quantity} {ingredient.unitLabel}
-              </span>
-            </span>
-          </li>
+            ingredient={ingredient}
+            className="w-40 shrink-0 snap-start sm:w-53 nth-[4n+1]:-rotate-2 nth-[4n+2]:rotate-[1.5deg] nth-[4n+3]:-rotate-1 nth-[4n]:rotate-2"
+          />
         ))}
       </ul>
     </section>

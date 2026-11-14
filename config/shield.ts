@@ -47,10 +47,11 @@ const shieldConfig = defineConfig({
     enabled: true,
 
     /**
-     * The cooking state is updated by phones without a session, the MCP
-     * endpoint by bearer clients: neither can carry a CSRF token.
+     * The cooking state is updated by phones without a session, the demo
+     * session opened by visitors without one, the MCP endpoint by bearer
+     * clients: none of them can carry a CSRF token.
      */
-    exceptRoutes: ['/cook/:code/state', '/mcp'],
+    exceptRoutes: ['/cook/:code/state', '/cook/demo', '/mcp'],
 
     /**
      * Expose an encrypted XSRF-TOKEN cookie for frontend HTTP clients.
@@ -74,9 +75,10 @@ const shieldConfig = defineConfig({
     enabled: true,
 
     /**
-     * Block all framing attempts. Default value is DENY.
+     * Only the site itself may frame its pages: the home page embeds
+     * the cooking demo.
      */
-    action: 'DENY',
+    action: 'SAMEORIGIN',
   },
 
   /**

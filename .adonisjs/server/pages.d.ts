@@ -18,10 +18,12 @@ declare module '@adonisjs/inertia/types' {
     'auth/reset_password': ExtractProps<(typeof import('../../inertia/pages/auth/reset_password.tsx'))['default']>
     'auth/signup': ExtractProps<(typeof import('../../inertia/pages/auth/signup.tsx'))['default']>
     'auth/verify_email': ExtractProps<(typeof import('../../inertia/pages/auth/verify_email.tsx'))['default']>
+    'cook/demo': ExtractProps<(typeof import('../../inertia/pages/cook/demo.tsx'))['default']>
     'cook/join': ExtractProps<(typeof import('../../inertia/pages/cook/join.tsx'))['default']>
     'cook/show': ExtractProps<(typeof import('../../inertia/pages/cook/show.tsx'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.tsx'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.tsx'))['default']>
+    'home': ExtractProps<(typeof import('../../inertia/pages/home.tsx'))['default']>
     'inventory/index': ExtractProps<(typeof import('../../inertia/pages/inventory/index.tsx'))['default']>
     'legal/show': ExtractProps<(typeof import('../../inertia/pages/legal/show.tsx'))['default']>
     'oauth/authorize': ExtractProps<(typeof import('../../inertia/pages/oauth/authorize.tsx'))['default']>

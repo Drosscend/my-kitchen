@@ -1,12 +1,13 @@
 import router from '@adonisjs/core/services/router'
 import { SESSION_CODE_PATTERN } from '#cooking/domain/cooking_session'
 import { middleware } from '#start/kernel'
-import { joinThrottle, sessionGuessThrottle } from '#start/limiter'
+import { demoThrottle, joinThrottle, sessionGuessThrottle } from '#start/limiter'
 
 const StartCookingSessionController = () =>
   import('#app/cooking/controllers/start_cooking_session_controller')
 const JoinCookingSessionController = () =>
   import('#app/cooking/controllers/join_cooking_session_controller')
+const CookingDemoController = () => import('#app/cooking/controllers/cooking_demo_controller')
 const CookingSessionController = () => import('#app/cooking/controllers/cooking_session_controller')
 const CookingSessionStateController = () =>
   import('#app/cooking/controllers/cooking_session_state_controller')
@@ -24,6 +25,11 @@ router
  * code has no account.
  */
 router.get('cook/join', [JoinCookingSessionController, 'render']).as('cooking.join')
+router.get('cook/demo', [CookingDemoController, 'render']).as('cooking.demo')
+router
+  .post('cook/demo', [CookingDemoController, 'execute'])
+  .as('cooking.demo.store')
+  .use(demoThrottle)
 router
   .post('cook/join', [JoinCookingSessionController, 'execute'])
   .as('cooking.join.store')

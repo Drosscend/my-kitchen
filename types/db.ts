@@ -29,7 +29,7 @@ export interface CookingSessions {
   recipe: Json;
   state: Json;
   updated_at: Generated<Timestamp>;
-  user_id: string;
+  user_id: string | null;
 }
 
 export interface EmailVerificationTokens {

@@ -164,3 +164,38 @@ test.group('Cooking sessions', (group) => {
     state.assertBodyContains({ state: { closed: true } })
   })
 })
+
+test.group('Cooking demo sessions', (group) => {
+  group.each.setup(() => resetState())
+
+  test('opens a session without an account, where the demo stood', async ({ client, assert }) => {
+    const timer = { total: 2700, startedAt: Date.now() }
+
+    const response = await client
+      .post('/cook/demo')
+      .json({ currentStepIndex: 7, activeTimers: { cuisson: timer, unknown: timer } })
+    const { code } = response.body()
+    const state = await client.get(`/cook/${code}/state`)
+    const stored = await db
+      .selectFrom('cooking_sessions')
+      .select('user_id')
+      .where('code', '=', code)
+      .executeTakeFirstOrThrow()
+
+    response.assertStatus(201)
+    assert.match(code, /^\d{6}$/)
+    assert.isNull(stored.user_id)
+    assert.equal(state.body().recipe.title, 'Ratatouille au four')
+    assert.deepEqual(state.body().state.currentStepIndex, 7)
+    assert.deepEqual(state.body().state.activeTimers, { cuisson: timer })
+  })
+
+  test('refuses a state it cannot read', async ({ client }) => {
+    const response = await client
+      .post('/cook/demo')
+      .accept('json')
+      .json({ currentStepIndex: 'oven' })
+
+    response.assertStatus(422)
+  })
+})
