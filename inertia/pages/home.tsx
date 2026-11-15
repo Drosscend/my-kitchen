@@ -60,8 +60,8 @@ export default function Home({ mcpUrl }: PageProps) {
           </h1>
           <p className="max-w-xl text-lg text-pretty text-muted-foreground sm:text-xl">
             Mon Garde-Manger tient l'inventaire de ta cuisine avec les dates de péremption et range
-            tes recettes. Relié à Claude ou à ChatGPT, il se met à jour d'une photo de tes courses et
-            te propose des recettes avec ce qu'il te reste.
+            tes recettes. Relié à Claude ou à ChatGPT, il se met à jour d'une photo de tes courses
+            et te propose des recettes avec ce qu'il te reste.
           </p>
           <SignupActions />
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
@@ -92,8 +92,8 @@ export default function Home({ mcpUrl }: PageProps) {
                 quand tu le sors.
               </Point>
               <Point swatch="mustard">
-                <strong>Les paquets les plus anciens partent d'abord.</strong> Quand tu retires
-                200 g, le stock se vide dans l'ordre des dates.
+                <strong>Les paquets les plus anciens partent d'abord.</strong> Quand tu retires 200
+                g, le stock se vide dans l'ordre des dates.
               </Point>
               <Point swatch="sage">
                 <strong>Un seuil de stock bas</strong> te signale ce qu'il faut racheter.
@@ -181,8 +181,8 @@ export default function Home({ mcpUrl }: PageProps) {
                 produits à ton garde-manger.
               </Point>
               <Point swatch="tomato">
-                <strong>Pour le repas du soir</strong>, il propose une recette avec ce qui périme
-                et l'enregistre si elle te plaît.
+                <strong>Pour le repas du soir</strong>, il propose une recette avec ce qui périme et
+                l'enregistre si elle te plaît.
               </Point>
               <Point swatch="sage">
                 <strong>Avant de faire les courses</strong>, il prépare ta liste à partir du stock

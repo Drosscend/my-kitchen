@@ -91,7 +91,7 @@ const configuration: Configuration = {
     registration: { enabled: true, issueRegistrationAccessToken: false },
     clientIdMetadataDocument: {
       enabled: true,
-      ack: 'draft-02',
+      ack: 'draft-03',
       allowFetch: async (_ctx, clientId) => resolvesToPublicAddresses(new URL(clientId).hostname),
     },
     resourceIndicators: {
