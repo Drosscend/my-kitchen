@@ -1,6 +1,5 @@
 import { Form, useRouter } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
-import { cn } from 'cn'
 import {
   BellOffIcon,
   BellPlusIcon,
@@ -41,32 +40,51 @@ function formatDate(value: string) {
   return new Date(value).toLocaleDateString('fr-FR', { dateStyle: 'medium' })
 }
 
-function Section({
+function Group({
   id,
   title,
   destructive,
   children,
 }: {
-  id?: string
+  id: string
   title: string
   destructive?: boolean
   children: ReactNode
 }) {
   return (
-    <section
-      id={id}
-      className="grid scroll-mt-6 grid-cols-1 gap-4 border-t py-8 first:border-t-0 first:pt-0 last:pb-0 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-10"
-    >
-      <h2 className="text-lg md:pt-5">{title}</h2>
+    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-6 space-y-4">
+      <h2 id={`${id}-title`} className="text-lg">
+        {title}
+      </h2>
       <div
-        className={cn(
-          'rounded-xl border bg-card p-5 sm:p-6',
-          destructive && 'border-destructive/40'
-        )}
+        data-destructive={destructive}
+        className="rounded-xl border bg-card px-5 sm:px-6 data-destructive:border-destructive/40"
       >
         {children}
       </div>
     </section>
+  )
+}
+
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title?: string
+  description?: ReactNode
+  children: ReactNode
+}) {
+  return (
+    <div className="space-y-5 border-t py-5 first:border-t-0 sm:py-6">
+      {(title || description) && (
+        <div className="space-y-1.5">
+          {title && <h3 className="font-semibold">{title}</h3>}
+          {description && <div className="text-sm text-muted-foreground">{description}</div>}
+        </div>
+      )}
+      {children}
+    </div>
   )
 }
 
@@ -400,236 +418,276 @@ export default function ShowAccount({
             </Form>
           }
         />
-        <div className="max-w-5xl">
-          <Section title="Profil">
-            <Form route="account.profile.update" errorBag="profile">
-              {({ errors, processing }) => (
-                <FieldGroup className="max-w-md">
-                  <Field data-invalid={Boolean(errors.name)}>
-                    <FieldLabel htmlFor="name">Prénom</FieldLabel>
-                    <Input
-                      id="name"
-                      name="name"
-                      defaultValue={account.name ?? ''}
-                      aria-invalid={Boolean(errors.name)}
-                    />
-                    {errors.name && <FieldError>{errors.name}</FieldError>}
-                  </Field>
-                  <Button type="submit" disabled={processing} className="w-fit">
-                    Enregistrer
-                  </Button>
-                </FieldGroup>
-              )}
-            </Form>
-          </Section>
-
-          <Section title="Adresse e-mail">
-            <p className="mb-6 text-sm">
-              Adresse actuelle : <strong className="break-all">{account.email}</strong>
-            </p>
-            <Form route="account.email.update" errorBag="email">
-              {({ errors, processing }) => (
-                <FieldGroup className="max-w-md">
-                  <Field data-invalid={Boolean(errors.email)}>
-                    <FieldLabel htmlFor="new-email">Nouvelle adresse e-mail</FieldLabel>
-                    <Input
-                      id="new-email"
-                      type="email"
-                      name="email"
-                      autoComplete="email"
-                      required
-                      aria-invalid={Boolean(errors.email)}
-                    />
-                    {errors.email && <FieldError>{errors.email}</FieldError>}
-                  </Field>
-                  {account.hasPassword && (
-                    <Field data-invalid={Boolean(errors.password)}>
-                      <FieldLabel htmlFor="email-password">Mot de passe actuel</FieldLabel>
-                      <Input
-                        id="email-password"
-                        type="password"
-                        name="password"
-                        autoComplete="current-password"
-                        required
-                        aria-invalid={Boolean(errors.password)}
-                      />
-                      {errors.password && <FieldError>{errors.password}</FieldError>}
-                    </Field>
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_13rem] lg:gap-14">
+          <div className="min-w-0 space-y-12">
+            <Group id="profile" title="Profil">
+              <Section>
+                <Form route="account.profile.update" errorBag="profile">
+                  {({ errors, processing }) => (
+                    <FieldGroup className="max-w-md">
+                      <Field data-invalid={Boolean(errors.name)}>
+                        <FieldLabel htmlFor="name">Prénom</FieldLabel>
+                        <Input
+                          id="name"
+                          name="name"
+                          defaultValue={account.name ?? ''}
+                          aria-invalid={Boolean(errors.name)}
+                        />
+                        {errors.name && <FieldError>{errors.name}</FieldError>}
+                      </Field>
+                      <Button type="submit" disabled={processing} className="w-fit">
+                        Enregistrer
+                      </Button>
+                    </FieldGroup>
                   )}
-                  <Button type="submit" disabled={processing} className="w-fit">
-                    Envoyer le lien de confirmation
-                  </Button>
-                </FieldGroup>
-              )}
-            </Form>
-          </Section>
+                </Form>
+              </Section>
 
-          <Section id="notifications" title="Notifications">
-            <NotificationSettings
-              notifications={notifications}
-              pushDevices={pushDevices}
-              vapidPublicKey={vapidPublicKey}
-            />
-          </Section>
-
-          <Section id="expiry-warnings" title="Alertes de péremption">
-            <ExpiryWarningSettings warnings={expiryWarnings} />
-          </Section>
-
-          {(googleSignIn || account.googleLinked) && (
-            <Section title="Connexion Google">
-              <p className="text-sm">
-                {account.googleLinked
-                  ? 'Ton compte est lié à Google : « Continuer avec Google » te connecte directement.'
-                  : 'Pour lier ton compte, déconnecte-toi puis choisis « Continuer avec Google » avec un compte Google qui utilise la même adresse.'}
-              </p>
-            </Section>
-          )}
-
-          <Section title="Mot de passe">
-            {!account.hasPassword && (
-              <p className="mb-6 text-sm text-muted-foreground">
-                Ton compte n'a pas encore de mot de passe. Définis-en un pour pouvoir aussi te
-                connecter avec ton adresse e-mail.
-              </p>
-            )}
-            <Form route="account.password.update" errorBag="password">
-              {({ errors, processing }) => (
-                <FieldGroup className="max-w-md">
-                  {account.hasPassword && (
-                    <Field data-invalid={Boolean(errors.currentPassword)}>
-                      <FieldLabel htmlFor="current-password">Mot de passe actuel</FieldLabel>
-                      <Input
-                        id="current-password"
-                        type="password"
-                        name="currentPassword"
-                        autoComplete="current-password"
-                        required
-                        aria-invalid={Boolean(errors.currentPassword)}
-                      />
-                      {errors.currentPassword && <FieldError>{errors.currentPassword}</FieldError>}
-                    </Field>
+              <Section title="Adresse e-mail">
+                <p className="mb-6 text-sm">
+                  Adresse actuelle : <strong className="break-all">{account.email}</strong>
+                </p>
+                <Form route="account.email.update" errorBag="email">
+                  {({ errors, processing }) => (
+                    <FieldGroup className="max-w-md">
+                      <Field data-invalid={Boolean(errors.email)}>
+                        <FieldLabel htmlFor="new-email">Nouvelle adresse e-mail</FieldLabel>
+                        <Input
+                          id="new-email"
+                          type="email"
+                          name="email"
+                          autoComplete="email"
+                          required
+                          aria-invalid={Boolean(errors.email)}
+                        />
+                        {errors.email && <FieldError>{errors.email}</FieldError>}
+                      </Field>
+                      {account.hasPassword && (
+                        <Field data-invalid={Boolean(errors.password)}>
+                          <FieldLabel htmlFor="email-password">Mot de passe actuel</FieldLabel>
+                          <Input
+                            id="email-password"
+                            type="password"
+                            name="password"
+                            autoComplete="current-password"
+                            required
+                            aria-invalid={Boolean(errors.password)}
+                          />
+                          {errors.password && <FieldError>{errors.password}</FieldError>}
+                        </Field>
+                      )}
+                      <Button type="submit" disabled={processing} className="w-fit">
+                        Envoyer le lien de confirmation
+                      </Button>
+                    </FieldGroup>
                   )}
-                  <Field data-invalid={Boolean(errors.password)}>
-                    <FieldLabel htmlFor="new-password">
-                      Nouveau mot de passe (8 caractères minimum)
-                    </FieldLabel>
-                    <Input
-                      id="new-password"
-                      type="password"
-                      name="password"
-                      autoComplete="new-password"
-                      required
-                      aria-invalid={Boolean(errors.password)}
-                    />
-                    {errors.password && <FieldError>{errors.password}</FieldError>}
-                  </Field>
-                  <Field data-invalid={Boolean(errors.passwordConfirmation)}>
-                    <FieldLabel htmlFor="new-password-confirmation">
-                      Confirmer le nouveau mot de passe
-                    </FieldLabel>
-                    <Input
-                      id="new-password-confirmation"
-                      type="password"
-                      name="passwordConfirmation"
-                      autoComplete="new-password"
-                      required
-                      aria-invalid={Boolean(errors.passwordConfirmation)}
-                    />
-                    {errors.passwordConfirmation && (
-                      <FieldError>{errors.passwordConfirmation}</FieldError>
-                    )}
-                  </Field>
-                  <Button type="submit" disabled={processing} className="w-fit">
-                    {account.hasPassword ? 'Modifier le mot de passe' : 'Définir le mot de passe'}
-                  </Button>
-                </FieldGroup>
+                </Form>
+              </Section>
+
+              {(googleSignIn || account.googleLinked) && (
+                <Section title="Connexion Google">
+                  <p className="text-sm">
+                    {account.googleLinked
+                      ? 'Ton compte est lié à Google : « Continuer avec Google » te connecte directement.'
+                      : 'Pour lier ton compte, déconnecte-toi puis choisis « Continuer avec Google » avec un compte Google qui utilise la même adresse.'}
+                  </p>
+                </Section>
               )}
-            </Form>
-          </Section>
+            </Group>
 
-          <Section title="Accès MCP">
-            <div className="space-y-8">
-              <ConnectorGuide mcpUrl={mcpUrl} embedded />
+            <Group id="security" title="Sécurité">
+              <Section title="Mot de passe">
+                {!account.hasPassword && (
+                  <p className="mb-6 text-sm text-muted-foreground">
+                    Ton compte n'a pas encore de mot de passe. Définis-en un pour pouvoir aussi te
+                    connecter avec ton adresse e-mail.
+                  </p>
+                )}
+                <Form route="account.password.update" errorBag="password">
+                  {({ errors, processing }) => (
+                    <FieldGroup className="max-w-md">
+                      {account.hasPassword && (
+                        <Field data-invalid={Boolean(errors.currentPassword)}>
+                          <FieldLabel htmlFor="current-password">Mot de passe actuel</FieldLabel>
+                          <Input
+                            id="current-password"
+                            type="password"
+                            name="currentPassword"
+                            autoComplete="current-password"
+                            required
+                            aria-invalid={Boolean(errors.currentPassword)}
+                          />
+                          {errors.currentPassword && (
+                            <FieldError>{errors.currentPassword}</FieldError>
+                          )}
+                        </Field>
+                      )}
+                      <Field data-invalid={Boolean(errors.password)}>
+                        <FieldLabel htmlFor="new-password">
+                          Nouveau mot de passe (8 caractères minimum)
+                        </FieldLabel>
+                        <Input
+                          id="new-password"
+                          type="password"
+                          name="password"
+                          autoComplete="new-password"
+                          required
+                          aria-invalid={Boolean(errors.password)}
+                        />
+                        {errors.password && <FieldError>{errors.password}</FieldError>}
+                      </Field>
+                      <Field data-invalid={Boolean(errors.passwordConfirmation)}>
+                        <FieldLabel htmlFor="new-password-confirmation">
+                          Confirmer le nouveau mot de passe
+                        </FieldLabel>
+                        <Input
+                          id="new-password-confirmation"
+                          type="password"
+                          name="passwordConfirmation"
+                          autoComplete="new-password"
+                          required
+                          aria-invalid={Boolean(errors.passwordConfirmation)}
+                        />
+                        {errors.passwordConfirmation && (
+                          <FieldError>{errors.passwordConfirmation}</FieldError>
+                        )}
+                      </Field>
+                      <Button type="submit" disabled={processing} className="w-fit">
+                        {account.hasPassword
+                          ? 'Modifier le mot de passe'
+                          : 'Définir le mot de passe'}
+                      </Button>
+                    </FieldGroup>
+                  )}
+                </Form>
+              </Section>
+            </Group>
 
-              {oauthConnections.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Applications connectées</p>
-                  <ul className="space-y-2">
-                    {oauthConnections.map((connection) => (
-                      <li
-                        key={connection.id}
-                        className="flex items-center justify-between gap-4 rounded-md bg-muted px-4 py-3"
-                      >
-                        <div className="min-w-0">
-                          <p className="flex items-center gap-2 text-sm font-medium">
-                            <PlugIcon className="size-3.5 shrink-0 text-muted-foreground" />
-                            {connection.clientName ?? 'Application inconnue'}
-                          </p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            Autorisée le {formatDate(connection.createdAt)}
-                            {connection.lastUsedAt
-                              ? `, utilisée le ${formatDate(connection.lastUsedAt)}`
-                              : ', jamais utilisée'}
-                          </p>
-                        </div>
-                        <RevokeConnectionDialog connection={connection} />
-                      </li>
-                    ))}
-                  </ul>
+            <Group id="notifications" title="Notifications">
+              <Section
+                title="Canaux"
+                description="Le point du matin, envoyé à 8 h, liste les produits proches de leur date. Les alertes de sécurité signalent toute modification sensible du compte."
+              >
+                <NotificationSettings
+                  notifications={notifications}
+                  pushDevices={pushDevices}
+                  vapidPublicKey={vapidPublicKey}
+                />
+              </Section>
+
+              <Section
+                title="Alertes de péremption"
+                description="Nombre de jours avant la date à partir duquel un produit est signalé. « Se gâte » s'applique aux produits frais et aux DLC, « Longue conservation » aux DDM des produits qui se gardent."
+              >
+                <ExpiryWarningSettings warnings={expiryWarnings} />
+              </Section>
+            </Group>
+
+            <Group id="assistants" title="Assistants">
+              <Section title="Accès MCP">
+                <div className="space-y-8">
+                  <ConnectorGuide mcpUrl={mcpUrl} embedded />
+
+                  {oauthConnections.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Applications connectées</p>
+                      <ul className="space-y-2">
+                        {oauthConnections.map((connection) => (
+                          <li
+                            key={connection.id}
+                            className="flex items-center justify-between gap-4 rounded-md bg-muted px-4 py-3"
+                          >
+                            <div className="min-w-0">
+                              <p className="flex items-center gap-2 text-sm font-medium">
+                                <PlugIcon className="size-3.5 shrink-0 text-muted-foreground" />
+                                {connection.clientName ?? 'Application inconnue'}
+                              </p>
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                Autorisée le {formatDate(connection.createdAt)}
+                                {connection.lastUsedAt
+                                  ? `, utilisée le ${formatDate(connection.lastUsedAt)}`
+                                  : ', jamais utilisée'}
+                              </p>
+                            </div>
+                            <RevokeConnectionDialog connection={connection} />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </Section>
+              </Section>
+            </Group>
 
-          <Section title="Supprimer le compte" destructive>
-            <p className="mb-6 text-sm text-muted-foreground">
-              Le compte, son inventaire et ses recettes sont effacés immédiatement.
-            </p>
-            <Form route="account.destroy" errorBag="delete">
-              {({ errors, processing }) => (
-                <FieldGroup className="max-w-md">
-                  {account.hasPassword ? (
-                    <Field data-invalid={Boolean(errors.password)}>
-                      <FieldLabel htmlFor="delete-password">Mot de passe</FieldLabel>
-                      <Input
-                        id="delete-password"
-                        type="password"
-                        name="password"
-                        autoComplete="current-password"
-                        required
-                        aria-invalid={Boolean(errors.password)}
-                      />
-                      {errors.password && <FieldError>{errors.password}</FieldError>}
-                    </Field>
-                  ) : (
-                    <Field data-invalid={Boolean(errors.email)}>
-                      <FieldLabel htmlFor="delete-email">
-                        Tape l'adresse e-mail du compte pour confirmer
-                      </FieldLabel>
-                      <Input
-                        id="delete-email"
-                        type="email"
-                        name="email"
-                        autoComplete="off"
-                        required
-                        aria-invalid={Boolean(errors.email)}
-                      />
-                      {errors.email && <FieldError>{errors.email}</FieldError>}
-                    </Field>
+            <Group id="delete-account" title="Supprimer le compte" destructive>
+              <Section description="Le compte, son inventaire et ses recettes sont effacés immédiatement.">
+                <Form route="account.destroy" errorBag="delete">
+                  {({ errors, processing }) => (
+                    <FieldGroup className="max-w-md">
+                      {account.hasPassword ? (
+                        <Field data-invalid={Boolean(errors.password)}>
+                          <FieldLabel htmlFor="delete-password">Mot de passe</FieldLabel>
+                          <Input
+                            id="delete-password"
+                            type="password"
+                            name="password"
+                            autoComplete="current-password"
+                            required
+                            aria-invalid={Boolean(errors.password)}
+                          />
+                          {errors.password && <FieldError>{errors.password}</FieldError>}
+                        </Field>
+                      ) : (
+                        <Field data-invalid={Boolean(errors.email)}>
+                          <FieldLabel htmlFor="delete-email">
+                            Tape l'adresse e-mail du compte pour confirmer
+                          </FieldLabel>
+                          <Input
+                            id="delete-email"
+                            type="email"
+                            name="email"
+                            autoComplete="off"
+                            required
+                            aria-invalid={Boolean(errors.email)}
+                          />
+                          {errors.email && <FieldError>{errors.email}</FieldError>}
+                        </Field>
+                      )}
+                      <Button
+                        type="submit"
+                        variant="destructive"
+                        disabled={processing}
+                        className="w-fit"
+                      >
+                        Supprimer mon compte
+                      </Button>
+                    </FieldGroup>
                   )}
-                  <Button
-                    type="submit"
-                    variant="destructive"
-                    disabled={processing}
-                    className="w-fit"
+                </Form>
+              </Section>
+            </Group>
+          </div>
+
+          <nav aria-label="Sommaire" className="hidden lg:block">
+            <ul className="sticky top-6 space-y-1 border-l text-sm">
+              {[
+                ['profile', 'Profil'],
+                ['security', 'Sécurité'],
+                ['notifications', 'Notifications'],
+                ['assistants', 'Assistants'],
+                ['delete-account', 'Supprimer le compte'],
+              ].map(([id, title]) => (
+                <li key={id}>
+                  <a
+                    href={`#${id}`}
+                    className="-ml-px block border-l border-transparent py-1 pl-4 text-muted-foreground hover:border-foreground hover:text-foreground"
                   >
-                    Supprimer mon compte
-                  </Button>
-                </FieldGroup>
-              )}
-            </Form>
-          </Section>
+                    {title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
       </Page>
     </>
