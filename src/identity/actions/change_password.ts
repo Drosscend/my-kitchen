@@ -12,6 +12,7 @@ import PasswordChangedMail from '#identity/mails/password_changed_mail'
 import { EmailVerificationTokenRepository } from '#identity/repositories/email_verification_token_repository'
 import { PasswordResetTokenRepository } from '#identity/repositories/password_reset_token_repository'
 import { UserRepository } from '#identity/repositories/user_repository'
+import { NotifyDevices } from '#notifications/actions/notify_devices'
 import { TransactionManager } from '#shared/services/transaction_manager'
 import type { User } from '#identity/domain/user'
 
@@ -34,7 +35,8 @@ export class ChangePassword {
     private readonly users: UserRepository,
     private readonly resetTokens: PasswordResetTokenRepository,
     private readonly verificationTokens: EmailVerificationTokenRepository,
-    private readonly transactions: TransactionManager
+    private readonly transactions: TransactionManager,
+    private readonly devices: NotifyDevices
   ) {}
 
   async execute(params: ChangePasswordParams): Promise<ChangePasswordResult> {
@@ -66,6 +68,15 @@ export class ChangePassword {
     })
 
     await mail.sendLater(new PasswordChangedMail(user.email, new Date()))
+    await this.devices.execute({
+      userId: user.getIdentifier(),
+      alert: 'security',
+      message: {
+        title: 'Ton mot de passe a été modifié',
+        body: "Si ce n'est pas toi, réinitialise-le tout de suite.",
+        url: '/account',
+      },
+    })
     return ok(user)
   }
 }

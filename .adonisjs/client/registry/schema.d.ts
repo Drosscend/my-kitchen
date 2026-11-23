@@ -229,6 +229,45 @@ export interface Registry {
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/notifications/controllers/update_notification_settings_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'account.push_devices.store': {
+    methods: ["POST"]
+    pattern: '/account/push-devices'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/notifications/controllers/add_push_device_controller').default)['validator']>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#app/notifications/controllers/add_push_device_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/notifications/controllers/add_push_device_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/notifications/controllers/add_push_device_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/notifications/controllers/add_push_device_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'account.push_devices.destroy': {
+    methods: ["DELETE"]
+    pattern: '/account/push-devices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/notifications/controllers/remove_push_device_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/notifications/controllers/remove_push_device_controller').default['execute']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/notifications/controllers/remove_push_device_controller').default['execute']>>>
+    }
+  }
+  'account.push_devices.test': {
+    methods: ["POST"]
+    pattern: '/account/push-devices/:id/test'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#app/notifications/controllers/send_test_push_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/notifications/controllers/send_test_push_controller').default['execute']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/notifications/controllers/send_test_push_controller').default['execute']>>>
+    }
+  }
   'notifications.unsubscribe': {
     methods: ["POST"]
     pattern: '/notifications/unsubscribe/:token'

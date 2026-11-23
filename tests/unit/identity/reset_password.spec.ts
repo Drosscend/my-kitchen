@@ -4,15 +4,20 @@ import { test } from '@japa/runner'
 import { RequestPasswordReset } from '#identity/actions/request_password_reset'
 import { ResetPassword } from '#identity/actions/reset_password'
 import PasswordChangedMail from '#identity/mails/password_changed_mail'
+import { AddPushDevice } from '#notifications/actions/add_push_device'
 import { db } from '#shared/services/db'
 import { queuedLink, queuedMessageOf } from '#tests/helpers/mail'
+import { fakePushSender, restorePushSender } from '#tests/helpers/push'
 import { resetState } from '#tests/helpers/state'
 import { createUser } from '#tests/helpers/users'
 
 test.group('ResetPassword', (group) => {
   group.each.setup(async () => {
     await resetState()
-    return () => mail.restore()
+    return () => {
+      mail.restore()
+      restorePushSender()
+    }
   })
 
   test('rejects a password outside the policy', async ({ assert }) => {
@@ -59,5 +64,30 @@ test.group('ResetPassword', (group) => {
     message.assertTo('ada@example.com')
     message.assertSubject('Ton mot de passe a été modifié')
     message.assertHtmlIncludes('Réinitialiser mon mot de passe')
+  })
+
+  test('pushes the change to the devices of the account', async ({ assert }) => {
+    const mailer = mail.fake()
+    const sender = fakePushSender()
+    const ada = await createUser('ada@example.com')
+    const addPushDevice = await app.container.make(AddPushDevice)
+    await addPushDevice.execute({
+      userId: ada.getIdentifier(),
+      endpoint: 'https://push.example/one',
+      p256dh: 'p256dh-key',
+      auth: 'auth-secret',
+      userAgent: '',
+    })
+    const requestPasswordReset = await app.container.make(RequestPasswordReset)
+    const resetPassword = await app.container.make(ResetPassword)
+    await requestPasswordReset.execute({ email: 'ada@example.com' })
+    const token = await queuedLink(mailer, /\/reset-password\/(\S+)/)
+
+    await resetPassword.execute({ token, password: 'a-new-password' })
+
+    assert.deepEqual(
+      sender.sent.map((push) => push.message.title),
+      ['Ton mot de passe a été modifié']
+    )
   })
 })

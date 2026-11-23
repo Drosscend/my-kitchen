@@ -6,16 +6,18 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class UpdateNotificationSettingsController {
   static readonly validator = vine.create({
-    expiryMail: vine.boolean(),
+    expiryMail: vine.boolean().optional(),
+    expiryPush: vine.boolean().optional(),
+    securityPush: vine.boolean().optional(),
   })
 
   constructor(private readonly updateNotificationSettings: UpdateNotificationSettings) {}
 
   async execute({ request, response, auth, session }: HttpContext) {
-    const params = await request.validateUsing(UpdateNotificationSettingsController.validator)
+    const changes = await request.validateUsing(UpdateNotificationSettingsController.validator)
     await this.updateNotificationSettings.execute({
       userId: auth.getUserOrFail().getIdentifier(),
-      expiryMail: params.expiryMail,
+      changes,
     })
 
     session.flash('success', 'Notifications mises à jour')

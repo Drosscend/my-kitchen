@@ -45,6 +45,9 @@ export const controllers = {
     ProtectedResource: () => import('#app/mcp/controllers/protected_resource_controller'),
   },
   notifications: {
+    AddPushDevice: () => import('#app/notifications/controllers/add_push_device_controller'),
+    RemovePushDevice: () => import('#app/notifications/controllers/remove_push_device_controller'),
+    SendTestPush: () => import('#app/notifications/controllers/send_test_push_controller'),
     Unsubscribe: () => import('#app/notifications/controllers/unsubscribe_controller'),
     UpdateNotificationSettings: () => import('#app/notifications/controllers/update_notification_settings_controller'),
   },

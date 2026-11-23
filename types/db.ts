@@ -72,6 +72,8 @@ export interface Ingredients {
 
 export interface NotificationSettings {
   expiry_mail: Generated<boolean>;
+  expiry_push: Generated<boolean>;
+  security_push: Generated<boolean>;
   updated_at: Generated<Timestamp>;
   user_id: string;
 }
@@ -95,6 +97,16 @@ export interface PasswordResetTokens {
   expires_at: Timestamp;
   id: string;
   token_hash: string;
+  user_id: string;
+}
+
+export interface PushSubscriptions {
+  auth: string;
+  created_at: Generated<Timestamp>;
+  endpoint: string;
+  id: string;
+  label: string;
+  p256dh: string;
   user_id: string;
 }
 
@@ -149,6 +161,7 @@ export interface DB {
   notification_settings: NotificationSettings;
   oauth_models: OauthModels;
   password_reset_tokens: PasswordResetTokens;
+  push_subscriptions: PushSubscriptions;
   recipe_ingredients: RecipeIngredients;
   recipe_steps: RecipeSteps;
   recipes: Recipes;
