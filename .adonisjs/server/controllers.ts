@@ -44,6 +44,10 @@ export const controllers = {
     Mcp: () => import('#app/mcp/controllers/mcp_controller'),
     ProtectedResource: () => import('#app/mcp/controllers/protected_resource_controller'),
   },
+  notifications: {
+    Unsubscribe: () => import('#app/notifications/controllers/unsubscribe_controller'),
+    UpdateNotificationSettings: () => import('#app/notifications/controllers/update_notification_settings_controller'),
+  },
   oauth: {
     AuthorizeClient: () => import('#app/oauth/controllers/authorize_client_controller'),
     DenyClient: () => import('#app/oauth/controllers/deny_client_controller'),

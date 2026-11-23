@@ -98,7 +98,11 @@
                 align="center"
                 style="padding: 18px 12px 0; font-size: 12px; line-height: 1.5; color: #6b6155"
               >
-                {{ footer ?? 'Mon Garde-Manger · inventaire, recettes et mode cuisine' }}
+                @if($slots.footer)
+                  {{{ await $slots.footer() }}}
+                @else
+                  Mon Garde-Manger · inventaire, recettes et mode cuisine
+                @end
               </td>
             </tr>
           </table>

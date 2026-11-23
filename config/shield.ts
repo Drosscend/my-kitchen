@@ -49,9 +49,10 @@ const shieldConfig = defineConfig({
     /**
      * The cooking state is updated by phones without a session, the demo
      * session opened by visitors without one, the MCP endpoint by bearer
-     * clients: none of them can carry a CSRF token.
+     * clients, the one-click unsubscribe by mailboxes: none of them can
+     * carry a CSRF token.
      */
-    exceptRoutes: ['/cook/:code/state', '/cook/demo', '/mcp'],
+    exceptRoutes: ['/cook/:code/state', '/cook/demo', '/mcp', '/notifications/unsubscribe/:token'],
 
     /**
      * Expose an encrypted XSRF-TOKEN cookie for frontend HTTP clients.

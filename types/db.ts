@@ -41,6 +41,14 @@ export interface EmailVerificationTokens {
   user_id: string;
 }
 
+export interface ExpiryNotices {
+  batch_id: string;
+  expires_on: Timestamp;
+  notified_at: Generated<Timestamp>;
+  status: string;
+  user_id: string;
+}
+
 export interface IngredientBatches {
   created_at: Generated<Timestamp>;
   expires_on: Timestamp | null;
@@ -58,6 +66,12 @@ export interface Ingredients {
   name: string;
   state: string;
   unit: string;
+  updated_at: Generated<Timestamp>;
+  user_id: string;
+}
+
+export interface NotificationSettings {
+  expiry_mail: Generated<boolean>;
   updated_at: Generated<Timestamp>;
   user_id: string;
 }
@@ -129,8 +143,10 @@ export interface Users {
 export interface DB {
   cooking_sessions: CookingSessions;
   email_verification_tokens: EmailVerificationTokens;
+  expiry_notices: ExpiryNotices;
   ingredient_batches: IngredientBatches;
   ingredients: Ingredients;
+  notification_settings: NotificationSettings;
   oauth_models: OauthModels;
   password_reset_tokens: PasswordResetTokens;
   recipe_ingredients: RecipeIngredients;

@@ -11,6 +11,7 @@ import type IdentityAccountDetailsTransformer from '#app/identity/transformers/a
 import type IdentityOauthConnectionTransformer from '#app/identity/transformers/oauth_connection_transformer'
 import type IdentityUserTransformer from '#app/identity/transformers/user_transformer'
 import type InventoryIngredientTransformer from '#app/inventory/transformers/ingredient_transformer'
+import type NotificationsNotificationSettingsTransformer from '#app/notifications/transformers/notification_settings_transformer'
 import type RecipesRecipeSummaryTransformer from '#app/recipes/transformers/recipe_summary_transformer'
 import type RecipesRecipeTransformer from '#app/recipes/transformers/recipe_transformer'
 import type InertiaMiddleware from '#app/middleware/inertia_middleware'
@@ -40,6 +41,12 @@ export namespace Data {
     export type Ingredient = InferData<InventoryIngredientTransformer>
     export namespace Ingredient {
       export type Variants = InferVariants<InventoryIngredientTransformer>
+    }
+  }
+  export namespace Notifications {
+    export type NotificationSettings = InferData<NotificationsNotificationSettingsTransformer>
+    export namespace NotificationSettings {
+      export type Variants = InferVariants<NotificationsNotificationSettingsTransformer>
     }
   }
   export namespace Recipes {
