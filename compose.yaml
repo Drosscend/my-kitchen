@@ -2,7 +2,7 @@
 # docker-compose.yml (`db` service) and mail goes through the SMTP relay.
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:17.12-alpine3.24
     environment:
       POSTGRES_USER: my_kitchen
       POSTGRES_PASSWORD: password

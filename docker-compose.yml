@@ -55,7 +55,7 @@ services:
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 
   db:
-    image: postgres:17-alpine
+    image: postgres:17.12-alpine3.24
     restart: always
     networks:
       - internal
