@@ -62,6 +62,12 @@ const routes = {
     tokens: [[0,"inventory"],[1,"id"],[0,"batches"],[1,"batchId"]],
     types: placeholder as Registry['inventory.batches.destroy']['types'],
   },
+  'account.expiry_warnings.update': {
+    methods: ["PUT"],
+    pattern: '/account/expiry-warnings',
+    tokens: [[0,"account"],[0,"expiry-warnings"]],
+    types: placeholder as Registry['account.expiry_warnings.update']['types'],
+  },
   'recipes.index': {
     methods: ["GET","HEAD"],
     pattern: '/recipes',

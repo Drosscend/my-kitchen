@@ -21,6 +21,7 @@ import { Page, PageHeader } from '~/components/page'
 import { Button } from '~/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '~/components/ui/input-group'
 import { Switch } from '~/components/ui/switch'
 import { usePushSubscription } from '~/notifications/use_push_subscription'
 import { type InertiaProps } from '~/types'
@@ -31,6 +32,7 @@ type PageProps = InertiaProps<{
   notifications: Data.Notifications.NotificationSettings
   pushDevices: Data.Notifications.PushDevice[]
   vapidPublicKey: string | null
+  expiryWarnings: Data.Inventory.ExpiryWarning[]
   mcpUrl: string
   googleSignIn: boolean
 }>
@@ -254,6 +256,101 @@ function NotificationSettings({
   )
 }
 
+function ExpiryWarningSettings({ warnings }: { warnings: Data.Inventory.ExpiryWarning[] }) {
+  const router = useRouter()
+  const customized = warnings.some(
+    (warning) => warning.custom.perishable !== null || warning.custom.shelfStable !== null
+  )
+
+  return (
+    <Form
+      key={warnings
+        .map((warning) => `${warning.custom.perishable}:${warning.custom.shelfStable}`)
+        .join('|')}
+      route="account.expiry_warnings.update"
+      errorBag="expiryWarnings"
+      options={{ preserveScroll: true }}
+      className="space-y-6"
+    >
+      {({ errors, processing }) => (
+        <>
+          <div className="[--warning-columns:minmax(0,1fr)_5.5rem_5.5rem]">
+            <div className="grid grid-cols-(--warning-columns) gap-3 pb-1 text-center text-xs font-medium text-muted-foreground">
+              <span className="sr-only">Catégorie</span>
+              <span className="col-start-2">Se gâte</span>
+              <span>Longue conservation</span>
+            </div>
+            {warnings.map((warning, index) => (
+              <div
+                key={warning.category}
+                className="grid min-h-12 grid-cols-(--warning-columns) items-center gap-3 border-t first-of-type:border-t-0"
+              >
+                <input
+                  type="hidden"
+                  name={`warnings[${index}][category]`}
+                  value={warning.category}
+                />
+                <span className="text-sm font-medium">{warning.categoryLabel}</span>
+                <InputGroup>
+                  <InputGroupInput
+                    type="number"
+                    min={0}
+                    max={365}
+                    name={`warnings[${index}][perishable]`}
+                    defaultValue={warning.custom.perishable ?? ''}
+                    placeholder={String(warning.defaults.perishable)}
+                    aria-label={`${warning.categoryLabel}, produit qui se gâte, jours avant la date`}
+                    aria-invalid={Boolean(errors[`warnings.${index}.perishable`])}
+                    className="text-right tabular-nums"
+                  />
+                  <InputGroupAddon align="inline-end">j</InputGroupAddon>
+                </InputGroup>
+                <InputGroup>
+                  <InputGroupInput
+                    type="number"
+                    min={0}
+                    max={365}
+                    name={`warnings[${index}][shelfStable]`}
+                    defaultValue={warning.custom.shelfStable ?? ''}
+                    placeholder={String(warning.defaults.shelfStable)}
+                    aria-label={`${warning.categoryLabel}, longue conservation, jours avant la date`}
+                    aria-invalid={Boolean(errors[`warnings.${index}.shelfStable`])}
+                    className="text-right tabular-nums"
+                  />
+                  <InputGroupAddon align="inline-end">j</InputGroupAddon>
+                </InputGroup>
+              </div>
+            ))}
+          </div>
+          {Object.keys(errors).length > 0 && (
+            <FieldError>Un délai est un nombre entier de jours, entre 0 et 365.</FieldError>
+          )}
+          <div className="flex flex-wrap gap-2">
+            <Button type="submit" disabled={processing}>
+              Enregistrer
+            </Button>
+            {customized && (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={processing}
+                onClick={() =>
+                  router.visit(
+                    { route: 'account.expiry_warnings.update' },
+                    { preserveScroll: true, data: { warnings: [] } }
+                  )
+                }
+              >
+                Remettre par défaut
+              </Button>
+            )}
+          </div>
+        </>
+      )}
+    </Form>
+  )
+}
+
 function RevokeConnectionDialog({ connection }: { connection: Data.Identity.OauthConnection }) {
   const router = useRouter()
   const name = connection.clientName ?? 'cette application'
@@ -284,6 +381,7 @@ export default function ShowAccount({
   notifications,
   pushDevices,
   vapidPublicKey,
+  expiryWarnings,
   mcpUrl,
   googleSignIn,
 }: PageProps) {
@@ -372,6 +470,10 @@ export default function ShowAccount({
               pushDevices={pushDevices}
               vapidPublicKey={vapidPublicKey}
             />
+          </Section>
+
+          <Section id="expiry-warnings" title="Alertes de péremption">
+            <ExpiryWarningSettings warnings={expiryWarnings} />
           </Section>
 
           {(googleSignIn || account.googleLinked) && (

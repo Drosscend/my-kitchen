@@ -53,10 +53,34 @@ export function daysUntil(on: string, from: string) {
   return Math.round((Date.parse(on) - Date.parse(from)) / DAY_IN_MILLISECONDS)
 }
 
+/**
+ * How many days before its date a batch becomes urgent: `perishable` for
+ * a batch that truly spoils, `shelfStable` for any other one.
+ */
+export interface WarningDays {
+  perishable: number
+  shelfStable: number
+}
+
+/**
+ * The warning days of a category, the user's own where set.
+ */
+export function warningDaysFor(
+  category: IngredientCategory,
+  custom?: { perishable: number | null; shelfStable: number | null }
+): WarningDays {
+  const defaults = INGREDIENT_CATEGORIES[category]
+  return {
+    perishable: custom?.perishable ?? defaults.perishableWarningDays,
+    shelfStable: custom?.shelfStable ?? defaults.shelfStableWarningDays,
+  }
+}
+
 interface ExpiryContext {
   category: IngredientCategory
   state: IngredientState
   today: string
+  warningDays: WarningDays
 }
 
 /**
@@ -76,14 +100,9 @@ export function expiryStatus(expiry: Expiry | null, context: ExpiryContext): Exp
     return expiry.kind === 'use_by' ? 'expired' : 'check'
   }
 
-  return daysLeft <= warningDays(expiry.kind, context) ? 'soon' : 'ok'
-}
-
-function warningDays(kind: ExpiryKind, { category, state }: ExpiryContext) {
-  const { perishableWarningDays, shelfStableWarningDays } = INGREDIENT_CATEGORIES[category]
-  return kind === 'use_by' || isPerishable(state, category)
-    ? perishableWarningDays
-    : shelfStableWarningDays
+  const spoils = expiry.kind === 'use_by' || isPerishable(context.state, context.category)
+  const warning = spoils ? context.warningDays.perishable : context.warningDays.shelfStable
+  return daysLeft <= warning ? 'soon' : 'ok'
 }
 
 export function isMoreUrgent(status: ExpiryStatus, than: ExpiryStatus) {

@@ -125,6 +125,19 @@ export interface Registry {
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/inventory/controllers/remove_ingredient_batch_controller').default['execute']>>>
     }
   }
+  'account.expiry_warnings.update': {
+    methods: ["PUT"]
+    pattern: '/account/expiry-warnings'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#app/inventory/controllers/update_expiry_warnings_controller').default)['validator']>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#app/inventory/controllers/update_expiry_warnings_controller').default)['validator']>>
+      response: ExtractResponse<Awaited<ReturnType<import('#app/inventory/controllers/update_expiry_warnings_controller').default['execute']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#app/inventory/controllers/update_expiry_warnings_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#app/inventory/controllers/update_expiry_warnings_controller').default['execute']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'recipes.index': {
     methods: ["GET","HEAD"]
     pattern: '/recipes'

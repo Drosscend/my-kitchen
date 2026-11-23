@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { expiryStatus, today, validateExpiryDate } from '#inventory/domain/expiry'
+import { expiryStatus, today, validateExpiryDate, warningDaysFor } from '#inventory/domain/expiry'
 
 const TODAY = '2026-03-10'
 
@@ -17,7 +17,12 @@ test.group('Expiry', () => {
   })
 
   test('grades a date against the warning days of the category', ({ assert }) => {
-    const dairy = { category: 'dairy', state: 'fresh', today: TODAY } as const
+    const dairy = {
+      category: 'dairy',
+      state: 'fresh',
+      today: TODAY,
+      warningDays: warningDaysFor('dairy'),
+    } as const
 
     assert.equal(expiryStatus({ on: '2026-03-09', kind: 'use_by' }, dairy), 'expired')
     assert.equal(expiryStatus({ on: '2026-03-09', kind: 'best_before' }, dairy), 'check')
@@ -28,7 +33,12 @@ test.group('Expiry', () => {
   })
 
   test('keeps tracking the date of a dry product', ({ assert }) => {
-    const can = { category: 'fish', state: 'dry', today: TODAY } as const
+    const can = {
+      category: 'fish',
+      state: 'dry',
+      today: TODAY,
+      warningDays: warningDaysFor('fish'),
+    } as const
 
     assert.equal(expiryStatus({ on: '2026-03-09', kind: 'best_before' }, can), 'check')
     assert.equal(expiryStatus({ on: '2026-03-24', kind: 'best_before' }, can), 'soon')
@@ -37,8 +47,18 @@ test.group('Expiry', () => {
   })
 
   test('warns early for a best before date outside perishable fresh products', ({ assert }) => {
-    const pasta = { category: 'starches', state: 'fresh', today: TODAY } as const
-    const cumin = { category: 'spices', state: 'dry', today: TODAY } as const
+    const pasta = {
+      category: 'starches',
+      state: 'fresh',
+      today: TODAY,
+      warningDays: warningDaysFor('starches'),
+    } as const
+    const cumin = {
+      category: 'spices',
+      state: 'dry',
+      today: TODAY,
+      warningDays: warningDaysFor('spices'),
+    } as const
 
     assert.equal(expiryStatus({ on: '2026-03-24', kind: 'best_before' }, pasta), 'soon')
     assert.equal(expiryStatus({ on: '2026-03-25', kind: 'best_before' }, pasta), 'ok')
@@ -47,8 +67,18 @@ test.group('Expiry', () => {
   })
 
   test('warns late for a use by date whatever the category', ({ assert }) => {
-    const pastry = { category: 'starches', state: 'fresh', today: TODAY } as const
-    const hummus = { category: 'other', state: 'fresh', today: TODAY } as const
+    const pastry = {
+      category: 'starches',
+      state: 'fresh',
+      today: TODAY,
+      warningDays: warningDaysFor('starches'),
+    } as const
+    const hummus = {
+      category: 'other',
+      state: 'fresh',
+      today: TODAY,
+      warningDays: warningDaysFor('other'),
+    } as const
 
     assert.equal(expiryStatus({ on: '2026-03-12', kind: 'use_by' }, pastry), 'soon')
     assert.equal(expiryStatus({ on: '2026-03-13', kind: 'use_by' }, pastry), 'ok')
@@ -57,7 +87,12 @@ test.group('Expiry', () => {
   })
 
   test('warns late for a perishable fresh product whatever its kind', ({ assert }) => {
-    const butter = { category: 'dairy', state: 'fresh', today: TODAY } as const
+    const butter = {
+      category: 'dairy',
+      state: 'fresh',
+      today: TODAY,
+      warningDays: warningDaysFor('dairy'),
+    } as const
 
     assert.equal(expiryStatus({ on: '2026-03-13', kind: 'best_before' }, butter), 'soon')
     assert.equal(expiryStatus({ on: '2026-03-14', kind: 'best_before' }, butter), 'ok')
@@ -67,9 +102,22 @@ test.group('Expiry', () => {
     assert.equal(
       expiryStatus(
         { on: '2026-03-01', kind: 'use_by' },
-        { category: 'meat', state: 'frozen', today: TODAY }
+        { category: 'meat', state: 'frozen', today: TODAY, warningDays: warningDaysFor('meat') }
       ),
       'none'
     )
+  })
+
+  test('grades a date against the warning days the user set', ({ assert }) => {
+    const dairy = {
+      category: 'dairy',
+      state: 'fresh',
+      today: TODAY,
+      warningDays: warningDaysFor('dairy', { perishable: 7, shelfStable: null }),
+    } as const
+
+    assert.deepEqual(dairy.warningDays, { perishable: 7, shelfStable: 14 })
+    assert.equal(expiryStatus({ on: '2026-03-17', kind: 'use_by' }, dairy), 'soon')
+    assert.equal(expiryStatus({ on: '2026-03-18', kind: 'use_by' }, dairy), 'ok')
   })
 })

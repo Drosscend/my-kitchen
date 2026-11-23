@@ -13,6 +13,7 @@ export type ScannedRoutes = {
     'inventory.batches.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.batches.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'batchId': ParamValue} }
     'inventory.batches.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'batchId': ParamValue} }
+    'account.expiry_warnings.update': { paramsTuple?: []; params?: {} }
     'recipes.index': { paramsTuple?: []; params?: {} }
     'recipes.create': { paramsTuple?: []; params?: {} }
     'recipes.store': { paramsTuple?: []; params?: {} }
@@ -160,6 +161,7 @@ export type ScannedRoutes = {
     'account.oauth_connections.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
+    'account.expiry_warnings.update': { paramsTuple?: []; params?: {} }
     'recipes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account.notifications.update': { paramsTuple?: []; params?: {} }
   }

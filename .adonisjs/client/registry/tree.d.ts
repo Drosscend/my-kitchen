@@ -15,16 +15,10 @@ export interface ApiDefinition {
       destroy: typeof routes['inventory.batches.destroy']
     }
   }
-  recipes: {
-    index: typeof routes['recipes.index']
-    create: typeof routes['recipes.create']
-    store: typeof routes['recipes.store']
-    show: typeof routes['recipes.show']
-    edit: typeof routes['recipes.edit']
-    update: typeof routes['recipes.update']
-    destroy: typeof routes['recipes.destroy']
-  }
   account: {
+    expiryWarnings: {
+      update: typeof routes['account.expiry_warnings.update']
+    }
     notifications: {
       update: typeof routes['account.notifications.update']
     }
@@ -47,6 +41,15 @@ export interface ApiDefinition {
     oauthConnections: {
       destroy: typeof routes['account.oauth_connections.destroy']
     }
+  }
+  recipes: {
+    index: typeof routes['recipes.index']
+    create: typeof routes['recipes.create']
+    store: typeof routes['recipes.store']
+    show: typeof routes['recipes.show']
+    edit: typeof routes['recipes.edit']
+    update: typeof routes['recipes.update']
+    destroy: typeof routes['recipes.destroy']
   }
   notifications: {
     unsubscribe: typeof routes['notifications.unsubscribe']

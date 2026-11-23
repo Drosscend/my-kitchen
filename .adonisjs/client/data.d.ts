@@ -10,6 +10,7 @@ import type CookingCookingSessionTransformer from '#app/cooking/transformers/coo
 import type IdentityAccountDetailsTransformer from '#app/identity/transformers/account_details_transformer'
 import type IdentityOauthConnectionTransformer from '#app/identity/transformers/oauth_connection_transformer'
 import type IdentityUserTransformer from '#app/identity/transformers/user_transformer'
+import type InventoryExpiryWarningTransformer from '#app/inventory/transformers/expiry_warning_transformer'
 import type InventoryIngredientTransformer from '#app/inventory/transformers/ingredient_transformer'
 import type NotificationsNotificationSettingsTransformer from '#app/notifications/transformers/notification_settings_transformer'
 import type NotificationsPushDeviceTransformer from '#app/notifications/transformers/push_device_transformer'
@@ -39,6 +40,10 @@ export namespace Data {
     }
   }
   export namespace Inventory {
+    export type ExpiryWarning = InferData<InventoryExpiryWarningTransformer>
+    export namespace ExpiryWarning {
+      export type Variants = InferVariants<InventoryExpiryWarningTransformer>
+    }
     export type Ingredient = InferData<InventoryIngredientTransformer>
     export namespace Ingredient {
       export type Variants = InferVariants<InventoryIngredientTransformer>
