@@ -1,13 +1,15 @@
 import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
+import PasswordChangedMail from '#identity/mails/password_changed_mail'
 import { assertRedirectedTo } from '#tests/helpers/http'
-import { queuedLink, queuedMessage } from '#tests/helpers/mail'
+import { queuedLink, queuedMessage, queuedMessageOf } from '#tests/helpers/mail'
 import { resetState } from '#tests/helpers/state'
 import { createGoogleUser, createUser, storedUser, TEST_PASSWORD } from '#tests/helpers/users'
 
 test.group('Account', (group) => {
   group.each.setup(async () => {
     await resetState()
+    mail.fake()
     return () => mail.restore()
   })
 
@@ -126,6 +128,8 @@ test.group('Account', (group) => {
     change.assertFlashMessage('success', 'Mot de passe modifié')
     assertRedirectedTo(staleReset, '/forgot-password')
     assertRedirectedTo(login, '/inventory')
+    mailer.mails.assertQueuedCount(PasswordChangedMail, 1)
+    ;(await queuedMessageOf(mailer, PasswordChangedMail)).assertTo('ada@example.com')
   })
 
   test('a password change cancels a pending address change', async ({ client, assert }) => {

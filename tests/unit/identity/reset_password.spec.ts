@@ -3,8 +3,9 @@ import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
 import { RequestPasswordReset } from '#identity/actions/request_password_reset'
 import { ResetPassword } from '#identity/actions/reset_password'
+import PasswordChangedMail from '#identity/mails/password_changed_mail'
 import { db } from '#shared/services/db'
-import { queuedLink } from '#tests/helpers/mail'
+import { queuedLink, queuedMessageOf } from '#tests/helpers/mail'
 import { resetState } from '#tests/helpers/state'
 import { createUser } from '#tests/helpers/users'
 
@@ -39,5 +40,24 @@ test.group('ResetPassword', (group) => {
 
     assert.deepEqual(unknown, { ok: false, error: { type: 'invalid_token' } })
     assert.deepEqual(expired, { ok: false, error: { type: 'invalid_token' } })
+    mailer.mails.assertQueuedCount(PasswordChangedMail, 0)
+  })
+
+  test('mails the account once the password is reset', async ({ assert }) => {
+    const mailer = mail.fake()
+    await createUser('ada@example.com')
+    const requestPasswordReset = await app.container.make(RequestPasswordReset)
+    const resetPassword = await app.container.make(ResetPassword)
+    await requestPasswordReset.execute({ email: 'ada@example.com' })
+    const token = await queuedLink(mailer, /\/reset-password\/(\S+)/)
+
+    const result = await resetPassword.execute({ token, password: 'a-new-password' })
+
+    assert.isTrue(result.ok)
+    mailer.mails.assertQueuedCount(PasswordChangedMail, 1)
+    const message = await queuedMessageOf(mailer, PasswordChangedMail)
+    message.assertTo('ada@example.com')
+    message.assertSubject('Ton mot de passe a été modifié')
+    message.assertHtmlIncludes('Réinitialiser mon mot de passe')
   })
 })

@@ -1,6 +1,9 @@
+import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
+import ConnectedApplicationMail from '#identity/mails/connected_application_mail'
 import { db } from '#shared/services/db'
 import { assertRedirectedTo } from '#tests/helpers/http'
+import { queuedMessage } from '#tests/helpers/mail'
 import {
   authorize,
   CLAUDE_CALLBACK,
@@ -81,7 +84,11 @@ test.group('OAuth discovery', (group) => {
 })
 
 test.group('OAuth authorization', (group) => {
-  group.each.setup(() => resetState())
+  group.each.setup(async () => {
+    await resetState()
+    mail.fake()
+    return () => mail.restore()
+  })
 
   test('shows the consent page with the client name and its redirect host', async ({ client }) => {
     const user = await createUser('ada@example.com')
@@ -171,6 +178,19 @@ test.group('OAuth authorization', (group) => {
     ;(await listTools(client, tokens.access_token)).assertStatus(200)
   })
 
+  test('mails the account when an assistant is authorized', async ({ client }) => {
+    const mailer = mail.fake()
+    const user = await createUser('ada@example.com')
+
+    await authorize(client, user)
+
+    mailer.mails.assertQueuedCount(ConnectedApplicationMail, 1)
+    const message = await queuedMessage(mailer)
+    message.assertTo('ada@example.com')
+    message.assertSubject('Nouvelle application connectée : Claude')
+    message.assertHtmlIncludes('Gérer les applications connectées')
+  })
+
   test('stores tokens hashed', async ({ client, assert }) => {
     const user = await createUser('ada@example.com')
     const { tokens } = await authorize(client, user)
@@ -247,7 +267,11 @@ test.group('OAuth authorization', (group) => {
 })
 
 test.group('OAuth tokens', (group) => {
-  group.each.setup(() => resetState())
+  group.each.setup(async () => {
+    await resetState()
+    mail.fake()
+    return () => mail.restore()
+  })
 
   test('rotates the refresh token and revokes the grant when an old one comes back', async ({
     client,
@@ -270,7 +294,11 @@ test.group('OAuth tokens', (group) => {
 })
 
 test.group('OAuth connections', (group) => {
-  group.each.setup(() => resetState())
+  group.each.setup(async () => {
+    await resetState()
+    mail.fake()
+    return () => mail.restore()
+  })
 
   test('lists the connected assistants and revokes their access', async ({ client, assert }) => {
     const user = await createUser('ada@example.com')

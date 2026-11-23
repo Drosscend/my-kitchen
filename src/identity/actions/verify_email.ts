@@ -1,8 +1,10 @@
 import { inject } from '@adonisjs/core'
+import mail from '@adonisjs/mail/services/main'
 import { err, ok, type Result } from '#core/result'
 import { EmailAddress } from '#identity/domain/email_address'
 import { hashSecureToken, type InvalidTokenError } from '#identity/domain/secure_token'
 import { UserIdentifier } from '#identity/domain/user_identifier'
+import EmailChangedMail from '#identity/mails/email_changed_mail'
 import { EmailVerificationTokenRepository } from '#identity/repositories/email_verification_token_repository'
 import { UserRepository, type EmailAlreadyTakenError } from '#identity/repositories/user_repository'
 import { TransactionManager } from '#shared/services/transaction_manager'
@@ -26,24 +28,37 @@ export class VerifyEmail {
   async execute(params: VerifyEmailParams): Promise<VerifyEmailResult> {
     const tokenHash = hashSecureToken(params.token)
 
-    return this.transactions.run(async () => {
+    const outcome = await this.transactions.run(async () => {
       const token = await this.tokens.findValid(tokenHash, new Date())
       const email = token ? EmailAddress.create(token.email) : null
 
       if (!token || !email?.ok) {
-        return err({ type: 'invalid_token' })
+        return err({ type: 'invalid_token' as const })
       }
 
       const userId = UserIdentifier.fromString(token.userId)
       const owner = await this.users.findUserByEmail(email.value)
 
       if (owner && owner.id !== token.userId) {
-        return err({ type: 'email_already_taken' })
+        return err({ type: 'email_already_taken' as const })
       }
 
+      const previous = await this.users.findUserById(userId)
       const user = await this.users.markEmailVerified(userId, email.value, new Date())
       await this.tokens.deleteForUser(userId)
-      return ok(user)
+      return ok({ user, previousEmail: previous?.email ?? user.email })
     })
+
+    if (!outcome.ok) {
+      return outcome
+    }
+
+    const { user, previousEmail } = outcome.value
+
+    if (previousEmail !== user.email) {
+      await mail.sendLater(new EmailChangedMail(previousEmail, user.email, new Date()))
+    }
+
+    return ok(user)
   }
 }

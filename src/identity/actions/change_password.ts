@@ -1,5 +1,6 @@
 import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
+import mail from '@adonisjs/mail/services/main'
 import { err, ok, type Result } from '#core/result'
 import {
   confirmCurrentPassword,
@@ -7,6 +8,7 @@ import {
   type InvalidCredentialsError,
   type InvalidPasswordError,
 } from '#identity/domain/password'
+import PasswordChangedMail from '#identity/mails/password_changed_mail'
 import { EmailVerificationTokenRepository } from '#identity/repositories/email_verification_token_repository'
 import { PasswordResetTokenRepository } from '#identity/repositories/password_reset_token_repository'
 import { UserRepository } from '#identity/repositories/user_repository'
@@ -51,16 +53,19 @@ export class ChangePassword {
     const userId = params.user.getIdentifier()
     const passwordHash = await hash.make(password.value)
 
-    return this.transactions.run(async () => {
-      const user = await this.users.updatePassword(userId, passwordHash)
+    const user = await this.transactions.run(async () => {
+      const updated = await this.users.updatePassword(userId, passwordHash)
 
       /**
        * A reset link or an address change requested before the change
        * must not undo it.
        */
       await this.resetTokens.deleteForUser(userId)
-      await this.verificationTokens.deleteAddressChangesForUser(userId, user.emailAddress)
-      return ok(user)
+      await this.verificationTokens.deleteAddressChangesForUser(userId, updated.emailAddress)
+      return updated
     })
+
+    await mail.sendLater(new PasswordChangedMail(user.email, new Date()))
+    return ok(user)
   }
 }

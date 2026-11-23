@@ -1,9 +1,11 @@
 import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
+import mail from '@adonisjs/mail/services/main'
 import { err, ok, type Result } from '#core/result'
 import { validatePassword, type InvalidPasswordError } from '#identity/domain/password'
 import { hashSecureToken, type InvalidTokenError } from '#identity/domain/secure_token'
 import { UserIdentifier } from '#identity/domain/user_identifier'
+import PasswordChangedMail from '#identity/mails/password_changed_mail'
 import { EmailVerificationTokenRepository } from '#identity/repositories/email_verification_token_repository'
 import { PasswordResetTokenRepository } from '#identity/repositories/password_reset_token_repository'
 import { UserRepository } from '#identity/repositories/user_repository'
@@ -36,7 +38,7 @@ export class ResetPassword {
 
     const tokenHash = hashSecureToken(params.token)
 
-    return this.transactions.run(async () => {
+    const result: ResetPasswordResult = await this.transactions.run(async () => {
       const token = await this.tokens.findValid(tokenHash, new Date())
 
       if (!token) {
@@ -49,5 +51,11 @@ export class ResetPassword {
       await this.verificationTokens.deleteAddressChangesForUser(userId, user.emailAddress)
       return ok(user)
     })
+
+    if (result.ok) {
+      await mail.sendLater(new PasswordChangedMail(result.value.email, new Date()))
+    }
+
+    return result
   }
 }

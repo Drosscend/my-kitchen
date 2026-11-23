@@ -1,3 +1,4 @@
+import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
 import { today } from '#inventory/domain/expiry'
 import { authorize } from '#tests/helpers/oauth'
@@ -88,7 +89,11 @@ function errorText(response: ApiResponse) {
 const FLOUR = { name: 'Farine', quantity: 500, unit: 'g', category: 'starches' }
 
 test.group('MCP', (group) => {
-  group.each.setup(() => resetState())
+  group.each.setup(async () => {
+    await resetState()
+    mail.fake()
+    return () => mail.restore()
+  })
 
   test('refuses requests without a valid access token', async ({ client, assert }) => {
     const missing = await rpc(client, null, 'tools/list', {})

@@ -9,6 +9,7 @@ import { createUser, TEST_PASSWORD } from '#tests/helpers/users'
 test.group('Password reset', (group) => {
   group.each.setup(async () => {
     await resetState()
+    mail.fake()
     return () => mail.restore()
   })
 
