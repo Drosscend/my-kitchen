@@ -1,7 +1,7 @@
 import { Form, useRouter } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
 import { cn } from 'cn'
-import { LogOutIcon, PlugIcon, Trash2Icon } from 'lucide-react'
+import { LockIcon, LogOutIcon, PlugIcon, Trash2Icon } from 'lucide-react'
 import { type ReactNode } from 'react'
 import { type Data } from '@generated/data'
 import { ConfirmDeleteDialog } from '~/components/confirm_delete_dialog'
@@ -10,11 +10,14 @@ import { Page, PageHeader } from '~/components/page'
 import { Button } from '~/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
+import { Label } from '~/components/ui/label'
+import { Switch } from '~/components/ui/switch'
 import { type InertiaProps } from '~/types'
 
 type PageProps = InertiaProps<{
   account: Data.Identity.AccountDetails
   oauthConnections: Data.Identity.OauthConnection[]
+  notifications: Data.Notifications.NotificationSettings
   mcpUrl: string
   googleSignIn: boolean
 }>
@@ -24,16 +27,21 @@ function formatDate(value: string) {
 }
 
 function Section({
+  id,
   title,
   destructive,
   children,
 }: {
+  id?: string
   title: string
   destructive?: boolean
   children: ReactNode
 }) {
   return (
-    <section className="grid grid-cols-1 gap-4 border-t py-8 first:border-t-0 first:pt-0 last:pb-0 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-10">
+    <section
+      id={id}
+      className="grid scroll-mt-6 grid-cols-1 gap-4 border-t py-8 first:border-t-0 first:pt-0 last:pb-0 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-10"
+    >
       <h2 className="text-lg md:pt-5">{title}</h2>
       <div
         className={cn(
@@ -44,6 +52,45 @@ function Section({
         {children}
       </div>
     </section>
+  )
+}
+
+function NotificationSettings({
+  notifications,
+}: {
+  notifications: Data.Notifications.NotificationSettings
+}) {
+  const router = useRouter()
+
+  return (
+    <div className="[--notification-columns:minmax(0,1fr)_5rem]">
+      <div className="grid grid-cols-(--notification-columns) pb-1 text-xs font-medium text-muted-foreground">
+        <span className="sr-only">Alerte</span>
+        <span className="col-start-2 text-center">E-mail</span>
+      </div>
+      <div className="grid min-h-12 grid-cols-(--notification-columns) items-center">
+        <Label htmlFor="expiry-mail">Péremption</Label>
+        <div className="flex justify-center">
+          <Switch
+            id="expiry-mail"
+            checked={notifications.expiryMail}
+            onCheckedChange={(expiryMail) =>
+              router.visit(
+                { route: 'account.notifications.update' },
+                { preserveScroll: true, preserveState: true, data: { expiryMail } }
+              )
+            }
+          />
+        </div>
+      </div>
+      <div className="grid min-h-12 grid-cols-(--notification-columns) items-center border-t">
+        <Label htmlFor="security-mail">Sécurité du compte</Label>
+        <div className="flex items-center justify-center gap-1.5 pl-5">
+          <Switch id="security-mail" checked disabled />
+          <LockIcon aria-hidden="true" className="size-3.5 text-muted-foreground" />
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -74,6 +121,7 @@ function RevokeConnectionDialog({ connection }: { connection: Data.Identity.Oaut
 export default function ShowAccount({
   account,
   oauthConnections,
+  notifications,
   mcpUrl,
   googleSignIn,
 }: PageProps) {
@@ -154,6 +202,10 @@ export default function ShowAccount({
                 </FieldGroup>
               )}
             </Form>
+          </Section>
+
+          <Section id="notifications" title="Notifications">
+            <NotificationSettings notifications={notifications} />
           </Section>
 
           {(googleSignIn || account.googleLinked) && (

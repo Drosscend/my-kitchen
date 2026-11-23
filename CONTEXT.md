@@ -60,3 +60,14 @@ A frozen copy of a recipe under a six digit code, valid six hours after its last
 
 **Synced timer**:
 A running timer stores when it started in server time; a paused one stores what is left. Every device derives the remaining time from the server clock.
+
+## Notifications
+
+**Expiry digest**:
+The morning mail, sent at 8 h Paris time, listing the batches of a user that became expiring soon, expired or to check since the previous digest. A day with nothing new sends nothing. Only confirmed accounts receive it. "Point du matin" in the interface.
+
+**Expiry notice**:
+The memory that a batch was mailed with a given status and date. A batch is mailed again once its status or its date changes; the notice of a removed batch is forgotten.
+
+**Notification settings**:
+The channels a user chose for each alert. The expiry digest is on until the user turns it off, from the account page or the unsubscribe button of their mailbox. Security mails, sent on a new connected application or a changed address or password, cannot be turned off.

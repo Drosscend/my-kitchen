@@ -104,6 +104,18 @@ const routes = {
     tokens: [[0,"recipes"],[1,"id"]],
     types: placeholder as Registry['recipes.destroy']['types'],
   },
+  'account.notifications.update': {
+    methods: ["PUT"],
+    pattern: '/account/notifications',
+    tokens: [[0,"account"],[0,"notifications"]],
+    types: placeholder as Registry['account.notifications.update']['types'],
+  },
+  'notifications.unsubscribe': {
+    methods: ["POST"],
+    pattern: '/notifications/unsubscribe/:token',
+    tokens: [[0,"notifications"],[0,"unsubscribe"],[1,"token"]],
+    types: placeholder as Registry['notifications.unsubscribe']['types'],
+  },
   'mcp': {
     methods: ["POST","GET","DELETE"],
     pattern: '/mcp',

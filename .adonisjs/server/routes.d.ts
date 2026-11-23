@@ -20,6 +20,8 @@ export type ScannedRoutes = {
     'recipes.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'account.notifications.update': { paramsTuple?: []; params?: {} }
+    'notifications.unsubscribe': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'mcp': { paramsTuple?: []; params?: {} }
     'mcp.protected_resource': { paramsTuple?: []; params?: {} }
     'mcp.protected_resource.root': { paramsTuple?: []; params?: {} }
@@ -121,6 +123,7 @@ export type ScannedRoutes = {
     'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.batches.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.store': { paramsTuple?: []; params?: {} }
+    'notifications.unsubscribe': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'mcp': { paramsTuple?: []; params?: {} }
     'oauth.authorization.approve': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
     'oauth.authorization.deny': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
@@ -152,6 +155,7 @@ export type ScannedRoutes = {
   }
   PUT: {
     'recipes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'account.notifications.update': { paramsTuple?: []; params?: {} }
   }
 }
 declare module '@adonisjs/core/types/http' {

@@ -24,6 +24,28 @@ export interface ApiDefinition {
     update: typeof routes['recipes.update']
     destroy: typeof routes['recipes.destroy']
   }
+  account: {
+    notifications: {
+      update: typeof routes['account.notifications.update']
+    }
+    show: typeof routes['account.show']
+    profile: {
+      update: typeof routes['account.profile.update']
+    }
+    email: {
+      update: typeof routes['account.email.update']
+    }
+    password: {
+      update: typeof routes['account.password.update']
+    }
+    destroy: typeof routes['account.destroy']
+    oauthConnections: {
+      destroy: typeof routes['account.oauth_connections.destroy']
+    }
+  }
+  notifications: {
+    unsubscribe: typeof routes['notifications.unsubscribe']
+  }
   mcp: typeof routes['mcp'] & {
     protectedResource: typeof routes['mcp.protected_resource'] & {
       root: typeof routes['mcp.protected_resource.root']
@@ -65,22 +87,6 @@ export interface ApiDefinition {
     verify: typeof routes['verification.verify']
     notice: typeof routes['verification.notice']
     resend: typeof routes['verification.resend']
-  }
-  account: {
-    show: typeof routes['account.show']
-    profile: {
-      update: typeof routes['account.profile.update']
-    }
-    email: {
-      update: typeof routes['account.email.update']
-    }
-    password: {
-      update: typeof routes['account.password.update']
-    }
-    destroy: typeof routes['account.destroy']
-    oauthConnections: {
-      destroy: typeof routes['account.oauth_connections.destroy']
-    }
   }
   cooking: {
     start: typeof routes['cooking.start']
