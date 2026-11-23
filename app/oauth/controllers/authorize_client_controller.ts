@@ -1,7 +1,7 @@
 import { inject } from '@adonisjs/core'
 import { findPendingAuthorization } from '#app/oauth/interaction'
 import { MCP_SCOPE, mcpResourceUrl, oauthProvider } from '#app/oauth/provider'
-import { NameOAuthConnection } from '#identity/actions/name_oauth_connection'
+import { RecordOAuthConnection } from '#identity/actions/record_oauth_connection'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export const EXPIRED_AUTHORIZATION_MESSAGE =
@@ -13,7 +13,7 @@ export const EXPIRED_AUTHORIZATION_MESSAGE =
  */
 @inject()
 export default class AuthorizeClientController {
-  constructor(private readonly nameOAuthConnection: NameOAuthConnection) {}
+  constructor(private readonly recordOAuthConnection: RecordOAuthConnection) {}
 
   async render(ctx: HttpContext) {
     const authorization = await findPendingAuthorization(ctx)
@@ -39,12 +39,17 @@ export default class AuthorizeClientController {
       return ctx.response.redirect().toRoute('account.show')
     }
 
-    const accountId = ctx.auth.getUserOrFail().getIdentifier().toString()
+    const user = ctx.auth.getUserOrFail()
+    const accountId = user.getIdentifier().toString()
     const grant = new oauthProvider.Grant({ accountId, clientId: authorization.clientId })
     grant.addOIDCScope('openid offline_access')
     grant.addResourceScope(mcpResourceUrl, MCP_SCOPE)
     const grantId = await grant.save()
-    await this.nameOAuthConnection.execute({ grantId, clientName: authorization.clientName })
+    await this.recordOAuthConnection.execute({
+      user,
+      grantId,
+      clientName: authorization.clientName,
+    })
 
     const redirectTo = await oauthProvider.interactionResult(
       ctx.request.request,
