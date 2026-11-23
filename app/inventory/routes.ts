@@ -17,6 +17,8 @@ const RemoveIngredientBatchController = () =>
   import('#app/inventory/controllers/remove_ingredient_batch_controller')
 const InventoryMarkdownController = () =>
   import('#app/inventory/controllers/inventory_markdown_controller')
+const UpdateExpiryWarningsController = () =>
+  import('#app/inventory/controllers/update_expiry_warnings_controller')
 
 router
   .group(() => {
@@ -39,5 +41,8 @@ router
     router
       .delete('inventory/:id/batches/:batchId', [RemoveIngredientBatchController, 'execute'])
       .as('inventory.batches.destroy')
+    router
+      .put('account/expiry-warnings', [UpdateExpiryWarningsController, 'execute'])
+      .as('account.expiry_warnings.update')
   })
   .use([middleware.auth(), middleware.verified()])

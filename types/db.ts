@@ -49,6 +49,13 @@ export interface ExpiryNotices {
   user_id: string;
 }
 
+export interface ExpiryWarnings {
+  category: string;
+  perishable_days: number | null;
+  shelf_stable_days: number | null;
+  user_id: string;
+}
+
 export interface IngredientBatches {
   created_at: Generated<Timestamp>;
   expires_on: Timestamp | null;
@@ -156,6 +163,7 @@ export interface DB {
   cooking_sessions: CookingSessions;
   email_verification_tokens: EmailVerificationTokens;
   expiry_notices: ExpiryNotices;
+  expiry_warnings: ExpiryWarnings;
   ingredient_batches: IngredientBatches;
   ingredients: Ingredients;
   notification_settings: NotificationSettings;

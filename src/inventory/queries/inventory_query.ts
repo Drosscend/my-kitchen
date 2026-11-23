@@ -18,8 +18,10 @@ import {
   isMoreUrgent,
   parseExpiry,
   today,
+  warningDaysFor,
   type ExpiryStatus,
 } from '#inventory/domain/expiry'
+import { ExpiryWarningsQuery } from '#inventory/queries/expiry_warnings_query'
 import { TransactionManager } from '#shared/services/transaction_manager'
 import type { UserIdentifier } from '#identity/domain/user_identifier'
 
@@ -95,7 +97,10 @@ function expiresWithin(item: IngredientView, days: number) {
  */
 @inject()
 export class InventoryQuery {
-  constructor(private readonly transactions: TransactionManager) {}
+  constructor(
+    private readonly transactions: TransactionManager,
+    private readonly expiryWarnings: ExpiryWarningsQuery
+  ) {}
 
   async execute(userId: UserIdentifier, filters: InventoryFilters = {}): Promise<IngredientView[]> {
     const database = this.transactions.currentDatabase()
@@ -118,7 +123,7 @@ export class InventoryQuery {
       query = query.where('state', '=', filters.state)
     }
 
-    const [records, batchRecords] = await Promise.all([
+    const [records, batchRecords, warnings] = await Promise.all([
       query.orderBy('name').execute(),
       database
         .selectFrom('ingredient_batches')
@@ -134,8 +139,10 @@ export class InventoryQuery {
         .orderBy(sql`ingredient_batches.expires_on asc nulls last`)
         .orderBy('ingredient_batches.created_at')
         .execute(),
+      this.expiryWarnings.execute(userId),
     ])
     const now = today()
+    const warningDays = new Map(warnings.map((warning) => [warning.category, warning.warningDays]))
     const batchesByIngredient = Map.groupBy(batchRecords, (batch) => batch.ingredient_id)
 
     return records
@@ -150,7 +157,12 @@ export class InventoryQuery {
             expiresOn: expiry?.on ?? null,
             expiryKind: expiry?.kind ?? null,
             expiryKindLabel: expiry ? EXPIRY_KINDS[expiry.kind].label : null,
-            expiryStatus: expiryStatus(expiry, { category, state, today: now }),
+            expiryStatus: expiryStatus(expiry, {
+              category,
+              state,
+              today: now,
+              warningDays: warningDays.get(category) ?? warningDaysFor(category),
+            }),
             daysLeft: expiry ? daysUntil(expiry.on, now) : null,
           }
         })

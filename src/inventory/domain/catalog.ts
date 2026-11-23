@@ -5,6 +5,7 @@
  * A batch that truly spoils (a use by date, or a perishable fresh product)
  * warns `perishableWarningDays` ahead, any other one `shelfStableWarningDays`.
  * The only source for these values, the client receives them as page props.
+ * The warning days are defaults a user may override per category.
  */
 export const INGREDIENT_CATEGORIES = {
   vegetables: {

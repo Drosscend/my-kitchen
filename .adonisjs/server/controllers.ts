@@ -37,6 +37,7 @@ export const controllers = {
     InventoryMarkdown: () => import('#app/inventory/controllers/inventory_markdown_controller'),
     RemoveIngredientBatch: () => import('#app/inventory/controllers/remove_ingredient_batch_controller'),
     RemoveIngredient: () => import('#app/inventory/controllers/remove_ingredient_controller'),
+    UpdateExpiryWarnings: () => import('#app/inventory/controllers/update_expiry_warnings_controller'),
     UpdateIngredientBatch: () => import('#app/inventory/controllers/update_ingredient_batch_controller'),
     UpdateIngredient: () => import('#app/inventory/controllers/update_ingredient_controller'),
   },
