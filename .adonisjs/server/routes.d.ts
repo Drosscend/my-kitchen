@@ -21,6 +21,9 @@ export type ScannedRoutes = {
     'recipes.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account.notifications.update': { paramsTuple?: []; params?: {} }
+    'account.push_devices.store': { paramsTuple?: []; params?: {} }
+    'account.push_devices.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'account.push_devices.test': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.unsubscribe': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'mcp': { paramsTuple?: []; params?: {} }
     'mcp.protected_resource': { paramsTuple?: []; params?: {} }
@@ -123,6 +126,8 @@ export type ScannedRoutes = {
     'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.batches.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recipes.store': { paramsTuple?: []; params?: {} }
+    'account.push_devices.store': { paramsTuple?: []; params?: {} }
+    'account.push_devices.test': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.unsubscribe': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'mcp': { paramsTuple?: []; params?: {} }
     'oauth.authorization.approve': { paramsTuple: [ParamValue]; params: {'uid': ParamValue} }
@@ -149,6 +154,7 @@ export type ScannedRoutes = {
     'inventory.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.batches.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'batchId': ParamValue} }
     'recipes.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'account.push_devices.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'mcp': { paramsTuple?: []; params?: {} }
     'account.destroy': { paramsTuple?: []; params?: {} }
     'account.oauth_connections.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

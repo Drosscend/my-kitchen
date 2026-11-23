@@ -17,7 +17,7 @@ export default class UnsubscribeController {
       return response.notFound()
     }
 
-    await this.updateNotificationSettings.execute({ userId, expiryMail: false })
+    await this.updateNotificationSettings.execute({ userId, changes: { expiryMail: false } })
     return response.noContent()
   }
 }

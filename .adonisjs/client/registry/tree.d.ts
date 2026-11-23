@@ -28,6 +28,11 @@ export interface ApiDefinition {
     notifications: {
       update: typeof routes['account.notifications.update']
     }
+    pushDevices: {
+      store: typeof routes['account.push_devices.store']
+      destroy: typeof routes['account.push_devices.destroy']
+      test: typeof routes['account.push_devices.test']
+    }
     show: typeof routes['account.show']
     profile: {
       update: typeof routes['account.profile.update']

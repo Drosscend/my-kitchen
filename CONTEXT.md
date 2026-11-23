@@ -64,10 +64,13 @@ A running timer stores when it started in server time; a paused one stores what 
 ## Notifications
 
 **Expiry digest**:
-The morning mail, sent at 8 h Paris time, listing the batches of a user that became expiring soon, expired or to check since the previous digest. A day with nothing new sends nothing. Only confirmed accounts receive it. "Point du matin" in the interface.
+The morning mail and push, sent at 8 h Paris time, listing the batches of a user that became expiring soon, expired or to check since the previous digest. A day with nothing new sends nothing. Only confirmed accounts receive it. "Point du matin" in the interface.
 
 **Expiry notice**:
-The memory that a batch was mailed with a given status and date. A batch is mailed again once its status or its date changes; the notice of a removed batch is forgotten.
+The memory that a batch was notified with a given status and date. A batch is notified again once its status or its date changes; the notice of a removed batch is forgotten.
 
 **Notification settings**:
-The channels a user chose for each alert. The expiry digest is on until the user turns it off, from the account page or the unsubscribe button of their mailbox. Security mails, sent on a new connected application or a changed address or password, cannot be turned off.
+The channels a user chose for each alert, by e-mail and by push. The expiry digest is on until the user turns it off, from the account page or the unsubscribe button of their mailbox. Security mails, sent on a new connected application or a changed address or password, cannot be turned off. Push settings are on by default and only apply once the user added a device.
+
+**Device**:
+A browser that accepted push notifications for an account, named after its browser and system. The same browser added by another account moves to it. A device that unsubscribed or uninstalled the app is forgotten the next time a push reaches it. On iPhone and iPad, only the app installed on the home screen can be added. "Appareil" in the interface.

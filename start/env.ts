@@ -46,6 +46,10 @@ const env = await Env.create(new URL('../', import.meta.url), {
   // Google sign-in, off until both are set (OAuth client of Google Cloud)
   GOOGLE_CLIENT_ID: Env.schema.string.optional(),
   GOOGLE_CLIENT_SECRET: Env.schema.secret.optional(),
+
+  // Web push, off until both are set (npx web-push generate-vapid-keys)
+  VAPID_PUBLIC_KEY: Env.schema.string.optional(),
+  VAPID_PRIVATE_KEY: Env.schema.secret.optional(),
 })
 
 try {

@@ -3,6 +3,6 @@ import type { NotificationSettings } from '#notifications/queries/notification_s
 
 export default class NotificationSettingsTransformer extends BaseTransformer<NotificationSettings> {
   toObject() {
-    return this.pick(this.resource, ['expiryMail'])
+    return this.pick(this.resource, ['expiryMail', 'expiryPush', 'securityPush'])
   }
 }

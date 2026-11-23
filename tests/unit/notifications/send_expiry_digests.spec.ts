@@ -3,10 +3,12 @@ import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
 import { AddIngredient, type AddIngredientParams } from '#inventory/actions/add_ingredient'
 import { today } from '#inventory/domain/expiry'
+import { AddPushDevice } from '#notifications/actions/add_push_device'
 import { SendExpiryDigests } from '#notifications/actions/send_expiry_digests'
 import { UpdateNotificationSettings } from '#notifications/actions/update_notification_settings'
 import ExpiryDigestMail from '#notifications/mails/expiry_digest_mail'
 import { db } from '#shared/services/db'
+import { fakePushSender, restorePushSender } from '#tests/helpers/push'
 import { resetState } from '#tests/helpers/state'
 import { createUser } from '#tests/helpers/users'
 import type { User } from '#identity/domain/user'
@@ -55,7 +57,10 @@ async function sentDigest(mailer: ReturnType<typeof mail.fake>) {
 test.group('SendExpiryDigests', (group) => {
   group.each.setup(async () => {
     await resetState()
-    return () => mail.restore()
+    return () => {
+      mail.restore()
+      restorePushSender()
+    }
   })
 
   test('mails the expired, soon and to check batches, not the others', async ({ assert }) => {
@@ -110,7 +115,10 @@ test.group('SendExpiryDigests', (group) => {
     await addIngredient(ada, { expiresOn: inDays(-1) })
     await addIngredient(grace, { expiresOn: inDays(-1) })
     const updateNotificationSettings = await app.container.make(UpdateNotificationSettings)
-    await updateNotificationSettings.execute({ userId: ada.getIdentifier(), expiryMail: false })
+    await updateNotificationSettings.execute({
+      userId: ada.getIdentifier(),
+      changes: { expiryMail: false },
+    })
 
     assert.deepEqual(await sendDigests(), { sent: 0, failed: 0 })
     mailer.mails.assertSentCount(ExpiryDigestMail, 0)
@@ -126,5 +134,33 @@ test.group('SendExpiryDigests', (group) => {
     await sendDigests()
 
     assert.lengthOf(await db.selectFrom('expiry_notices').selectAll().execute(), 0)
+  })
+
+  test('pushes the digest to the devices, even with the mail off', async ({ assert }) => {
+    const mailer = mail.fake()
+    const sender = fakePushSender()
+    const ada = await createUser('ada@example.com')
+    await addIngredient(ada, { name: 'Yaourts', expiresOn: inDays(-1) })
+    const addPushDevice = await app.container.make(AddPushDevice)
+    await addPushDevice.execute({
+      userId: ada.getIdentifier(),
+      endpoint: 'https://push.example/one',
+      p256dh: 'p256dh-key',
+      auth: 'auth-secret',
+      userAgent: '',
+    })
+    const updateNotificationSettings = await app.container.make(UpdateNotificationSettings)
+    await updateNotificationSettings.execute({
+      userId: ada.getIdentifier(),
+      changes: { expiryMail: false },
+    })
+
+    assert.deepEqual(await sendDigests(), { sent: 1, failed: 0 })
+    mailer.mails.assertSentCount(ExpiryDigestMail, 0)
+    assert.deepEqual(
+      sender.sent.map((push) => push.message),
+      [{ title: 'Yaourts à surveiller', body: '1 périmé', url: '/inventory' }]
+    )
+    assert.deepEqual(await sendDigests(), { sent: 0, failed: 0 })
   })
 })

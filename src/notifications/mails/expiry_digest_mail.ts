@@ -1,16 +1,20 @@
 import { BaseMail } from '@adonisjs/mail'
 import { appUrl } from '#config/app'
 import { EXPIRY_KINDS, unitLabel } from '#inventory/domain/catalog'
-import type { ExpiryAlert, ExpiryAlertStatus } from '#notifications/domain/expiry_alert'
+import {
+  expiryAlertTitle,
+  expiryDigestHeadline,
+  expiryDigestSummary,
+  groupExpiryAlerts,
+  type ExpiryAlert,
+  type ExpiryAlertStatus,
+} from '#notifications/domain/expiry_alert'
 
-const groups = {
-  expired: { title: 'Périmé', dot: '#e2684a', stampBackground: '#fde6dd', stampColor: '#8a2a15' },
-  soon: { title: 'Bientôt', dot: '#e9b949', stampBackground: '#fff1c4', stampColor: '#6a4700' },
-  check: { title: 'À vérifier', dot: '#b08a45', stampBackground: '#f3e7cf', stampColor: '#6e5320' },
-} satisfies Record<
-  ExpiryAlertStatus,
-  { title: string; dot: string; stampBackground: string; stampColor: string }
->
+const swatches = {
+  expired: { dot: '#e2684a', stampBackground: '#fde6dd', stampColor: '#8a2a15' },
+  soon: { dot: '#e9b949', stampBackground: '#fff1c4', stampColor: '#6a4700' },
+  check: { dot: '#b08a45', stampBackground: '#f3e7cf', stampColor: '#6e5320' },
+} satisfies Record<ExpiryAlertStatus, { dot: string; stampBackground: string; stampColor: string }>
 
 const quantityFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 })
 const headingDate = new Intl.DateTimeFormat('fr-FR', {
@@ -56,24 +60,13 @@ export default class ExpiryDigestMail extends BaseMail {
   }
 
   prepare() {
-    const sections = (['expired', 'soon', 'check'] as const)
-      .map((status) => ({
-        ...groups[status],
-        items: this.alerts
-          .filter((alert) => alert.status === status)
-          .toSorted((a, b) => a.expiresOn.localeCompare(b.expiresOn))
-          .map(describe),
-      }))
-      .filter((section) => section.items.length > 0)
-    const [first] = sections[0].items
-    const others = this.alerts.length - 1
-    const subject =
-      others === 0
-        ? `${first.name} à surveiller`
-        : `${first.name} et ${others} ${others > 1 ? 'autres produits' : 'autre produit'} à surveiller`
-    const preheader = sections
-      .map((section) => `${section.items.length} ${section.title.toLowerCase()}`)
-      .join(', ')
+    const sections = groupExpiryAlerts(this.alerts).map((group) => ({
+      ...swatches[group.status],
+      title: expiryAlertTitle(group.status),
+      items: group.alerts.map(describe),
+    }))
+    const subject = expiryDigestHeadline(this.alerts)
+    const preheader = expiryDigestSummary(this.alerts)
     const date = headingDate.format(new Date())
     const inventoryUrl = `${appUrl}/inventory`
     const settingsUrl = `${appUrl}/account#notifications`

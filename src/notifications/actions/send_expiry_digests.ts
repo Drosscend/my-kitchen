@@ -2,7 +2,10 @@ import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import mail from '@adonisjs/mail/services/main'
 import { InventoryQuery, type IngredientView } from '#inventory/queries/inventory_query'
+import { NotifyDevices } from '#notifications/actions/notify_devices'
 import {
+  expiryDigestHeadline,
+  expiryDigestSummary,
   isExpiryAlertStatus,
   noticeKey,
   type ExpiryAlert,
@@ -35,7 +38,7 @@ function expiryAlerts(item: IngredientView): ExpiryAlert[] {
 }
 
 /**
- * Mails each recipient the batches that entered their warning window or
+ * Mails and pushes each recipient the batches that entered their warning window or
  * passed their date since the previous digest, then remembers them.
  */
 @inject()
@@ -43,7 +46,8 @@ export class SendExpiryDigests {
   constructor(
     private readonly recipients: ExpiryDigestRecipientsQuery,
     private readonly inventory: InventoryQuery,
-    private readonly notices: ExpiryNoticeRepository
+    private readonly notices: ExpiryNoticeRepository,
+    private readonly devices: NotifyDevices
   ) {}
 
   async execute() {
@@ -62,13 +66,27 @@ export class SendExpiryDigests {
         continue
       }
 
-      try {
-        await mail.send(
-          new ExpiryDigestMail(recipient.email, signUnsubscribeToken(recipient.userId), alerts)
-        )
-      } catch (error) {
-        logger.error({ err: error, userId: recipient.userId.toString() }, 'expiry digest failed')
-        failed += 1
+      const pushed = await this.devices.execute({
+        userId: recipient.userId,
+        alert: 'expiry',
+        message: {
+          title: expiryDigestHeadline(alerts),
+          body: expiryDigestSummary(alerts),
+          url: '/inventory',
+        },
+      })
+
+      if (recipient.expiryMail) {
+        try {
+          await mail.send(
+            new ExpiryDigestMail(recipient.email, signUnsubscribeToken(recipient.userId), alerts)
+          )
+        } catch (error) {
+          logger.error({ err: error, userId: recipient.userId.toString() }, 'expiry digest failed')
+          failed += 1
+          continue
+        }
+      } else if (pushed === 0) {
         continue
       }
 

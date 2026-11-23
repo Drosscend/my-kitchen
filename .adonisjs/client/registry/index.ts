@@ -110,6 +110,24 @@ const routes = {
     tokens: [[0,"account"],[0,"notifications"]],
     types: placeholder as Registry['account.notifications.update']['types'],
   },
+  'account.push_devices.store': {
+    methods: ["POST"],
+    pattern: '/account/push-devices',
+    tokens: [[0,"account"],[0,"push-devices"]],
+    types: placeholder as Registry['account.push_devices.store']['types'],
+  },
+  'account.push_devices.destroy': {
+    methods: ["DELETE"],
+    pattern: '/account/push-devices/:id',
+    tokens: [[0,"account"],[0,"push-devices"],[1,"id"]],
+    types: placeholder as Registry['account.push_devices.destroy']['types'],
+  },
+  'account.push_devices.test': {
+    methods: ["POST"],
+    pattern: '/account/push-devices/:id/test',
+    tokens: [[0,"account"],[0,"push-devices"],[1,"id"],[0,"test"]],
+    types: placeholder as Registry['account.push_devices.test']['types'],
+  },
   'notifications.unsubscribe': {
     methods: ["POST"],
     pattern: '/notifications/unsubscribe/:token',

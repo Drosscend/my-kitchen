@@ -1,7 +1,18 @@
 import { Form, useRouter } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
 import { cn } from 'cn'
-import { LockIcon, LogOutIcon, PlugIcon, Trash2Icon } from 'lucide-react'
+import {
+  BellOffIcon,
+  BellPlusIcon,
+  LockIcon,
+  LogOutIcon,
+  MonitorIcon,
+  PlugIcon,
+  SendIcon,
+  ShareIcon,
+  SmartphoneIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { type ReactNode } from 'react'
 import { type Data } from '@generated/data'
 import { ConfirmDeleteDialog } from '~/components/confirm_delete_dialog'
@@ -10,14 +21,16 @@ import { Page, PageHeader } from '~/components/page'
 import { Button } from '~/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
-import { Label } from '~/components/ui/label'
 import { Switch } from '~/components/ui/switch'
+import { usePushSubscription } from '~/notifications/use_push_subscription'
 import { type InertiaProps } from '~/types'
 
 type PageProps = InertiaProps<{
   account: Data.Identity.AccountDetails
   oauthConnections: Data.Identity.OauthConnection[]
   notifications: Data.Notifications.NotificationSettings
+  pushDevices: Data.Notifications.PushDevice[]
+  vapidPublicKey: string | null
   mcpUrl: string
   googleSignIn: boolean
 }>
@@ -57,39 +70,186 @@ function Section({
 
 function NotificationSettings({
   notifications,
+  pushDevices,
+  vapidPublicKey,
 }: {
   notifications: Data.Notifications.NotificationSettings
+  pushDevices: Data.Notifications.PushDevice[]
+  vapidPublicKey: string | null
 }) {
   const router = useRouter()
+  const push = usePushSubscription()
+  const hasDevice = pushDevices.length > 0
+  const thisDeviceAdded = pushDevices.some((device) => device.endpoint === push.endpoint)
+
+  function update(changes: Partial<Data.Notifications.NotificationSettings>) {
+    router.visit(
+      { route: 'account.notifications.update' },
+      { preserveScroll: true, preserveState: true, data: changes }
+    )
+  }
+
+  async function addThisDevice(publicKey: string) {
+    const subscription = await push.subscribe(publicKey)
+
+    if (subscription) {
+      router.visit(
+        { route: 'account.push_devices.store' },
+        { preserveScroll: true, preserveState: true, data: subscription }
+      )
+    }
+  }
+
+  async function removeDevice(device: Data.Notifications.PushDevice) {
+    if (device.endpoint === push.endpoint) {
+      await push.unsubscribe()
+    }
+
+    router.visit(
+      { route: 'account.push_devices.destroy', routeParams: { id: device.id } },
+      { preserveScroll: true, preserveState: true }
+    )
+  }
 
   return (
-    <div className="[--notification-columns:minmax(0,1fr)_5rem]">
-      <div className="grid grid-cols-(--notification-columns) pb-1 text-xs font-medium text-muted-foreground">
-        <span className="sr-only">Alerte</span>
-        <span className="col-start-2 text-center">E-mail</span>
-      </div>
-      <div className="grid min-h-12 grid-cols-(--notification-columns) items-center">
-        <Label htmlFor="expiry-mail">Péremption</Label>
-        <div className="flex justify-center">
-          <Switch
-            id="expiry-mail"
-            checked={notifications.expiryMail}
-            onCheckedChange={(expiryMail) =>
-              router.visit(
-                { route: 'account.notifications.update' },
-                { preserveScroll: true, preserveState: true, data: { expiryMail } }
-              )
-            }
-          />
+    <div className="space-y-6">
+      <div
+        data-push={vapidPublicKey !== null}
+        className="[--notification-columns:minmax(0,1fr)_4.5rem] data-[push=true]:[--notification-columns:minmax(0,1fr)_4.5rem_4.5rem]"
+      >
+        <div className="grid grid-cols-(--notification-columns) pb-1 text-center text-xs font-medium text-muted-foreground">
+          <span className="sr-only">Alerte</span>
+          <span className="col-start-2">E-mail</span>
+          {vapidPublicKey && <span>Push</span>}
+        </div>
+        <div className="grid min-h-12 grid-cols-(--notification-columns) items-center">
+          <span className="text-sm font-medium">Péremption</span>
+          <div className="flex justify-center">
+            <Switch
+              aria-label="Péremption par e-mail"
+              checked={notifications.expiryMail}
+              onCheckedChange={(expiryMail) => update({ expiryMail })}
+            />
+          </div>
+          {vapidPublicKey && (
+            <div className="flex justify-center">
+              <Switch
+                aria-label="Péremption en push"
+                checked={hasDevice && notifications.expiryPush}
+                disabled={!hasDevice}
+                onCheckedChange={(expiryPush) => update({ expiryPush })}
+              />
+            </div>
+          )}
+        </div>
+        <div className="grid min-h-12 grid-cols-(--notification-columns) items-center border-t">
+          <span className="text-sm font-medium">Sécurité du compte</span>
+          <div className="flex items-center justify-center gap-1.5 pl-5">
+            <Switch aria-label="Sécurité du compte par e-mail, toujours envoyé" checked disabled />
+            <LockIcon aria-hidden="true" className="size-3.5 text-muted-foreground" />
+          </div>
+          {vapidPublicKey && (
+            <div className="flex justify-center">
+              <Switch
+                aria-label="Sécurité du compte en push"
+                checked={hasDevice && notifications.securityPush}
+                disabled={!hasDevice}
+                onCheckedChange={(securityPush) => update({ securityPush })}
+              />
+            </div>
+          )}
         </div>
       </div>
-      <div className="grid min-h-12 grid-cols-(--notification-columns) items-center border-t">
-        <Label htmlFor="security-mail">Sécurité du compte</Label>
-        <div className="flex items-center justify-center gap-1.5 pl-5">
-          <Switch id="security-mail" checked disabled />
-          <LockIcon aria-hidden="true" className="size-3.5 text-muted-foreground" />
+
+      {vapidPublicKey && (
+        <div className="space-y-2">
+          <p className="text-sm font-medium">Appareils</p>
+          {hasDevice ? (
+            <ul className="space-y-2">
+              {pushDevices.map((device) => (
+                <li
+                  key={device.id}
+                  className="flex items-center justify-between gap-4 rounded-md bg-muted py-2 pr-2 pl-4"
+                >
+                  <div className="min-w-0">
+                    <p className="flex items-start gap-2 text-sm font-medium">
+                      {/iPhone|iPad|Android/.test(device.label) ? (
+                        <SmartphoneIcon className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+                      ) : (
+                        <MonitorIcon className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+                      )}
+                      <span>
+                        {device.label}
+                        {device.endpoint === push.endpoint && (
+                          <span className="ml-2 inline-block rounded-sm bg-card px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+                            Cet appareil
+                          </span>
+                        )}
+                      </span>
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Ajouté le {formatDate(device.createdAt)}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        router.visit(
+                          { route: 'account.push_devices.test', routeParams: { id: device.id } },
+                          { preserveScroll: true, preserveState: true }
+                        )
+                      }
+                    >
+                      <SendIcon />
+                      Tester
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Retirer ${device.label}`}
+                      onClick={() => removeDevice(device)}
+                    >
+                      <Trash2Icon className="text-muted-foreground" />
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">Aucun appareil</p>
+          )}
+
+          {push.support === 'blocked' && (
+            <p className="flex gap-2.5 rounded-md bg-muted px-4 py-3 text-sm">
+              <BellOffIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <span>
+                <strong className="font-semibold">
+                  Notifications bloquées dans ce navigateur.
+                </strong>{' '}
+                Autorise-les dans les réglages du site, puis recharge la page.
+              </span>
+            </p>
+          )}
+          {push.support === 'install_app' && (
+            <p className="flex gap-2.5 rounded-md bg-muted px-4 py-3 text-sm">
+              <ShareIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <span>
+                <strong className="font-semibold">Sur iPhone, installe d'abord l'app :</strong>{' '}
+                Partager, puis « Sur l'écran d'accueil ». Ouvre-la depuis l'icône pour ajouter cet
+                appareil.
+              </span>
+            </p>
+          )}
+          {push.support === 'available' && !thisDeviceAdded && (
+            <Button variant="outline" onClick={() => addThisDevice(vapidPublicKey)}>
+              <BellPlusIcon />
+              Ajouter cet appareil
+            </Button>
+          )}
         </div>
-      </div>
+      )}
     </div>
   )
 }
@@ -122,6 +282,8 @@ export default function ShowAccount({
   account,
   oauthConnections,
   notifications,
+  pushDevices,
+  vapidPublicKey,
   mcpUrl,
   googleSignIn,
 }: PageProps) {
@@ -205,7 +367,11 @@ export default function ShowAccount({
           </Section>
 
           <Section id="notifications" title="Notifications">
-            <NotificationSettings notifications={notifications} />
+            <NotificationSettings
+              notifications={notifications}
+              pushDevices={pushDevices}
+              vapidPublicKey={vapidPublicKey}
+            />
           </Section>
 
           {(googleSignIn || account.googleLinked) && (
