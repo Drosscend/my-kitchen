@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="supported-color-schemes" content="light" />
+    <title>{{ title }}</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Caveat:wght@600&display=swap"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      a {
+        color: #2a4290;
+      }
+      @media (max-width: 600px) {
+        .email-card {
+          padding: 28px 22px !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="margin: 0; padding: 0; background-color: #ece5d6">
+    <div style="display: none; max-height: 0; overflow: hidden; opacity: 0; mso-hide: all">
+      {{ preheader }}
+    </div>
+    <table
+      role="presentation"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      bgcolor="#ece5d6"
+      style="background-color: #ece5d6"
+    >
+      <tr>
+        <td align="center" style="padding: 32px 16px">
+          <table
+            role="presentation"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="max-width: 560px; font-family: 'Bricolage Grotesque', -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #29231e"
+          >
+            <tr>
+              <td style="padding: 0 4px 18px">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="padding-right: 10px">
+                      <img
+                        src="{{ logoUrl }}"
+                        width="32"
+                        height="32"
+                        alt=""
+                        style="display: block; border: 0"
+                      />
+                    </td>
+                    <td
+                      style="font-size: 17px; font-weight: 800; font-stretch: 80%; letter-spacing: -0.01em"
+                    >
+                      Mon Garde-Manger
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td
+                class="email-card"
+                bgcolor="#fffefb"
+                style="background-color: #fffefb; border: 1px solid #e0d7c5; border-radius: 12px; padding: 32px 36px; font-size: 15px; line-height: 1.6"
+              >
+                {{{ await $slots.main() }}}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 0 6px">
+                <div
+                  style="height: 4px; background-color: #f6f1e6; border: 1px solid #e0d7c5; border-top: 0; border-radius: 0 0 12px 12px"
+                ></div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 0 12px">
+                <div
+                  style="height: 4px; background-color: #f1ebde; border: 1px solid #e0d7c5; border-top: 0; border-radius: 0 0 12px 12px"
+                ></div>
+              </td>
+            </tr>
+            <tr>
+              <td
+                align="center"
+                style="padding: 18px 12px 0; font-size: 12px; line-height: 1.5; color: #6b6155"
+              >
+                Mon Garde-Manger · inventaire, recettes et mode cuisine
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

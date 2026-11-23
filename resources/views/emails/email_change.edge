@@ -1,0 +1,19 @@
+@email.layout({ title: subject, preheader, logoUrl })
+  <h1
+    style="margin: 0 0 16px; font-size: 27px; line-height: 1.15; font-weight: 800; font-stretch: 80%; letter-spacing: -0.01em"
+  >
+    Une <span style="background-color: #fbecb8; background-image: linear-gradient(#fffefb 40%, #f6d877 40%); padding: 0 2px">nouvelle adresse</span> à confirmer
+  </h1>
+  <p style="margin: 0">
+    Tu as demandé à utiliser <strong>{{ email }}</strong> pour ton compte. Elle remplacera
+    <strong>{{ currentEmail }}</strong> dès que tu l'auras confirmée.
+  </p>
+  @email.button({ href: url })
+    Confirmer cette adresse
+  @end
+  <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #6b6155">
+    Le lien est valable 24 heures. Si tu n'es pas à l'origine de cette demande, ignore ce message :
+    ton adresse actuelle ne change pas.
+  </p>
+  @!email.fallback({ href: url })
+@end
