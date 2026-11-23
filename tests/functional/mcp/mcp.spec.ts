@@ -166,7 +166,7 @@ test.group('MCP', (group) => {
       'update_recipe',
       'delete_recipe',
     ])
-    assert.containsSubset(structured(added), { ingredient: { name: 'Farine', state: 'fresh' } })
+    assert.containsSubset(structured(added), { ingredient: { name: 'Farine', state: 'dry' } })
     assert.deepEqual(
       structured<{ ingredients: { name: string }[] }>(listed).ingredients.map((item) => item.name),
       ['Farine']

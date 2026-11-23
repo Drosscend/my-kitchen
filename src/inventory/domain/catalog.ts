@@ -1,56 +1,74 @@
 /**
- * Fixed catalog of the pantry: labels, perishability, the days before an
- * expiry date that make a batch urgent, and the expiry kind a new date
- * starts with, per category.
+ * Fixed catalog of the pantry, per category: label, perishability, the state
+ * a new ingredient starts in, the days before an expiry date that make a
+ * batch urgent and the expiry kind a new date starts with.
+ * A batch that truly spoils (a use by date, or a perishable fresh product)
+ * warns `perishableWarningDays` ahead, any other one `shelfStableWarningDays`.
  * The only source for these values, the client receives them as page props.
  */
 export const INGREDIENT_CATEGORIES = {
   vegetables: {
     label: 'Légumes',
     perishable: true,
-    expiryWarningDays: 2,
+    defaultState: 'fresh',
+    perishableWarningDays: 2,
+    shelfStableWarningDays: 14,
     defaultExpiryKind: 'use_by',
   },
   fruits: {
     label: 'Fruits',
     perishable: true,
-    expiryWarningDays: 2,
+    defaultState: 'fresh',
+    perishableWarningDays: 2,
+    shelfStableWarningDays: 14,
     defaultExpiryKind: 'use_by',
   },
   meat: {
     label: 'Viandes',
     perishable: true,
-    expiryWarningDays: 2,
+    defaultState: 'fresh',
+    perishableWarningDays: 2,
+    shelfStableWarningDays: 14,
     defaultExpiryKind: 'use_by',
   },
   fish: {
     label: 'Poissons',
     perishable: true,
-    expiryWarningDays: 1,
+    defaultState: 'fresh',
+    perishableWarningDays: 1,
+    shelfStableWarningDays: 14,
     defaultExpiryKind: 'use_by',
   },
   dairy: {
     label: 'Produits laitiers',
     perishable: true,
-    expiryWarningDays: 3,
+    defaultState: 'fresh',
+    perishableWarningDays: 3,
+    shelfStableWarningDays: 14,
     defaultExpiryKind: 'use_by',
   },
   spices: {
     label: 'Épices',
     perishable: false,
-    expiryWarningDays: 30,
+    defaultState: 'dry',
+    perishableWarningDays: 2,
+    shelfStableWarningDays: 30,
     defaultExpiryKind: 'best_before',
   },
   starches: {
     label: 'Féculents',
     perishable: false,
-    expiryWarningDays: 14,
+    defaultState: 'dry',
+    perishableWarningDays: 2,
+    shelfStableWarningDays: 14,
     defaultExpiryKind: 'best_before',
   },
   other: {
     label: 'Autres',
     perishable: false,
-    expiryWarningDays: 7,
+    defaultState: 'dry',
+    perishableWarningDays: 3,
+    shelfStableWarningDays: 14,
     defaultExpiryKind: 'best_before',
   },
 } as const
@@ -149,6 +167,13 @@ export function defaultExpiryKind(category: IngredientCategory, state: Ingredien
   return state === 'dry' ? 'best_before' : INGREDIENT_CATEGORIES[category].defaultExpiryKind
 }
 
+/**
+ * Starches, spices and other groceries are mostly bought dry.
+ */
+export function defaultState(category: IngredientCategory): IngredientState {
+  return INGREDIENT_CATEGORIES[category].defaultState
+}
+
 export function unitLabel(unit: IngredientUnit, quantity: number) {
   return quantity > 1 ? INGREDIENT_UNITS[unit].plural : INGREDIENT_UNITS[unit].label
 }
@@ -161,6 +186,7 @@ export function catalogOptions() {
     categories: INGREDIENT_CATEGORY_VALUES.map((value) => ({
       value,
       label: INGREDIENT_CATEGORIES[value].label,
+      defaultState: INGREDIENT_CATEGORIES[value].defaultState,
       defaultExpiryKind: INGREDIENT_CATEGORIES[value].defaultExpiryKind,
     })),
     units: INGREDIENT_UNIT_VALUES.map((value) => ({ value, label: INGREDIENT_UNITS[value].label })),

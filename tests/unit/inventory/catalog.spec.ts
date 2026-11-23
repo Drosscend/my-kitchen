@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { defaultExpiryKind, isPerishable, unitLabel } from '#inventory/domain/catalog'
+import { defaultExpiryKind, defaultState, isPerishable, unitLabel } from '#inventory/domain/catalog'
 
 test.group('Inventory catalog', () => {
   test('freezing suspends perishability', ({ assert }) => {
@@ -17,6 +17,13 @@ test.group('Inventory catalog', () => {
     assert.equal(defaultExpiryKind('fish', 'fresh'), 'use_by')
     assert.equal(defaultExpiryKind('fish', 'dry'), 'best_before')
     assert.equal(defaultExpiryKind('spices', 'fresh'), 'best_before')
+  })
+
+  test('starts starches, spices and other groceries dry', ({ assert }) => {
+    assert.equal(defaultState('starches'), 'dry')
+    assert.equal(defaultState('spices'), 'dry')
+    assert.equal(defaultState('other'), 'dry')
+    assert.equal(defaultState('meat'), 'fresh')
   })
 
   test('pluralizes counted units only above one', ({ assert }) => {

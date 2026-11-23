@@ -18,7 +18,7 @@ export type Batch = Ingredient['batches'][number]
 export type CatalogOption = { value: string; label: string }
 
 export type Catalog = {
-  categories: (CatalogOption & { defaultExpiryKind: string })[]
+  categories: (CatalogOption & { defaultState: string; defaultExpiryKind: string })[]
   units: CatalogOption[]
   states: CatalogOption[]
   expiryKinds: CatalogOption[]
@@ -58,6 +58,13 @@ export function defaultExpiryKind(catalog: Catalog, category: string, state: str
   return (
     catalog.categories.find((option) => option.value === category)?.defaultExpiryKind ?? 'use_by'
   )
+}
+
+/**
+ * Mirrors the server: starches, spices and other groceries start dry.
+ */
+export function defaultState(catalog: Catalog, category: string) {
+  return catalog.categories.find((option) => option.value === category)?.defaultState ?? 'fresh'
 }
 
 export function isCategory(value: string): value is Ingredient['category'] {

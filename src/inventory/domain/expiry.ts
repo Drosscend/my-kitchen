@@ -2,6 +2,7 @@ import { err, ok, type Result } from '#core/result'
 import {
   INGREDIENT_CATEGORIES,
   isExpiryKind,
+  isPerishable,
   type ExpiryKind,
   type IngredientCategory,
   type IngredientState,
@@ -60,6 +61,9 @@ interface ExpiryContext {
 
 /**
  * Freezing suspends expiry the way it suspends perishability.
+ * The state alone cannot tell a batch that truly spoils, since a new
+ * ingredient starts fresh by default: a use by date, printed on the pack,
+ * says it as well.
  */
 export function expiryStatus(expiry: Expiry | null, context: ExpiryContext): ExpiryStatus {
   if (!expiry || context.state === 'frozen') {
@@ -72,7 +76,14 @@ export function expiryStatus(expiry: Expiry | null, context: ExpiryContext): Exp
     return expiry.kind === 'use_by' ? 'expired' : 'check'
   }
 
-  return daysLeft <= INGREDIENT_CATEGORIES[context.category].expiryWarningDays ? 'soon' : 'ok'
+  return daysLeft <= warningDays(expiry.kind, context) ? 'soon' : 'ok'
+}
+
+function warningDays(kind: ExpiryKind, { category, state }: ExpiryContext) {
+  const { perishableWarningDays, shelfStableWarningDays } = INGREDIENT_CATEGORIES[category]
+  return kind === 'use_by' || isPerishable(state, category)
+    ? perishableWarningDays
+    : shelfStableWarningDays
 }
 
 export function isMoreUrgent(status: ExpiryStatus, than: ExpiryStatus) {
