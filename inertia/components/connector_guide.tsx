@@ -129,7 +129,7 @@ export function ConnectorGuide({ mcpUrl, embedded }: { mcpUrl: string; embedded?
           <>
             <Steps>
               <li>
-                Sur la page des plugins, clique sur <Label>+</Label> puis{' '}
+                Sur la page des plugins, clique en haut sur <Label>Add</Label> puis{' '}
                 <Label>Add custom MCP server</Label>.
               </li>
               <li>
@@ -137,18 +137,19 @@ export function ConnectorGuide({ mcpUrl, embedded }: { mcpUrl: string; embedded?
                 sous <Label>Connection</Label>.
               </li>
               <li>
-                Choisis <Label>OAuth</Label>, coche <Label>I understand and want to continue</Label>{' '}
+                Laisse <Label>OAuth</Label>, coche <Label>I understand and want to continue</Label>{' '}
                 puis <Label>Create as a plugin</Label>.
               </li>
               <li>
-                Installe le plugin et autorise l'accès sur la page de Mon Garde-Manger qui s'ouvre.
+                Clique sur <Label>Connect Mon Garde-Manger</Label> : Mon Garde-Manger s'ouvre.
+                Connecte-toi et choisis <Label>Autoriser</Label>.
               </li>
               <li>
                 Dans une nouvelle conversation, tape <Label>@</Label> et choisis Mon Garde-Manger.
               </li>
             </Steps>
             <p className="mt-6 border-t pt-4 text-sm text-muted-foreground">
-              Disponible sur ChatGPT web, selon ton offre.
+              L'offre gratuite de ChatGPT accepte un serveur MCP personnalisé.
             </p>
           </>
         )}
