@@ -31,10 +31,10 @@ A part of the stock of an ingredient sharing one expiry date, or none. Taking fr
 The date printed on a batch, of one of two kinds: a use by date (DLC) is a safety limit, a best before date (DDM) only a quality one. A new date takes the default kind of its category, a best before date for a dry ingredient. Dates are calendar days in the Paris time zone.
 
 **Expiring soon**:
-A batch whose use by date is past (expired), whose best before date is past (to check), or whose date falls within the warning days of its category. An ingredient takes the status of its most urgent batch. Freezing suspends expiry.
+A batch whose use by date is past (expired), whose best before date is past (to check), or whose date falls within the warning days of its category. A batch that truly spoils, with a use by date or a perishable fresh product, warns a few days ahead; any other one, a best before date on a shelf stable product, two weeks ahead (a month for spices). An ingredient takes the status of its most urgent batch. Freezing suspends expiry.
 
 **Catalog**:
-The fixed lists of categories, units, states and expiry kinds, with the perishability, the expiry warning days and the default expiry kind of each category. Constants of the code, never edited by users.
+The fixed lists of categories, units, states and expiry kinds, with the perishability, the default state, the two expiry warning days and the default expiry kind of each category. Constants of the code, never edited by users.
 
 **Low stock**:
 An ingredient whose quantity is under its low stock threshold, a quantity in its unit set by the user on each ingredient. Without a threshold (zero), an ingredient is never low.

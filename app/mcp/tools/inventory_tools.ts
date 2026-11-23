@@ -9,6 +9,7 @@ import { RemoveIngredient } from '#inventory/actions/remove_ingredient'
 import { UpdateIngredient } from '#inventory/actions/update_ingredient'
 import { UpdateIngredientBatch } from '#inventory/actions/update_ingredient_batch'
 import {
+  defaultState,
   EXPIRY_KIND_VALUES,
   INGREDIENT_CATEGORIES,
   INGREDIENT_CATEGORY_VALUES,
@@ -170,13 +171,13 @@ export async function registerInventoryTools(server: McpServer, userId: UserIden
     {
       title: 'Ajouter un ingrédient',
       description:
-        'Ajoute un ingrédient au garde-manger. Pour racheter un ingrédient déjà présent, préférer add_ingredient_batch. Sans expiryKind, une date prend le type par défaut de la catégorie.',
+        "Ajoute un ingrédient au garde-manger. Pour racheter un ingrédient déjà présent, préférer add_ingredient_batch. Sans state, l'ingrédient prend l'état par défaut de sa catégorie (sec pour les épices, féculents et autres, frais sinon). Sans expiryKind, une date prend le type par défaut de la catégorie.",
       inputSchema: z.object({
         name: z.string().min(1).max(100),
         quantity: z.number().min(0),
         unit,
         category,
-        state: state.default('fresh'),
+        state: state.optional(),
         lowStockThreshold: z
           .number()
           .min(0)
@@ -189,7 +190,11 @@ export async function registerInventoryTools(server: McpServer, userId: UserIden
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
     },
     async (input) => {
-      const result = await addIngredient.execute({ userId, ...input })
+      const result = await addIngredient.execute({
+        userId,
+        ...input,
+        state: input.state ?? defaultState(input.category),
+      })
 
       return result.ok
         ? toolResult({ ingredient: toOutput(result.value) })

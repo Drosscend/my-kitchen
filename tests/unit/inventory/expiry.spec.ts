@@ -31,7 +31,36 @@ test.group('Expiry', () => {
     const can = { category: 'fish', state: 'dry', today: TODAY } as const
 
     assert.equal(expiryStatus({ on: '2026-03-09', kind: 'best_before' }, can), 'check')
+    assert.equal(expiryStatus({ on: '2026-03-24', kind: 'best_before' }, can), 'soon')
+    assert.equal(expiryStatus({ on: '2026-03-25', kind: 'best_before' }, can), 'ok')
     assert.equal(expiryStatus({ on: '2027-03-10', kind: 'best_before' }, can), 'ok')
+  })
+
+  test('warns early for a best before date outside perishable fresh products', ({ assert }) => {
+    const pasta = { category: 'starches', state: 'fresh', today: TODAY } as const
+    const cumin = { category: 'spices', state: 'dry', today: TODAY } as const
+
+    assert.equal(expiryStatus({ on: '2026-03-24', kind: 'best_before' }, pasta), 'soon')
+    assert.equal(expiryStatus({ on: '2026-03-25', kind: 'best_before' }, pasta), 'ok')
+    assert.equal(expiryStatus({ on: '2026-04-09', kind: 'best_before' }, cumin), 'soon')
+    assert.equal(expiryStatus({ on: '2026-04-10', kind: 'best_before' }, cumin), 'ok')
+  })
+
+  test('warns late for a use by date whatever the category', ({ assert }) => {
+    const pastry = { category: 'starches', state: 'fresh', today: TODAY } as const
+    const hummus = { category: 'other', state: 'fresh', today: TODAY } as const
+
+    assert.equal(expiryStatus({ on: '2026-03-12', kind: 'use_by' }, pastry), 'soon')
+    assert.equal(expiryStatus({ on: '2026-03-13', kind: 'use_by' }, pastry), 'ok')
+    assert.equal(expiryStatus({ on: '2026-03-13', kind: 'use_by' }, hummus), 'soon')
+    assert.equal(expiryStatus({ on: '2026-03-14', kind: 'use_by' }, hummus), 'ok')
+  })
+
+  test('warns late for a perishable fresh product whatever its kind', ({ assert }) => {
+    const butter = { category: 'dairy', state: 'fresh', today: TODAY } as const
+
+    assert.equal(expiryStatus({ on: '2026-03-13', kind: 'best_before' }, butter), 'soon')
+    assert.equal(expiryStatus({ on: '2026-03-14', kind: 'best_before' }, butter), 'ok')
   })
 
   test('suspends expiry while frozen', ({ assert }) => {

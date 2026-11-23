@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { Field, FieldError, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
-import { defaultExpiryKind, type Catalog } from '~/inventory/catalog'
+import { defaultExpiryKind, defaultState, type Catalog } from '~/inventory/catalog'
 import { CatalogSelect } from '~/inventory/catalog_select'
 import { categoryIcon, stateIcon } from '~/inventory/option_icons'
 
@@ -20,8 +20,10 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
   )
 
   function changeCategory(value: string) {
+    const nextState = defaultState(catalog, value)
     setCategory(value)
-    setExpiryKind(defaultExpiryKind(catalog, value, state))
+    setState(nextState)
+    setExpiryKind(defaultExpiryKind(catalog, value, nextState))
   }
 
   function changeState(value: string) {
