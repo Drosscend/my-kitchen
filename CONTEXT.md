@@ -22,7 +22,7 @@ An assistant a user authorized on the consent page to call the MCP endpoint in t
 ## Inventory
 
 **Ingredient**:
-An item of the pantry: a name, one of six units, one of eight categories, a state, fresh or frozen, a low stock threshold and its batches. Its quantity is the sum of its batches.
+An item of the pantry: a name, one of eight units, one of eight categories, a state, fresh or frozen, a low stock threshold and its batches. Its quantity is the sum of its batches.
 
 **Batch**:
 A part of the stock of an ingredient sharing one expiry date, or none. Taking from an ingredient empties the batches that expire first, undated ones last; adding to it grows the latest batch. An empty batch disappears. "Lot" in the interface.

@@ -62,6 +62,8 @@ export const INGREDIENT_UNITS = {
   L: { label: 'L', plural: 'L' },
   unit: { label: 'unité', plural: 'unités' },
   piece: { label: 'pièce', plural: 'pièces' },
+  packet: { label: 'sachet', plural: 'sachets' },
+  box: { label: 'boîte', plural: 'boîtes' },
 } as const
 
 export const INGREDIENT_STATES = {
