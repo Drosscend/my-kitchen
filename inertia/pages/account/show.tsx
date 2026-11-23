@@ -16,7 +16,7 @@ import {
 import { type ReactNode } from 'react'
 import { type Data } from '@generated/data'
 import { ConfirmDeleteDialog } from '~/components/confirm_delete_dialog'
-import { CopyButton } from '~/components/copy_button'
+import { ConnectorGuide } from '~/components/connector_guide'
 import { Page, PageHeader } from '~/components/page'
 import { Button } from '~/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '~/components/ui/field'
@@ -448,20 +448,7 @@ export default function ShowAccount({
 
           <Section title="Accès MCP">
             <div className="space-y-8">
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Adresse du serveur</p>
-                <div className="flex items-center gap-2">
-                  <code className="min-w-0 flex-1 truncate rounded-md bg-muted px-3 py-2 font-mono text-sm">
-                    {mcpUrl}
-                  </code>
-                  <CopyButton text={() => mcpUrl} label="Copier l'adresse" size="icon" iconOnly />
-                </div>
-              </div>
-
-              <p className="text-sm text-muted-foreground">
-                Ajoute cette adresse comme connecteur dans Claude ou ChatGPT : l'assistant t'enverra
-                ici pour autoriser son accès.
-              </p>
+              <ConnectorGuide mcpUrl={mcpUrl} embedded />
 
               {oauthConnections.length > 0 && (
                 <div className="space-y-2">

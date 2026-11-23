@@ -22,9 +22,9 @@ function Steps({ children }: { children: ReactNode }) {
 
 /**
  * How to add the MCP server to an assistant, with the labels each app
- * shows today.
+ * shows today. Embedded in a card, it stacks and drops its own paper.
  */
-export function ConnectorGuide({ mcpUrl }: { mcpUrl: string }) {
+export function ConnectorGuide({ mcpUrl, embedded }: { mcpUrl: string; embedded?: boolean }) {
   const [assistant, setAssistant] = useState<'claude' | 'chatgpt'>('claude')
   const claudeLink = `https://claude.ai/customize/connectors?${new URLSearchParams({
     modal: 'add-custom-connector',
@@ -33,7 +33,10 @@ export function ConnectorGuide({ mcpUrl }: { mcpUrl: string }) {
   })}`
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14">
+    <div
+      data-embedded={embedded}
+      className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14 data-embedded:gap-6 data-embedded:lg:grid-cols-1"
+    >
       <div className="flex flex-col gap-5">
         <ToggleGroup
           variant="outline"
@@ -92,31 +95,34 @@ export function ConnectorGuide({ mcpUrl }: { mcpUrl: string }) {
         )}
       </div>
 
-      <div className="rounded-2xl bg-card p-6 paper-stack sm:p-8">
+      <div
+        data-embedded={embedded}
+        className="rounded-2xl bg-card p-6 paper-stack sm:p-8 data-embedded:rounded-none data-embedded:border-t data-embedded:px-0 data-embedded:pt-6 data-embedded:pb-0 data-embedded:shadow-none"
+      >
         {assistant === 'claude' ? (
           <>
             <Steps>
               <li>
-                <Label>Ajouter à Claude</Label> ouvre Claude sur la fenêtre{' '}
-                <Label>Ajouter un connecteur personnalisé</Label>, avec le nom et l'adresse déjà
-                remplis.
+                « Ajouter à Claude » ouvre <Label>Add custom connector</Label> dans les{' '}
+                <Label>Plugins</Label> de Claude, avec le nom et l'adresse déjà remplis.
               </li>
               <li>
-                Garde les réglages proposés et valide avec <Label>Ajouter</Label>.
+                Vérifie-les et clique sur <Label>Continue</Label>.
               </li>
               <li>
-                Clique sur <Label>Connecter</Label> : Mon Garde-Manger s'ouvre. Connecte-toi et
+                Garde les options proposées et valide avec <Label>Continue</Label>.
+              </li>
+              <li>
+                Clique sur <Label>Connect</Label> : Mon Garde-Manger s'ouvre. Connecte-toi et
                 choisis <Label>Autoriser</Label>.
               </li>
               <li>
-                Dans une conversation, active-le depuis <Label>+</Label> puis{' '}
-                <Label>Connecteurs</Label>, et pose ta question.
+                Dans une conversation, active Mon Garde-Manger depuis le menu <Label>+</Label>, et
+                pose ta question.
               </li>
             </Steps>
             <p className="mt-6 border-t pt-4 text-sm text-muted-foreground">
-              Sans le bouton : <Label>Personnaliser</Label>, <Label>Connecteurs</Label>,{' '}
-              <Label>+ Ajouter</Label>, puis colle l'adresse. L'offre gratuite de Claude accepte un
-              connecteur personnalisé.
+              L'offre gratuite de Claude accepte un connecteur personnalisé.
             </p>
           </>
         ) : (
