@@ -1,0 +1,23 @@
+@email.layout({ title: subject, preheader, logoUrl })
+  <h1
+    style="margin: 0 0 16px; font-size: 27px; line-height: 1.15; font-weight: 800; font-stretch: 80%; letter-spacing: -0.01em"
+  >
+    <span style="background-color: #fbecb8; background-image: linear-gradient(#fffefb 40%, #f6d877 40%); padding: 0 2px">Bienvenue</span>{{ name ? `, ${name}` : '' }}
+  </h1>
+  <p style="margin: 0">
+    Il reste une étape avant de remplir ton garde-manger : confirmer que cette adresse est bien la
+    tienne.
+  </p>
+  @email.button({ href: url })
+    Confirmer mon adresse
+  @end
+  <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #6b6155">
+    Le lien est valable 24 heures. Si tu n'as pas créé de compte, ignore ce message.
+  </p>
+  @!email.fallback({ href: url })
+  <p
+    style="margin: 20px 0 0; font-family: 'Caveat', 'Segoe Print', 'Bradley Hand', cursive; font-size: 24px; font-weight: 600; line-height: 1; color: #2a4290"
+  >
+    À bientôt en cuisine
+  </p>
+@end

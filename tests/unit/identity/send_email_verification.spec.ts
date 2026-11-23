@@ -6,6 +6,7 @@ import {
   SendEmailVerification,
 } from '#identity/actions/send_email_verification'
 import { EmailAddress } from '#identity/domain/email_address'
+import EmailChangeMail from '#identity/mails/email_change_mail'
 import EmailVerificationMail from '#identity/mails/email_verification_mail'
 import { db } from '#shared/services/db'
 import { queuedMessage } from '#tests/helpers/mail'
@@ -41,6 +42,10 @@ test.group('SendEmailVerification', (group) => {
     const message = await queuedMessage(mailer)
     message.assertTo('ada@example.com')
     message.assertTextIncludes('/verify-email/')
+    message.assertSubject('Confirme ton adresse e-mail')
+    message.assertHtmlIncludes(/href="[^"]+\/verify-email\/[^"]+"/)
+    message.assertHtmlIncludes('Confirmer mon adresse')
+    assert.notInclude(String(message.nodeMailerMessage.html), '@!')
   })
 
   test('confirms another address when one is given', async ({ assert }) => {
@@ -58,8 +63,14 @@ test.group('SendEmailVerification', (group) => {
 
     const [token] = await storedTokens()
     assert.equal(token.email, 'new@example.com')
+    mailer.mails.assertQueuedCount(EmailChangeMail, 1)
+    mailer.mails.assertQueuedCount(EmailVerificationMail, 0)
     const message = await queuedMessage(mailer)
     message.assertTo('new@example.com')
     assert.isFalse(message.hasTo('ada@example.com'))
+    message.assertSubject('Confirme ta nouvelle adresse e-mail')
+    message.assertHtmlIncludes('Confirmer cette adresse')
+    message.assertHtmlIncludes('<strong>ada@example.com</strong>')
+    message.assertTextIncludes('Elle remplacera ada@example.com')
   })
 })

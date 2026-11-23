@@ -1,4 +1,5 @@
 import { BaseMail } from '@adonisjs/mail'
+import { appUrl } from '#config/app'
 
 export default class EmailVerificationMail extends BaseMail {
   constructor(
@@ -10,9 +11,18 @@ export default class EmailVerificationMail extends BaseMail {
   }
 
   prepare() {
+    const subject = 'Confirme ton adresse e-mail'
+
     this.message
       .to(this.recipient)
-      .subject('Confirme ton adresse e-mail')
+      .subject(subject)
+      .htmlView('emails/email_verification', {
+        subject,
+        preheader: 'Un clic et ton garde-manger est prêt.',
+        logoUrl: `${appUrl}/email-logo.png`,
+        name: this.name,
+        url: this.url,
+      })
       .text(
         [
           `Bonjour ${this.name ?? ''}`.trim() + ',',
@@ -21,7 +31,7 @@ export default class EmailVerificationMail extends BaseMail {
           this.url,
           '',
           'Le lien est valable 24 heures.',
-          "Si tu n'es pas à l'origine de cette demande, ignore ce message.",
+          "Si tu n'as pas créé de compte, ignore ce message.",
         ].join('\n')
       )
   }

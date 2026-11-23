@@ -46,5 +46,8 @@ test.group('RequestPasswordReset', (group) => {
     const message = await queuedMessage(mailer)
     message.assertTo('ada@example.com')
     message.assertTextIncludes('/reset-password/')
+    message.assertHtmlIncludes(/href="[^"]+\/reset-password\/[^"]+"/)
+    message.assertHtmlIncludes('Choisir un nouveau mot de passe')
+    message.assertHtmlIncludes('Copie ce lien dans ton navigateur')
   })
 })

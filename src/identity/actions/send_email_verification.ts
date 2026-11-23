@@ -3,6 +3,7 @@ import mail from '@adonisjs/mail/services/main'
 import { appUrl } from '#config/app'
 import { generateSecureToken } from '#identity/domain/secure_token'
 import { TokenIdentifier } from '#identity/domain/token_identifier'
+import EmailChangeMail from '#identity/mails/email_change_mail'
 import EmailVerificationMail from '#identity/mails/email_verification_mail'
 import { EmailVerificationTokenRepository } from '#identity/repositories/email_verification_token_repository'
 import { TransactionManager } from '#shared/services/transaction_manager'
@@ -41,6 +42,15 @@ export class SendEmailVerification {
     )
 
     const url = `${appUrl}/verify-email/${token.value}`
-    await mail.sendLater(new EmailVerificationMail(email.toString(), params.user.name, url))
+    await mail.sendLater(
+      params.email
+        ? new EmailChangeMail(
+            email.toString(),
+            params.user.name,
+            url,
+            params.user.emailAddress.toString()
+          )
+        : new EmailVerificationMail(email.toString(), params.user.name, url)
+    )
   }
 }
