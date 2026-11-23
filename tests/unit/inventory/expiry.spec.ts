@@ -27,6 +27,13 @@ test.group('Expiry', () => {
     assert.equal(expiryStatus(null, dairy), 'none')
   })
 
+  test('keeps tracking the date of a dry product', ({ assert }) => {
+    const can = { category: 'fish', state: 'dry', today: TODAY } as const
+
+    assert.equal(expiryStatus({ on: '2026-03-09', kind: 'best_before' }, can), 'check')
+    assert.equal(expiryStatus({ on: '2027-03-10', kind: 'best_before' }, can), 'ok')
+  })
+
   test('suspends expiry while frozen', ({ assert }) => {
     assert.equal(
       expiryStatus(

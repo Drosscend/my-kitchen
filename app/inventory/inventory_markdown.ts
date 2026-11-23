@@ -34,7 +34,7 @@ function section(items: IngredientView[], title: string) {
 
 /**
  * The pantry as a Markdown list meant to be pasted into a chat with an
- * assistant: in-stock items only, fresh then frozen, grouped by category.
+ * assistant: in-stock items only, fresh, frozen then dry, grouped by category.
  */
 export function formatInventoryMarkdown(items: IngredientView[]) {
   const inStock = items.filter((item) => item.quantity > 0)

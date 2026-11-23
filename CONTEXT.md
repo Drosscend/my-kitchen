@@ -22,16 +22,16 @@ An assistant a user authorized on the consent page to call the MCP endpoint in t
 ## Inventory
 
 **Ingredient**:
-An item of the pantry: a name, one of eight units, one of eight categories, a state, fresh or frozen, a low stock threshold and its batches. Its quantity is the sum of its batches.
+An item of the pantry: a name, one of eight units, one of eight categories, a state, fresh, frozen or dry, a low stock threshold and its batches. Its quantity is the sum of its batches.
 
 **Batch**:
 A part of the stock of an ingredient sharing one expiry date, or none. Taking from an ingredient empties the batches that expire first, undated ones last; adding to it grows the latest batch. An empty batch disappears. "Lot" in the interface.
 
 **Expiry date**:
-The date printed on a batch, of one of two kinds: a use by date (DLC) is a safety limit, a best before date (DDM) only a quality one. A new date takes the default kind of its category. Dates are calendar days in the Paris time zone.
+The date printed on a batch, of one of two kinds: a use by date (DLC) is a safety limit, a best before date (DDM) only a quality one. A new date takes the default kind of its category, a best before date for a dry ingredient. Dates are calendar days in the Paris time zone.
 
 **Expiring soon**:
-A fresh batch whose use by date is past (expired), whose best before date is past (to check), or whose date falls within the warning days of its category. An ingredient takes the status of its most urgent batch. Freezing suspends expiry.
+A batch whose use by date is past (expired), whose best before date is past (to check), or whose date falls within the warning days of its category. An ingredient takes the status of its most urgent batch. Freezing suspends expiry.
 
 **Catalog**:
 The fixed lists of categories, units, states and expiry kinds, with the perishability, the expiry warning days and the default expiry kind of each category. Constants of the code, never edited by users.
@@ -40,7 +40,7 @@ The fixed lists of categories, units, states and expiry kinds, with the perishab
 An ingredient whose quantity is under its low stock threshold, a quantity in its unit set by the user on each ingredient. Without a threshold (zero), an ingredient is never low.
 
 **Perishable**:
-A fresh ingredient of a perishable category. Freezing suspends perishability.
+A fresh ingredient of a perishable category. Freezing suspends perishability; a dry ingredient, a can or a packet of pasta, is never perishable.
 
 ## Recipes
 

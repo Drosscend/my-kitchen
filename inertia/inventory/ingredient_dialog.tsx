@@ -7,7 +7,7 @@ import { Button } from '~/components/ui/button'
 import { Dialog, DialogFooter, DialogHeader, DialogTitle } from '~/components/ui/dialog'
 import { Field, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
-import { type Batch, type Catalog, type Ingredient } from '~/inventory/catalog'
+import { defaultExpiryKind, type Batch, type Catalog, type Ingredient } from '~/inventory/catalog'
 import { CatalogSelect } from '~/inventory/catalog_select'
 import { ExpiryStamp } from '~/inventory/expiry_stamp'
 import { categoryIcon, stateIcon } from '~/inventory/option_icons'
@@ -101,10 +101,9 @@ function BatchRow({
 }
 
 function NewBatchForm({ ingredient, catalog }: { ingredient: Ingredient; catalog: Catalog }) {
-  const defaultKind =
-    catalog.categories.find((category) => category.value === ingredient.category)
-      ?.defaultExpiryKind ?? 'use_by'
-  const [expiryKind, setExpiryKind] = useState(defaultKind)
+  const [expiryKind, setExpiryKind] = useState(
+    defaultExpiryKind(catalog, ingredient.category, ingredient.state)
+  )
 
   return (
     <Form

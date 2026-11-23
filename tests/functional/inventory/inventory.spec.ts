@@ -154,6 +154,51 @@ test.group('Inventory', (group) => {
     })
   })
 
+  test('keeps a dry product out of the perishables with a best before date', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createUser('ada@example.com')
+    await client
+      .post('/inventory')
+      .loginAs(user)
+      .withCsrfToken()
+      .form({
+        name: 'Thon au naturel',
+        quantity: 3,
+        unit: 'box',
+        category: 'fish',
+        state: 'dry',
+        lowStockThreshold: 1,
+        expiresOn: inDays(400),
+      })
+      .redirects(0)
+    const [ingredient] = await storedIngredients(user)
+
+    const page = await client.get('/inventory').loginAs(user).withInertia()
+
+    page.assertInertiaPropsContains({
+      ingredients: [
+        {
+          name: 'Thon au naturel',
+          unitLabel: 'boîtes',
+          stateLabel: 'Sec',
+          perishable: false,
+          expiryStatus: 'ok',
+        },
+      ],
+    })
+    const [batch] = await storedBatches(ingredient.id)
+    assert.deepEqual(await storedBatches(ingredient.id), [
+      {
+        id: batch.id,
+        quantity: 3,
+        expiresOn: inDays(400),
+        expiry_kind: 'best_before',
+      },
+    ])
+  })
+
   test('flags an ingredient under its own threshold, never without one', async ({ client }) => {
     const user = await createUser('ada@example.com')
     await client.post('/inventory').loginAs(user).withCsrfToken().form(TOMATOES).redirects(0)

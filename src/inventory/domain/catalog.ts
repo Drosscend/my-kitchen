@@ -69,6 +69,7 @@ export const INGREDIENT_UNITS = {
 export const INGREDIENT_STATES = {
   fresh: { label: 'Frais' },
   frozen: { label: 'Congelé' },
+  dry: { label: 'Sec' },
 } as const
 
 /**
@@ -132,8 +133,20 @@ export function parseCatalogValues(record: CatalogRecord) {
   return { unit, category, state }
 }
 
+/**
+ * Freezing suspends perishability, a dry product (a can, a packet of
+ * pasta) keeps at room temperature whatever its category.
+ */
 export function isPerishable(state: IngredientState, category: IngredientCategory) {
-  return state !== 'frozen' && INGREDIENT_CATEGORIES[category].perishable
+  return state === 'fresh' && INGREDIENT_CATEGORIES[category].perishable
+}
+
+/**
+ * A dry product carries a best before date, even in a category whose fresh
+ * products carry a use by date.
+ */
+export function defaultExpiryKind(category: IngredientCategory, state: IngredientState) {
+  return state === 'dry' ? 'best_before' : INGREDIENT_CATEGORIES[category].defaultExpiryKind
 }
 
 export function unitLabel(unit: IngredientUnit, quantity: number) {

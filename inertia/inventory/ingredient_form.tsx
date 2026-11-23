@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { Field, FieldError, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
-import { type Catalog } from '~/inventory/catalog'
+import { defaultExpiryKind, type Catalog } from '~/inventory/catalog'
 import { CatalogSelect } from '~/inventory/catalog_select'
 import { categoryIcon, stateIcon } from '~/inventory/option_icons'
 
@@ -15,17 +15,18 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
   const [unit, setUnit] = useState(DEFAULTS.unit)
   const [category, setCategory] = useState(DEFAULTS.category)
   const [state, setState] = useState(DEFAULTS.state)
-  const [expiryKind, setExpiryKind] = useState(defaultExpiryKind(DEFAULTS.category))
-
-  function defaultExpiryKind(value: string) {
-    return (
-      catalog.categories.find((option) => option.value === value)?.defaultExpiryKind ?? 'use_by'
-    )
-  }
+  const [expiryKind, setExpiryKind] = useState(
+    defaultExpiryKind(catalog, DEFAULTS.category, DEFAULTS.state)
+  )
 
   function changeCategory(value: string) {
     setCategory(value)
-    setExpiryKind(defaultExpiryKind(value))
+    setExpiryKind(defaultExpiryKind(catalog, value, state))
+  }
+
+  function changeState(value: string) {
+    setState(value)
+    setExpiryKind(defaultExpiryKind(catalog, category, value))
   }
 
   return (
@@ -138,7 +139,7 @@ export function IngredientForm({ catalog }: { catalog: Catalog }) {
               options={catalog.states}
               value={state}
               icon={stateIcon}
-              onValueChange={setState}
+              onValueChange={changeState}
             />
           </Field>
 

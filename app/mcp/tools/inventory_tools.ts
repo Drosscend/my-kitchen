@@ -116,7 +116,7 @@ export async function registerInventoryTools(server: McpServer, userId: UserIden
     'list_ingredients',
     {
       title: 'Lister le garde-manger',
-      description: `Liste les ingrédients du garde-manger avec leur quantité, leur état (frais ou congelé), les alertes de stock bas et leurs lots, dans l'ordre de consommation. expiryStatus, expiresOn et daysLeft résument le lot le plus urgent. Catégories : ${categoryHelp}.`,
+      description: `Liste les ingrédients du garde-manger avec leur quantité, leur état (frais, congelé ou sec), les alertes de stock bas et leurs lots, dans l'ordre de consommation. expiryStatus, expiresOn et daysLeft résument le lot le plus urgent. Catégories : ${categoryHelp}.`,
       inputSchema: z.object({
         search: z.string().optional().describe('Filtre sur le nom, insensible à la casse'),
         category: category.optional(),

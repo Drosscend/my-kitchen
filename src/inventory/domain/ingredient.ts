@@ -2,7 +2,7 @@ import { createId } from '@paralleldrive/cuid2'
 import { Entity } from '#core/domain/entity'
 import { err, ok, type Result } from '#core/result'
 import {
-  INGREDIENT_CATEGORIES,
+  defaultExpiryKind,
   type ExpiryKind,
   type IngredientCategory,
   type IngredientState,
@@ -312,7 +312,7 @@ export class Ingredient extends Entity<IngredientProperties> {
     const kind =
       changes.expiryKind ??
       current?.kind ??
-      INGREDIENT_CATEGORIES[this.props.category].defaultExpiryKind
+      defaultExpiryKind(this.props.category, this.props.state)
 
     if (changes.expiresOn !== undefined) {
       return { on: changes.expiresOn, kind }
