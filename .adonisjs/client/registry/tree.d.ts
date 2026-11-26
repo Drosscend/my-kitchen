@@ -72,6 +72,8 @@ export interface ApiDefinition {
   legal: {
     show: typeof routes['legal.show']
   }
+  robots: typeof routes['robots']
+  sitemap: typeof routes['sitemap']
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']

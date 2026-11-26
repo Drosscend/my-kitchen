@@ -15,7 +15,7 @@ function inDays(days: number) {
   const date = new Date()
   date.setDate(date.getDate() + days)
 
-  return date.toLocaleDateString('sv-SE')
+  return date.toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' })
 }
 
 const notes: (Pick<

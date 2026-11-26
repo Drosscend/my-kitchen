@@ -70,5 +70,7 @@ export const controllers = {
     Home: () => import('#app/shared/controllers/home_controller'),
     Legal: () => import('#app/shared/controllers/legal_controller'),
     Liveness: () => import('#app/shared/controllers/liveness_controller'),
+    Robots: () => import('#app/shared/controllers/robots_controller'),
+    Sitemap: () => import('#app/shared/controllers/sitemap_controller'),
   },
 }
