@@ -8,13 +8,13 @@ import { type InertiaProps } from '~/types'
 type PageProps = InertiaProps<{ recipe: Recipe }>
 
 /**
- * Opens on the oven step and its 45 minute timer. Every frame moves to
+ * Opens on the aubergine step and its 15 minute timer. Every frame moves to
  * the real session once one of them shares the demo, and the frame that
  * shared it shows the QR code.
  */
 export default function CookingDemo({ recipe }: PageProps) {
   const router = useRouter()
-  const demo = useCookingDemo(recipe.steps.length, 7, (code, sharer) =>
+  const demo = useCookingDemo(recipe.steps.length, 1, (code, sharer) =>
     router.visit({
       route: 'cooking.show',
       routeParams: { code },

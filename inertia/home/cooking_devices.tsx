@@ -45,7 +45,7 @@ function Screen({ width, height, title }: { width: number; height: number; title
  * An Android phone: the page sits between the status bar and the gesture
  * bar, both in the app's theme colour, sized from the frame's width.
  */
-function Phone({ title }: { title: string }) {
+function Phone({ title, battery, wifi }: { title: string; battery: number; wifi?: boolean }) {
   return (
     <figure className="@container">
       <div className="rounded-[11cqw] bg-[#2b2520] p-[2.2cqw] shadow-[inset_0_0_0_2px_#4a4038,0_30px_50px_-24px_rgb(41_35_30/0.55)]">
@@ -57,10 +57,10 @@ function Phone({ title }: { title: string }) {
               className="absolute top-1/2 left-1/2 size-[3.6cqw] -translate-1/2 rounded-full bg-[#1b1714]"
             />
             <span className="flex items-center gap-[1.4cqw]">
-              <WifiIcon className="size-[4cqw]" strokeWidth={2.5} />
+              {wifi && <WifiIcon className="size-[4cqw]" strokeWidth={2.5} />}
               <SignalIcon className="size-[4cqw]" strokeWidth={2.5} />
-              <span className="rounded-full bg-foreground/80 px-[1.6cqw] text-[3cqw] leading-[1.5] font-semibold text-card tabular-nums">
-                62
+              <span className="grid h-[4.6cqw] place-items-center rounded-full bg-foreground/80 px-[1.6cqw] text-[3cqw] leading-none font-semibold text-card tabular-nums">
+                {battery}
               </span>
             </span>
           </div>
@@ -89,8 +89,8 @@ export function CookingDevices() {
           Le PC de la cuisine
         </figcaption>
       </figure>
-      <Phone title="Ton téléphone" />
-      <Phone title="Le téléphone de Sam" />
+      <Phone title="Ton téléphone" battery={62} wifi />
+      <Phone title="Le téléphone de Sam" battery={34} />
     </div>
   )
 }
