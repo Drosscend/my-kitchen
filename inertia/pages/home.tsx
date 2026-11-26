@@ -1,15 +1,16 @@
 import { Link } from '@adonisjs/inertia/react'
-import { Head } from '@inertiajs/react'
 import { type ReactNode } from 'react'
 import { ConnectorGuide } from '~/components/connector_guide'
+import { JsonLd, Seo, type SeoMeta } from '~/components/seo'
 import { Button } from '~/components/ui/button'
 import { AssistantChat } from '~/home/assistant_chat'
 import { CookingDevices } from '~/home/cooking_devices'
+import { Faq } from '~/home/faq'
 import { FridgeCompare } from '~/home/fridge_compare'
 import { type Swatch } from '~/swatch'
 import { type InertiaProps } from '~/types'
 
-type PageProps = InertiaProps<{ mcpUrl: string }>
+type PageProps = InertiaProps<{ mcpUrl: string; seo: SeoMeta }>
 
 function Point({ swatch, children }: { swatch: Swatch; children: ReactNode }) {
   return (
@@ -48,10 +49,26 @@ function SignupActions() {
   )
 }
 
-export default function Home({ mcpUrl }: PageProps) {
+export default function Home({ mcpUrl, seo }: PageProps) {
   return (
     <main className="flex-1">
-      <Head title="Inventaire de cuisine, recettes et mode cuisine" />
+      <Seo meta={seo} />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'WebApplication',
+          'name': 'Mon Garde-Manger',
+          'url': seo.canonical,
+          'description': seo.description,
+          'image': seo.image,
+          'applicationCategory': 'LifestyleApplication',
+          'operatingSystem': 'Web',
+          'inLanguage': 'fr',
+          'isAccessibleForFree': true,
+          'offers': { '@type': 'Offer', 'price': '0', 'priceCurrency': 'EUR' },
+          'author': { '@type': 'Person', 'name': 'Kévin Véronési', 'url': 'https://kevin-dev.com' },
+        }}
+      />
 
       <section className="page-width grid grid-cols-1 items-center gap-10 pt-8 pb-16 sm:pt-12 lg:grid-cols-2 lg:gap-16 lg:pb-24">
         <div className="flex flex-col gap-6">
@@ -221,7 +238,9 @@ export default function Home({ mcpUrl }: PageProps) {
         </div>
       </section>
 
-      <section className="page-width flex flex-col items-start gap-6 py-20 sm:py-28">
+      <Faq />
+
+      <section className="page-width flex flex-col items-start gap-6 border-t py-20 sm:py-28">
         <h2 className="max-w-3xl text-5xl leading-[0.98] sm:text-7xl">
           Commence par ce qui traîne dans ton frigo.
         </h2>

@@ -3,7 +3,7 @@ import { resolvePageComponent } from '@adonisjs/inertia/helpers'
 import { TuyauProvider } from '@adonisjs/inertia/react'
 import { createInertiaApp, type ResolvedComponent } from '@inertiajs/react'
 import { type ReactElement } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import { client } from '~/client'
 import Layout from '~/layouts/default'
 
@@ -19,11 +19,17 @@ createInertiaApp({
     )
   },
   setup({ el, App, props }) {
-    createRoot(el).render(
+    const app = (
       <TuyauProvider client={client}>
         <App {...props} />
       </TuyauProvider>
     )
+
+    if (el.hasChildNodes()) {
+      hydrateRoot(el, app)
+    } else {
+      createRoot(el).render(app)
+    }
   },
   progress: {
     color: '#2a4290',

@@ -1,7 +1,8 @@
 import { Link } from '@adonisjs/inertia/react'
-import { Head } from '@inertiajs/react'
-import { type ReactNode, useEffect } from 'react'
+import { type ReactNode } from 'react'
 import { Page, PageHeader } from '~/components/page'
+import { Seo, type SeoMeta } from '~/components/seo'
+import { type InertiaProps } from '~/types'
 
 const CONTACT_EMAIL = 'contact@kevin-dev.com'
 
@@ -44,22 +45,10 @@ function Contact() {
   )
 }
 
-export default function Legal() {
-  /**
-   * The page renders after the browser looked for the anchor: links such as
-   * /legal#conditions scroll once the sections exist.
-   */
-  useEffect(() => {
-    const id = decodeURIComponent(window.location.hash.slice(1))
-
-    if (id) {
-      document.getElementById(id)?.scrollIntoView()
-    }
-  }, [])
-
+export default function Legal({ seo }: InertiaProps<{ seo: SeoMeta }>) {
   return (
     <>
-      <Head title="Mentions légales" />
+      <Seo meta={seo} />
       <Page>
         <PageHeader title="Mentions légales" meta="Mise à jour le 9 novembre 2026" />
 

@@ -9,7 +9,11 @@ export default defineConfig({
     react({ compiler: true }),
     tailwindcss(),
     cn({ content: ['inertia/**/*.{ts,tsx}'], out: 'inertia/cn_tables.ts' }),
-    adonisjs({ entryPoints: ['inertia/app.tsx'], reload: ['resources/views/**/*.edge'] }),
+    adonisjs({
+      entryPoints: ['inertia/app.tsx'],
+      serverEntryPoints: ['inertia/ssr.tsx'],
+      reload: ['resources/views/**/*.edge'],
+    }),
   ],
 
   resolve: {

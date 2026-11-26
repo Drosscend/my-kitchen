@@ -200,6 +200,18 @@ const routes = {
     tokens: [[0,"legal"]],
     types: placeholder as Registry['legal.show']['types'],
   },
+  'robots': {
+    methods: ["GET","HEAD"],
+    pattern: '/robots.txt',
+    tokens: [[0,"robots.txt"]],
+    types: placeholder as Registry['robots']['types'],
+  },
+  'sitemap': {
+    methods: ["GET","HEAD"],
+    pattern: '/sitemap.xml',
+    tokens: [[0,"sitemap.xml"]],
+    types: placeholder as Registry['sitemap']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

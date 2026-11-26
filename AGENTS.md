@@ -23,6 +23,8 @@ Use Kysely with Postgres for persistence. Keep database invariants in migrations
 
 Pages live in `inertia/pages`, built with the shadcn components of `inertia/components/ui` (Base UI, Vega style, `cva`, `cn`) and the Carnet aimanté theme of `inertia/css/app.css` (Bricolage Grotesque, kraft paper, magnet colours `mustard`, `tomato`, `sage`, `cornflower` and `cinnamon`, utilities `magnet`, `highlight`, `paper-stack`, `ruled` and `page-width`, light only). Tailwind classes live in `className` only, never in a constant or a lookup table: a variant goes through a `data-*` attribute and `data-[…]:` classes, a colour through `data-swatch`, a grid shared by several elements through a CSS variable set on their parent, a recurring block through an `@utility`. Recipe steps and notes are edited with TipTap, a step mentioning ingredients as inline nodes. Phones get a bottom tab bar and `DialogSheet` docks dialogs to the bottom of the screen. Use `Link` and `Form` from `@adonisjs/inertia/react` with a typed `route`. React Compiler is on: no `useMemo`, `useCallback` or `memo`.
 
+The landing page and the legal notice are the only pages search engines index: `config/inertia.ts` renders them on the server, their controllers pass the `seo` props that the `Seo` component turns into head tags, and `sitemap.xml` lists them. The layout marks every other page noindex. A page rendered on the server must give the same markup in the browser: nothing read from `window`, the clock or the local time zone during render.
+
 ## Verification
 
 Run `npm run lint`, `npm run format`, `npm run typecheck`, and `npm test` before committing. Tests need the local Postgres and a `my_kitchen_test` database. Use Conventional Commits, in English.
